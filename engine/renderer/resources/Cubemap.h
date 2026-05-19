@@ -17,8 +17,6 @@ namespace engine
 
 		void bind(GLint uniformHandle) const;
 		void unbind() const;
-		void bindToUnit(GLint uniformHandle, GLint unit) const;
-		void unbindFromUnit(GLint unit) const;
 
 	private:
 		GLuint _tid = 0;

@@ -101,15 +101,6 @@ void MyGame::init(engine::AssetManager& assets,
 		"textures/skybox/nz.png"
 	});
 	scene.setSkybox(skyboxCubemap);
-	Handle<engine::Cubemap> irradianceCubemap = assets.loadCubemap("dayIrradiance", {
-		"textures/irradiance/ipx.png",
-		"textures/irradiance/inx.png",
-		"textures/irradiance/ipy.png",
-		"textures/irradiance/iny.png",
-		"textures/irradiance/ipz.png",
-		"textures/irradiance/inz.png"
-	});
-	scene.setIrradianceMap(irradianceCubemap);
 
 
 	Handle<engine::Texture> defaultGrayTex = assets.createSolidTexture("defaultGrayTex", { 128, 128, 128, 255 });

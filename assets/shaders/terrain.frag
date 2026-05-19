@@ -5,9 +5,6 @@
 in vec3 fragPos;
 in vec3 fragNor;
 in vec2 fragTexCoord;
-uniform samplerCube irradianceMap;
-uniform int useIrradianceMap;
-uniform float irradianceStrength;
 
 out vec4 color;
 
@@ -83,17 +80,7 @@ void main()
     vec3 sampledSpec = mat.specular;
     vec3 diffuseSum = vec3(0.0);
     vec3 specularSum = vec3(0.0);
-    vec3 ambient;
-    
-    if (useIrradianceMap == 1)
-    {
-	    vec3 skyAmbient = texture(irradianceMap, normal).rgb;
-	    ambient = skyAmbient * sampledDif * irradianceStrength;
-    }
-    else
-    {
-	    ambient = mat.ambient * sampledDif;
-    }
+    vec3 ambient = mat.ambient * sampledDif;
 
 
     for (int i = 0; i < numLights; i++)
