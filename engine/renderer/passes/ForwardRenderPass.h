@@ -28,6 +28,5 @@ namespace engine
 	private:
 		Handle<Shader> _shader;
 		Framebuffer _framebuffer;
-		GLuint _vao = 0, _vbo = 0;
 	};
 }
