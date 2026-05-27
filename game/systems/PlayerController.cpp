@@ -84,6 +84,7 @@ namespace
 }
 
 
+
 void PlayerController::start()
 {
 	_characterController = owner->getComponent<engine::CharacterController>();
@@ -132,21 +133,20 @@ void PlayerController::update(float deltaTime)
 	if (engine::Input::isKeyDown(GLFW_KEY_D)) input.x += 1.0f;
 
 	bool isGrounded = _characterController->isOnGround();
-bool isMoving = input.x != 0.0f || input.z != 0.0f;
+	bool isMoving = input.x != 0.0f || input.z != 0.0f;
 
-	if (animator)
+	if (animator && !hasJumped)
 	{
-		if (!isGrounded && idleClip.valid())
+		Handle<engine::AnimationClip> desired = {};
+		if (isMoving && sprintClip.valid()) desired = sprintClip;
+		else if (idleClip.valid()) desired = idleClip;
+
+		// Only switch if desired clip matches neither current clip nor active blend target.
+		const bool currentMatches = animator->clip.valid() && animator->clip.index == desired.index;
+		const bool targetMatches = animator->isBlending && animator->targetClip.valid() && animator->targetClip.index == desired.index;
+		if (desired.valid() && !currentMatches && !targetMatches)
 		{
-			animator->clip = idleClip;
-		}
-		else if (isMoving && sprintClip.valid())
-		{
-			animator->clip = sprintClip;
-		}
-		else if (idleClip.valid())
-		{
-			animator->clip = idleClip;
+			animator->play(desired, true, 0.0f, locomotionCrossfade);
 		}
 	}
 
@@ -165,9 +165,12 @@ bool isMoving = input.x != 0.0f || input.z != 0.0f;
 		const float effectiveMass = glm::max(_characterController->mass, 0.001f);
 		_characterController->jump(glm::vec3(0.0f, jumpForce / effectiveMass, 0.0f));
 
-		if (animator && idleClip.valid())
+		if (animator && jumpClip.valid())
 		{
-			animator->clip = idleClip;
+			// play jump animation when jumping; start from beginning and don't loop
+			// play jump with a short crossfade from current animation
+			animator->play(jumpClip, false, 0.0f, jumpCrossfade);
+			std::cout << "Jump initiated! Playing jump animation.\n";
 		}
 	}
 	

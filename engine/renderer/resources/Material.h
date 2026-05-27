@@ -31,7 +31,10 @@ namespace engine
 		Handle<Texture> terrainSand;
 		Handle<Texture> terrainRock;
 		Handle<Texture> terrainSnow;
+		Handle<Texture> terrainHeightTex;
 
 		float terrainTextureTiling = 32.0f;
+		float terrainPlaneLen = 500.0f;
+		float terrainHeightScale = 400.0f;
 	};
 }

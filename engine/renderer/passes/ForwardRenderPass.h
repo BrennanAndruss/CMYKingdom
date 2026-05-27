@@ -9,6 +9,7 @@ namespace engine
 {
 	class Scene;
 	class Object;
+	class Camera;
 	class AssetManager;
 	class RenderContext;
 	class Shader;
@@ -30,10 +31,14 @@ namespace engine
 	private:
 		Handle<Shader> _shader;
 		Framebuffer _framebuffer;
+		Framebuffer _waterSceneCopy;
 
 		void drawObject(Object* object, const Scene& scene,
-			const AssetManager& assets);
+			const AssetManager& assets, const Camera* camera,
+			const Framebuffer* sceneCopy = nullptr);
 		void drawObjectCulled(Object* object, const Scene& scene,
-			const AssetManager& assets, const Frustum& frustum);
+			const AssetManager& assets, const Frustum& frustum,
+			const Camera* camera, bool waterOnly = false,
+			const Framebuffer* sceneCopy = nullptr);
 	};
 }

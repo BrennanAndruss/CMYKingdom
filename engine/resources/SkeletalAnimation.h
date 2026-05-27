@@ -61,6 +61,9 @@ namespace engine
 		glm::mat4 globalInverseTransform = glm::mat4(1.0f);
 		int rootNodeIndex = -1;
 
+// Returns the number of bones (max `boneIndex` + 1) in the skeleton.
+// Used by the engine to size skinning matrices and allocate per-bone GPU buffers.
+
 		std::size_t boneCount() const
 		{
 			std::size_t count = 0;
@@ -73,6 +76,9 @@ namespace engine
 			}
 			return count;
 		}
+
+// Find the index of a node by name in `nodes` using `nodeLookup`.
+// Used to map animation tracks and scene operations to skeleton nodes.
 
 		int findNodeIndex(const std::string& name) const
 		{
@@ -93,6 +99,9 @@ namespace engine
 		std::vector<BoneTrack> tracks;
 		std::unordered_map<std::string, std::size_t> trackLookup;
 
+// Find the `BoneTrack` for a given node name in this clip.
+// Used by the engine during pose evaluation to get per-node keyframe data.
+
 		const BoneTrack* findTrack(const std::string& nodeName) const
 		{
 			auto it = trackLookup.find(nodeName);
@@ -104,6 +113,9 @@ namespace engine
 		}
 	};
 
+// Compose a local transform matrix from translation, rotation and scale.
+// Used throughout the animation system to construct per-node local matrices.
+
 	inline glm::mat4 composeTransform(const glm::vec3& position,
 		const glm::quat& rotation,
 		const glm::vec3& scale)
@@ -112,6 +124,9 @@ namespace engine
 			glm::mat4_cast(rotation) *
 			glm::scale(glm::mat4(1.0f), scale);
 	}
+
+// Find the index of the position keyframe that comes immediately before `time`.
+// This is a helper for position interpolation during animation evaluation.
 
 	inline std::size_t findPositionKey(const std::vector<KeyPosition>& keys, float time)
 	{
@@ -125,6 +140,9 @@ namespace engine
 		return keys.size() - 1;
 	}
 
+// Find the index of the rotation keyframe that comes immediately before `time`.
+// Used by rotation interpolation helpers.
+
 	inline std::size_t findRotationKey(const std::vector<KeyRotation>& keys, float time)
 	{
 		for (std::size_t i = 0; i + 1 < keys.size(); ++i)
@@ -137,6 +155,9 @@ namespace engine
 		return keys.size() - 1;
 	}
 
+// Find the index of the scale keyframe that comes immediately before `time`.
+// Used by scale interpolation helpers.
+
 	inline std::size_t findScaleKey(const std::vector<KeyScale>& keys, float time)
 	{
 		for (std::size_t i = 0; i + 1 < keys.size(); ++i)
@@ -148,6 +169,9 @@ namespace engine
 		}
 		return keys.size() - 1;
 	}
+
+// Interpolate position from keyframes at `time`. Returns local translation for a node.
+// Engine uses this when building local transforms for skinning and animation blending.
 
 	inline glm::vec3 interpolatePosition(const std::vector<KeyPosition>& keys, float time)
 	{
@@ -169,6 +193,9 @@ namespace engine
 		return glm::mix(current.value, next.value, glm::clamp(factor, 0.0f, 1.0f));
 	}
 
+// Interpolate rotation (spherical linear interpolation) from keyframes at `time`.
+// Produces a normalized quaternion used in composing local node rotations.
+
 	inline glm::quat interpolateRotation(const std::vector<KeyRotation>& keys, float time)
 	{
 		if (keys.empty())
@@ -189,10 +216,15 @@ namespace engine
 		return glm::normalize(glm::slerp(current.value, next.value, glm::clamp(factor, 0.0f, 1.0f)));
 	}
 
+// Convert or fix rotation handedness from importer if necessary.
+// Currently normalizes the quaternion; keeps door open for handedness adjustments.
+
 	inline glm::quat convertAnimationRotationHandedness(const glm::quat& q)
 	{
 		return glm::normalize(q);
 	}
+
+// Interpolate scale from keyframes at `time`. Returns local scale for a node.
 
 	inline glm::vec3 interpolateScale(const std::vector<KeyScale>& keys, float time)
 	{
@@ -214,6 +246,9 @@ namespace engine
 		return glm::mix(current.value, next.value, glm::clamp(factor, 0.0f, 1.0f));
 	}
 
+// Evaluate a `BoneTrack` at `time` and return the composed local transform matrix.
+// Used when a node has a track and we need its animated local transform.
+
 	inline glm::mat4 evaluateTrack(const BoneTrack& track, float time)
 	{
 		return composeTransform(
@@ -222,6 +257,9 @@ namespace engine
 			interpolateScale(track.scales, time)
 		);
 	}
+
+// Determine whether a node's animated rotation should be treated as absolute
+// (not relative to bind basis). Primarily used for root/hips nodes to preserve intent.
 
 	inline bool shouldUseAnimatedRotationAbsolute(const SkeletonNode& node)
 	{
@@ -232,6 +270,9 @@ namespace engine
 		}
 		return node.name.find("Hips") != std::string::npos;
 	}
+
+// Evaluate a track but preserve the node's bind translation when appropriate.
+// This helps keep mesh vertices aligned with bind pose translation while applying animation.
 
 	inline glm::mat4 evaluateTrackWithBindTranslation(const SkeletonNode& node, const BoneTrack& track, float time)
 	{
@@ -250,6 +291,129 @@ namespace engine
 			scale
 		);
 	}
+
+// Sample local transforms for every node in the skeleton from `clip` at `time`.
+// If a node has no track, its bindLocalTransform is used. The resulting vector
+// is indexed by node index (same order as `skeleton.nodes`). This is useful for
+// performing per-node blending before computing skinning matrices.
+inline void sampleLocalTransforms(const Skeleton& skeleton, const AnimationClip* clip, float time, std::vector<glm::mat4>& outLocalTransforms)
+{
+	outLocalTransforms.resize(skeleton.nodes.size());
+	for (std::size_t i = 0; i < skeleton.nodes.size(); ++i)
+	{
+		outLocalTransforms[i] = skeleton.nodes[i].bindLocalTransform;
+	}
+
+	if (!clip)
+		return;
+
+	for (const auto& track : clip->tracks)
+	{
+		int nodeIdx = skeleton.findNodeIndex(track.nodeName);
+		if (nodeIdx >= 0 && static_cast<std::size_t>(nodeIdx) < outLocalTransforms.size())
+		{
+			outLocalTransforms[static_cast<std::size_t>(nodeIdx)] = evaluateTrackWithBindTranslation(skeleton.nodes[static_cast<std::size_t>(nodeIdx)], track, time);
+		}
+	}
+}
+
+// Blend two local transform matrices by decomposing to TRS, interpolating each
+// component (translation & scale linearly, rotation with slerp), and recomposing.
+inline glm::mat4 blendLocalTransforms(const glm::mat4& A, const glm::mat4& B, float t)
+{
+	glm::vec3 TA = glm::vec3(A[3]);  
+	glm::vec3 TB = glm::vec3(B[3]); 
+
+	glm::mat3 MA = glm::mat3(A);
+	glm::mat3 MB = glm::mat3(B);
+
+	glm::vec3 SA(glm::length(MA[0]), glm::length(MA[1]), glm::length(MA[2]));
+	glm::vec3 SB(glm::length(MB[0]), glm::length(MB[1]), glm::length(MB[2]));
+
+	glm::mat3 RA = MA;
+	if (SA.x > 0.0f) RA[0] /= SA.x; if (SA.y > 0.0f) RA[1] /= SA.y; if (SA.z > 0.0f) RA[2] /= SA.z;
+	glm::mat3 RB = MB;
+	if (SB.x > 0.0f) RB[0] /= SB.x; if (SB.y > 0.0f) RB[1] /= SB.y; if (SB.z > 0.0f) RB[2] /= SB.z;
+
+	glm::quat QA = glm::normalize(glm::quat_cast(RA));
+	glm::quat QB = glm::normalize(glm::quat_cast(RB));
+
+	glm::vec3 T = glm::mix(TA, TB, glm::clamp(t, 0.0f, 1.0f));
+	glm::quat R = glm::normalize(glm::slerp(QA, QB, glm::clamp(t, 0.0f, 1.0f)));
+	glm::vec3 S = glm::mix(SA, SB, glm::clamp(t, 0.0f, 1.0f));
+
+	return composeTransform(T, R, S);
+}
+
+// Compute skinning matrices (final bone matrices used for GPU skinning) from a
+// per-node local transform array. Mirrors evaluateSkeletonPoseRecursive but uses
+// the provided local transforms vector instead of sampling tracks.
+inline void computeSkinMatricesFromLocalTransforms(
+	const Skeleton& skeleton,
+	const std::vector<glm::mat4>& localTransforms,
+	std::vector<glm::mat4>& outBoneMatrices)
+{
+	if (skeleton.rootNodeIndex < 0)
+		return;
+
+	if (outBoneMatrices.size() < skeleton.boneCount())
+		outBoneMatrices.resize(skeleton.boneCount(), glm::mat4(1.0f));
+
+	// iterative stack to avoid recursion
+	struct StackItem { int nodeIndex; glm::mat4 parentGlobal; };
+	std::vector<StackItem> stack;
+	stack.push_back({ skeleton.rootNodeIndex, glm::mat4(1.0f) });
+
+	while (!stack.empty())
+	{
+		StackItem it = stack.back(); stack.pop_back();
+		int nodeIndex = it.nodeIndex;
+		if (nodeIndex < 0 || nodeIndex >= static_cast<int>(skeleton.nodes.size()))
+			continue;
+		const SkeletonNode& node = skeleton.nodes[static_cast<std::size_t>(nodeIndex)];
+		glm::mat4 local = localTransforms[static_cast<std::size_t>(nodeIndex)];
+		glm::mat4 global = it.parentGlobal * local;
+
+		if (node.isBone && node.boneIndex >= 0 && static_cast<std::size_t>(node.boneIndex) < outBoneMatrices.size())
+		{
+			outBoneMatrices[static_cast<std::size_t>(node.boneIndex)] = skeleton.globalInverseTransform * global * node.inverseBindMatrix;
+		}
+
+		for (int child : node.children)
+		{
+			stack.push_back({ child, global });
+		}
+	}
+}
+
+// Blend two clips at given times with weight `t` (0..1) and produce skinning
+// matrices into `outBoneMatrices`. This helper is a simple tweening function the
+// engine can call to crossfade between animations on the CPU.
+inline void blendClipsToSkinMatrices(
+	const Skeleton& skeleton,
+	const AnimationClip* a, float timeA,
+	const AnimationClip* b, float timeB,
+	float t,
+	std::vector<glm::mat4>& outBoneMatrices)
+{
+	std::vector<glm::mat4> localA, localB, blendedLocal;
+	sampleLocalTransforms(skeleton, a, timeA, localA);
+	sampleLocalTransforms(skeleton, b, timeB, localB);
+
+	blendedLocal.resize(skeleton.nodes.size());
+	for (std::size_t i = 0; i < skeleton.nodes.size(); ++i)
+	{
+		const glm::mat4& A = (i < localA.size()) ? localA[i] : skeleton.nodes[i].bindLocalTransform;
+		const glm::mat4& B = (i < localB.size()) ? localB[i] : skeleton.nodes[i].bindLocalTransform;
+		blendedLocal[i] = blendLocalTransforms(A, B, t);
+	}
+
+	computeSkinMatricesFromLocalTransforms(skeleton, blendedLocal, outBoneMatrices);
+}
+
+// Recursively evaluate the skeleton pose at `time`, filling `outBoneMatrices` with
+// skinning matrices (global-inverse * globalTransform * inverseBind). Called per-frame
+// by the animation system to produce GPU-ready bone matrices for skinning.
 
 	inline void evaluateSkeletonPoseRecursive(
 		const Skeleton& skeleton,
@@ -311,6 +475,9 @@ namespace engine
 			evaluateSkeletonPoseRecursive(skeleton, clip, childIndex, globalTransform, time, outBoneMatrices, debugFirstFrame, debugDepth + 1);
 		}
 	}
+
+// Evaluate the full skeleton pose for `clip` at `time` and populate `outBoneMatrices`.
+// Handles root setup and ensures `outBoneMatrices` has correct size for skinning.
 
 	inline void evaluateSkeletonPose(
 		const Skeleton& skeleton,
@@ -377,6 +544,11 @@ namespace engine
 		}
 	}
 
+
+
+// Compute per-bone global transforms (animated) at `time` and store them in
+// `outGlobalTransforms`. This is useful for debugging systems or non-skinning queries.
+
 	inline void evaluateSkeletonGlobals(
 		const Skeleton& skeleton,
 		const AnimationClip* clip,
@@ -398,4 +570,5 @@ namespace engine
 			outGlobalTransforms
 		);
 	}
+
 }

@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include "core/Input.h"
+#include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Mesh.h"
@@ -26,6 +27,10 @@ namespace engine
 		_framebuffer(width, height, {
 			{ AttachmentFormat::RGBA8 },
 			{ AttachmentFormat::Depth24Stencil8 }
+		}),
+		_waterSceneCopy(width, height, {
+			{ AttachmentFormat::RGBA8 },
+			{ AttachmentFormat::Depth24 }
 		}) {}
 
 	ForwardRenderPass::~ForwardRenderPass() = default;
@@ -33,6 +38,7 @@ namespace engine
 	void ForwardRenderPass::resize(int width, int height)
 	{
 		_framebuffer.resize(width, height);
+		_waterSceneCopy.resize(width, height);
 	}
 
 	void ForwardRenderPass::execute(const Scene& scene, const AssetManager& assets, 
@@ -51,7 +57,24 @@ namespace engine
 		// Cull and draw
 		for (const auto& object : scene.getRootObjects())
 		{
-			drawObjectCulled(object, scene, assets, frustum);
+			drawObjectCulled(object, scene, assets, frustum, camera, false, nullptr);
+		}
+
+		// Copy opaque scene into a texture pair we can safely sample from when drawing water.
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, _framebuffer.getFboId());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _waterSceneCopy.getFboId());
+		glBlitFramebuffer(
+			0, 0, ctx.width, ctx.height,
+			0, 0, ctx.width, ctx.height,
+			GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT,
+			GL_NEAREST
+		);
+		glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer.getFboId());
+
+		// Draw water after the scene has been captured.
+		for (const auto& object : scene.getRootObjects())
+		{
+			drawObjectCulled(object, scene, assets, frustum, camera, true, &_waterSceneCopy);
 		}
 
 		// Cleanup state for next pass
@@ -67,8 +90,22 @@ namespace engine
 	}
 
 	void ForwardRenderPass::drawObjectCulled(Object* object, const Scene& scene,
-		const AssetManager& assets, const Frustum& frustum)
+		const AssetManager& assets, const Frustum& frustum,
+		const Camera* camera, bool waterOnly, const Framebuffer* sceneCopy)
 	{
+		const bool isWaterObject = (object->name == "TempWaterPlane");
+		if (waterOnly != isWaterObject)
+		{
+			for (auto* childTransform : object->transform.getChildren())
+			{
+				if (Object* child = childTransform->owner)
+				{
+					drawObjectCulled(child, scene, assets, frustum, camera, waterOnly, sceneCopy);
+				}
+			}
+			return;
+		}
+
 		// Test object's hierarchy bbox
 		if (!object->transform.getChildren().empty())
 		{
@@ -87,7 +124,7 @@ namespace engine
 			const BBox& worldBBox = object->getWorldBBox(assets);
 			if (worldBBox.intersectsFrustum(frustum))
 			{
-				drawObject(object, scene, assets);
+				drawObject(object, scene, assets, camera, sceneCopy);
 			}
 			else
 			{
@@ -101,13 +138,13 @@ namespace engine
 		{
 			if (Object* child = childTransform->owner)
 			{
-				drawObjectCulled(child, scene, assets, frustum);
+				drawObjectCulled(child, scene, assets, frustum, camera, waterOnly, sceneCopy);
 			}
 		}
 	}
 
 	void ForwardRenderPass::drawObject(Object* object, const Scene& scene,
-		const AssetManager& assets)
+		const AssetManager& assets, const Camera* camera, const Framebuffer* sceneCopy)
 	{
 		auto* meshRenderer = object->getComponent<MeshRenderer>();
 		if (!meshRenderer) return;
@@ -120,6 +157,8 @@ namespace engine
 		if (!shader) return;
 
 		shader->bind();
+
+		const bool isWaterObject = (object->name == "TempWaterPlane");
 
 		//Cubemap* irradianceMap = nullptr;
 		//if (scene.hasIrradianceMap())
@@ -143,6 +182,44 @@ namespace engine
 		shader->setVec3("mat.specular", mat->specular);
 		shader->setFloat("mat.shininess", mat->shininess);
 		shader->setInt("numLights", scene.getLights().size());
+		shader->setFloat("uTime", Time::time());
+
+		if (isWaterObject)
+		{
+			const CameraData& camData = camera->getCameraData();
+			shader->setMat4("u_model", object->transform.getWorldMatrix());
+			shader->setMat4("u_view", camData.view);
+			shader->setMat4("u_projection", camData.projection);
+			shader->setFloat("u_time", Time::time());
+			shader->setFloat("u_waveSpeed", 1.9f);
+			shader->setFloat("u_waveLength", 3.0f);
+			shader->setFloat("u_waveHeight", 0.35f);
+			shader->setFloat("u_refractionStrength", 0.01f);
+			shader->setFloat("u_depthScale", 0.50f);
+			shader->setVec3("u_shallowColor", glm::vec3(0.4f, 0.914f, 0.98f));
+			shader->setVec3("u_deepColor", glm::vec3(0.0627f, 0.2196f, 0.91f));
+			shader->setFloat("u_terrainPlaneLen", mat->terrainPlaneLen);
+			shader->setFloat("u_terrainHeightScale", mat->terrainHeightScale);
+
+			if (sceneCopy)
+			{
+				const GLuint sceneColor = sceneCopy->getAttachment(AttachmentFormat::RGBA8);
+
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, sceneColor);
+				glUniform1i(shader->getUniform("u_sceneColorTex"), 0);
+
+				if (auto* noiseTex = assets.getTexture("waterNoiseTex"))
+				{
+					noiseTex->bindToUnit(shader->getUniform("u_noiseTex"), 1);
+				}
+
+				if (auto* terrainHeightTex = assets.getTexture(mat->terrainHeightTex))
+				{
+					terrainHeightTex->bindToUnit(shader->getUniform("u_terrainHeightTex"), 2);
+				}
+			}
+		}
 
 		if (meshRenderer->writeStencil)
 		{
@@ -212,6 +289,16 @@ namespace engine
 		}
 
 		mesh->draw();
+
+		if (isWaterObject)
+		{
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 
 		if (mat->isTerrain)
 		{

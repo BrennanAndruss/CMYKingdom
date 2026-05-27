@@ -27,6 +27,8 @@ namespace engine
 		void setAspect(float aspect);
 
 		const CameraData& getCameraData() const { return _cameraData; }
+		float getNearPlane() const { return _near; }
+		float getFarPlane() const { return _far; }
 
 		void updateViewMatrix();
 
