@@ -33,6 +33,28 @@ namespace engine
         }
     }
 
+    static float getFPS()
+    {
+        static float frameCount = 0.0f;
+        static float timeAccumulator = 0.0f;
+        static int updatesPerSecond = 8;
+        static float updateTime = 1.0f / (float)updatesPerSecond;
+        static float fpsDisplay = 0.0f;
+
+        frameCount += 1.0f;
+        timeAccumulator += Time::deltaTime();
+
+        // Update the display metrics only twice a second
+        if (timeAccumulator >= updateTime)
+        {
+            fpsDisplay = frameCount / timeAccumulator;
+            frameCount = 0.0f;
+            timeAccumulator = 0.0f;
+        }
+
+        return fpsDisplay;
+    }
+
     void Editor::initialize(GLFWwindow* windowHandle)
     {
         if (_initialized)
@@ -242,9 +264,11 @@ namespace engine
         ImGui::End();
 
         // Debugging
+        float fpsDisplay = getFPS();
+
         ImGui::Begin("Debug");
-        ImGui::Text("FPS: %.1f", Time::deltaTime() > 0.0f ? 1.0f / Time::deltaTime() : 0.0f);
-        ImGui::Text("Delta: %.3f ms", Time::deltaTime() * 1000.0f);
+        ImGui::Text("FPS: %.1f", fpsDisplay);
+        ImGui::Text("Frame Time: %.2f ms", (fpsDisplay > 0.0f) ? (1000.0f / fpsDisplay) : 0.0f);
         ImGui::End();
     }
 

@@ -49,7 +49,7 @@ namespace engine
 		std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
 		// Set vsync
-		glfwSwapInterval(1);
+		glfwSwapInterval(0);
 
 		// Store this window instance so static callbacks can retrieve it
 		glfwSetWindowUserPointer(_handle, this);
