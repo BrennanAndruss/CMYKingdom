@@ -1,7 +1,6 @@
 #include "renderer/resources/Mesh.h"
 
 #include <algorithm>
-#include <cfloat>
 #include <stdexcept>
 
 namespace engine
@@ -12,7 +11,7 @@ namespace engine
 			   const std::vector<unsigned int>& indices)
 	{
 		setupMesh(positions, normals, texcoords, indices);
-		computeBBox(positions);
+		_bbox = BBox::fromPositions(positions);
 	}
 
 	Mesh::Mesh(const std::vector<glm::vec3>& positions,
@@ -23,7 +22,7 @@ namespace engine
 			   const std::vector<glm::vec4>& boneWeights)
 	{
 		setupMesh(positions, normals, texcoords, indices, boneIds, boneWeights);
-		computeBBox(positions);
+		_bbox = BBox::fromPositions(positions);
 	}
 
 	void Mesh::setupMesh(const std::vector<glm::vec3>& positions,
@@ -116,23 +115,6 @@ namespace engine
 		glVertexAttribPointer(static_cast<GLuint>(Attrib::BoneWeights), 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0); // this 
 
 		glBindVertexArray(0);
-	}
-
-	void Mesh::computeBBox(const std::vector<glm::vec3>& positions)
-	{
-		_bbox.min = glm::vec3(FLT_MAX);
-		_bbox.max = glm::vec3(-FLT_MAX);
-
-		for (const glm::vec3& p : positions)
-		{
-			_bbox.min.x = std::min(_bbox.min.x, p.x);
-			_bbox.min.y = std::min(_bbox.min.y, p.y);
-			_bbox.min.z = std::min(_bbox.min.z, p.z);
-
-			_bbox.max.x = std::max(_bbox.max.x, p.x);
-			_bbox.max.y = std::max(_bbox.max.y, p.y);
-			_bbox.max.z = std::max(_bbox.max.z, p.z);
-		}
 	}
 
 	void Mesh::draw() const

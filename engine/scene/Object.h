@@ -5,6 +5,7 @@
 #include <memory>
 #include <type_traits>
 #include <cassert>
+#include "renderer/BoundingVolume.h"
 #include "scene/Transform.h"
 #include "scene/components/Component.h"
 
@@ -23,7 +24,7 @@ namespace engine
 		Transform transform;
 		bool markedForDeletion = false;
 
-		Object() = default;
+		Object();
 		Object(const std::string& name);
 		~Object() = default;
 
@@ -64,9 +65,24 @@ namespace engine
 			return _scene;
 		}
 
+		// Bounding volume hierarchy
+		const BBox& getWorldBBox(const AssetManager& assets) const;
+		BBox getHierarchyBBox(const AssetManager& assets) const;
+
+		bool isWorldBBoxDirty() const { return _worldBBoxDirty; }
+		void markWorldBBoxDirty();
+		bool isHierarchyBBoxDirty() const { return _hierarchyBBoxDirty; }
+		void markHierarchyBBoxDirty();
+
 	private:
 		Scene* _scene = nullptr;
 		bool _started = false;
+
+		// Mutable bounding volume cache
+		mutable BBox _worldBBox;
+		mutable bool _worldBBoxDirty = true;
+		mutable BBox _hierarchyBBox;
+		mutable bool _hierarchyBBoxDirty = true;
 
 		std::vector<std::unique_ptr<Component>> _components;
 	};
