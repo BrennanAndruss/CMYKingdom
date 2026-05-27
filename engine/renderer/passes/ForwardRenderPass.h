@@ -4,7 +4,6 @@
 #include "renderer/Framebuffer.h"
 #include "resources/Handle.h"
 
-// Forward declarations
 namespace engine
 {
 	class Scene;
@@ -12,7 +11,6 @@ namespace engine
 	class Camera;
 	class AssetManager;
 	class RenderContext;
-	class Shader;
 	struct Frustum;
 }
 
@@ -21,7 +19,7 @@ namespace engine
 	class ForwardRenderPass : public RenderPass
 	{
 	public:
-		ForwardRenderPass(int width, int height, Handle<Shader> shader);
+		ForwardRenderPass(int width, int height);
 		~ForwardRenderPass();
 
 		void resize(int width, int height) override;
@@ -29,7 +27,6 @@ namespace engine
 			RenderContext& ctx) override;
 
 	private:
-		Handle<Shader> _shader;
 		Framebuffer _framebuffer;
 		Framebuffer _waterSceneCopy;
 

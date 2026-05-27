@@ -2,7 +2,8 @@
 
 #include "renderer/FullscreenQuad.h"
 
-ColorRestorationPass::ColorRestorationPass(int width, int height, Handle<engine::Shader> shader) : 
+ColorRestorationPass::ColorRestorationPass(int width, int height, 
+	Handle<engine::Shader> shader) : 
 	_shader(shader),
 	_framebuffer(width, height, {
 		{ engine::AttachmentFormat::RGBA8 },
@@ -59,7 +60,7 @@ void ColorRestorationPass::execute(const engine::Scene& scene,
 	// Register outputs with render context
 	ctx.sceneFramebuffer = &_framebuffer;
 	ctx.setBuffer(engine::BufferNames::SceneColor, 
-		_framebuffer.getAttachment(engine::AttachmentFormat::RGBA8));
+		_framebuffer.getColorAttachment(0));
 	ctx.setBuffer(engine::BufferNames::SceneDepth,
-		_framebuffer.getAttachment(engine::AttachmentFormat::Depth24Stencil8));
+		_framebuffer.getDepthAttachment());
 }

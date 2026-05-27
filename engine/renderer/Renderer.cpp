@@ -29,7 +29,7 @@ namespace engine
 		assets.setDefaultShader(forwardShader);
 
 		// Construct render passes
-		addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height, forwardShader));
+		addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
 		addRenderPass(std::make_unique<DebugRenderPass>());
 		addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		_blitPass = std::make_unique<BlitPass>();

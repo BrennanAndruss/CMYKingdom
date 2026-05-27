@@ -99,17 +99,35 @@ namespace engine
 		create();
 	}
 
-	GLuint Framebuffer::getAttachment(AttachmentFormat format) const
+	GLuint Framebuffer::getColorAttachment(int index) const
+	{
+		int colorIdx = 0;
+		for (const auto& attachment : _attachments)
+		{
+			if (!isDepthFormat(attachment.format))
+			{
+				if (colorIdx == index)
+					return attachment.textureId;
+				colorIdx++;
+			}
+		}
+
+		assert(false && "Color attachment index out of range");
+		return 0;
+	}
+
+	GLuint Framebuffer::getDepthAttachment() const
 	{
 		for (const auto& attachment : _attachments)
 		{
-			if (attachment.format == format)
+			if (isDepthFormat(attachment.format))
 			{
 				return attachment.textureId;
 			}
 		}
 
-		assert(false && "Framebuffer attachment not found");
+		assert(false && "Depth attachment not found");
+		return 0;
 	}
 
 	void Framebuffer::create()
