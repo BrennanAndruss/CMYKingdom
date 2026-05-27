@@ -13,10 +13,10 @@ namespace engine
 
 		static void update()
 		{
-			static double lastTime = 0.0f;
+			static double lastTime = 0.0;
 			double currentTime = glfwGetTime();
+			_deltaTime = static_cast<float>(currentTime - lastTime);
 			_time = static_cast<float>(currentTime);
-			_deltaTime = _time - lastTime;
 			lastTime = currentTime;
 		}
 		

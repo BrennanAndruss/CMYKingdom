@@ -6,6 +6,11 @@
 
 namespace engine
 {
+	class Object;
+}
+
+namespace engine
+{
 	class Transform
 	{
 	public:
@@ -52,6 +57,8 @@ namespace engine
 
 		bool isDirty() const { return _dirty; }
 		void markDirty();
+
+		Object* owner = nullptr;
 
 	private:
 		Transform* _parent = nullptr;

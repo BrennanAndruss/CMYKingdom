@@ -6,6 +6,7 @@
 #include "renderer/RenderContext.h"
 #include "renderer/passes/ForwardRenderPass.h"
 #include "renderer/passes/SkyboxRenderPass.h"
+#include "renderer/passes/DebugRenderPass.h"
 #include "resources/AssetManager.h"
 
 namespace engine
@@ -29,6 +30,7 @@ namespace engine
 
 		// Construct render passes
 		addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height, forwardShader));
+		addRenderPass(std::make_unique<DebugRenderPass>());
 		addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		_blitPass = std::make_unique<BlitPass>();
 	}
