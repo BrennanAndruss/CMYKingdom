@@ -2,11 +2,9 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 #include <vector>
 #include <cstddef>
+#include "renderer/BoundingVolume.h"
 
 namespace engine
 {
@@ -20,12 +18,6 @@ namespace engine
 		TexCoord,	// 2
 		BoneIds,	// ivec4
 		BoneWeights	// vec4, all weights should sum to EXACTLY 1.0f 
-	};
-
-	struct BBox
-	{
-		glm::vec3 min;
-		glm::vec3 max;
 	};
 
 	class Mesh
@@ -64,7 +56,6 @@ namespace engine
 
 		void computeBBox(const std::vector<glm::vec3>& positions);
 
-	private:
 		std::vector<float> _vertBuf;
 		std::vector<glm::uvec4> _boneIdBuf;
 		std::vector<glm::vec4> _boneWeightBuf;

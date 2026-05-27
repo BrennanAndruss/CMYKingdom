@@ -8,9 +8,11 @@
 namespace engine
 {
 	class Scene;
+	class Object;
 	class AssetManager;
 	class RenderContext;
 	class Shader;
+	struct Frustum;
 }
 
 namespace engine
@@ -28,5 +30,10 @@ namespace engine
 	private:
 		Handle<Shader> _shader;
 		Framebuffer _framebuffer;
+
+		void drawObject(Object* object, const Scene& scene,
+			const AssetManager& assets);
+		void drawObjectCulled(Object* object, const Scene& scene,
+			const AssetManager& assets, const Frustum& frustum);
 	};
 }

@@ -2,6 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include "scene/Object.h"
 
 namespace engine
 {
@@ -208,6 +209,11 @@ namespace engine
 		for (auto& child : _children)
 		{
 			child->markDirty();
+		}
+
+		if (owner)
+		{
+			owner->markWorldBBoxDirty();
 		}
 	}
 }
