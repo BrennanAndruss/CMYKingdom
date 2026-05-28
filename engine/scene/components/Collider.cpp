@@ -1,6 +1,7 @@
 #include "scene/components/Collider.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <glm/gtc/quaternion.hpp>
 #include "physics/PhysicsSystem.h"
 #include "scene/Scene.h"
 #include "scene/Object.h"
@@ -11,6 +12,18 @@ namespace engine
 {
 	namespace
 	{
+		glm::vec3 getWorldColliderCenter(const Object* owner, const glm::vec3& localCenter)
+		{
+			if (!owner)
+			{
+				return glm::vec3(0.0f);
+			}
+
+			const glm::vec3 worldScale = glm::abs(owner->transform.getWorldScale());
+			return owner->transform.getWorldPosition()
+				+ (glm::mat3_cast(owner->transform.getWorldRotation()) * (localCenter * worldScale));
+		}
+
 		bool usesAnimatedVelocity(const Object* owner)
 		{
 			return owner && owner->getComponent<AnimatedVelocity>();
@@ -91,9 +104,9 @@ namespace engine
 		PhysicsSystem* physics = owner->getScene()->getPhysicsSystem();
 		_shape = std::make_unique<btBoxShape>(PhysicsSystem::toBullet(size));
 
-		glm::vec3 worldScale = owner->transform.getWorldScale();
+		const glm::vec3 worldScale = owner->transform.getWorldScale();
 		_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
-		const glm::vec3 worldCenter = center * worldScale;
+		const glm::vec3 worldCenter = getWorldColliderCenter(owner, center);
 
 		// If object doesn't have a RigidBody, register as static collision object
 		if (!owner->getComponent<RigidBody>())
@@ -117,7 +130,7 @@ namespace engine
 				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
-				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));
+				t.setOrigin(PhysicsSystem::toBullet(getWorldColliderCenter(owner, center)));
 				t.setRotation(PhysicsSystem::toBullet(owner->transform.getWorldRotation()));
 				_object->setWorldTransform(t);
 			}
@@ -131,9 +144,9 @@ namespace engine
 		// Recreate the shape with the new size
 		_shape = std::make_unique<btBoxShape>(PhysicsSystem::toBullet(size));
 		
-		glm::vec3 worldScale = owner->transform.getWorldScale();
+		const glm::vec3 worldScale = owner->transform.getWorldScale();
 		_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
-		const glm::vec3 worldCenter = center * worldScale;
+		const glm::vec3 worldCenter = getWorldColliderCenter(owner, center);
 		
 		// Remove the old collision object from physics system
 		if (_object)
@@ -199,7 +212,7 @@ namespace engine
 				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
-				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));
+				t.setOrigin(PhysicsSystem::toBullet(getWorldColliderCenter(owner, center)));
 				t.setRotation(PhysicsSystem::toBullet(owner->transform.getWorldRotation()));
 				_object->setWorldTransform(t);
 			}
@@ -242,9 +255,9 @@ namespace engine
 			break;
 		}
 
-		glm::vec3 worldScale = owner->transform.getWorldScale();
+		const glm::vec3 worldScale = owner->transform.getWorldScale();
 		_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
-		const glm::vec3 worldCenter = center * worldScale;
+		const glm::vec3 worldCenter = getWorldColliderCenter(owner, center);
 
 		// If object doesn't have a RigidBody, register as static collision object
 		if (!owner->getComponent<RigidBody>())
@@ -268,7 +281,7 @@ namespace engine
 				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
-				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));
+				t.setOrigin(PhysicsSystem::toBullet(getWorldColliderCenter(owner, center)));
 				t.setRotation(PhysicsSystem::toBullet(owner->transform.getWorldRotation()));
 				_object->setWorldTransform(t);
 			}
