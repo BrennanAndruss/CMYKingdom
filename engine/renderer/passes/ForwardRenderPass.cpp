@@ -200,7 +200,7 @@ namespace engine
 			shader->setFloat("u_time", Time::time());
 			shader->setFloat("u_waveSpeed", 1.9f);
 			shader->setFloat("u_waveLength", 3.0f);
-			shader->setFloat("u_waveHeight", 0.35f);
+			shader->setFloat("u_waveHeight", 0.25f);
 			shader->setFloat("u_refractionStrength", 0.01f);
 			shader->setFloat("u_depthScale", 0.50f);
 			shader->setVec3("u_shallowColor", glm::vec3(0.3f, 0.66f, 0.9f));
