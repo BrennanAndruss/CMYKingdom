@@ -32,7 +32,7 @@ Object: Platform0_Copy0
 Object: Platform0_Copy0_Copy0
   Position: -160.466, 9.866, -3.667
   Rotation: 0, -9, 0
-  Scale: 5, 2, 5
+  Scale: 5, 3, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -40,9 +40,9 @@ Object: Platform0_Copy0_Copy0
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
 
 Object: Platform0_Copy0_Copy0_Copy0
-  Position: -153.266, 11.466, 0.033
+  Position: -153.266, 10.366, 0.033
   Rotation: 0, 4, 0
-  Scale: 5, 2, 5
+  Scale: 5, 5, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -50,9 +50,9 @@ Object: Platform0_Copy0_Copy0_Copy0
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
 
 Object: Platform1
-  Position: -144.574, 12.739, -2.49256
+  Position: -144.574, 10.239, -2.49256
   Rotation: 0, 3, 0
-  Scale: 5, 2, 5
+  Scale: 5, 6, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -60,7 +60,7 @@ Object: Platform1
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
 
 Object: Platform1_Copy0
-  Position: -135.874, 14.139, -2.49256
+  Position: -135.874, 13.439, -2.49256
   Rotation: 0, 17, 0
   Scale: 5, 2, 5
   Mesh: square-platform
@@ -70,24 +70,15 @@ Object: Platform1_Copy0
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
 
 Object: Platform1_Copy0_Copy0
-  Position: -124.974, 14.139, -0.293
-  Rotation: 0, -22, 0
+  Position: -128.76, 14, -0.277
+  Rotation: -1.17509e-05, 81.656, -1.19259e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
   SpecularTexture: TexWhite
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
-
-Object: Platform1_Copy0_Copy0_Copy0
-  Position: -115.174, 15.439, -0.293
-  Rotation: -4.34877e-07, 11, 15
-  Scale: 7.8, 2, 5
-  Mesh: square-platform
-  Material: platformCMYKMaterial
-  DiffuseTexture: platformCMYKTex
-  SpecularTexture: TexWhite
-  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.1 phase=0 timeScale=1 linearBase=0,0,0 linearAmplitude=5,0,0 angularBase=0,10,0 angularAmplitude=0,0,0
 
 Object: Platform1_Copy0_Copy0_Copy0_Copy0
   Position: -104.774, 14.939, -0.293
@@ -298,7 +289,7 @@ Object: Star1_Copy0
 
 Object: Platform14
   Position: 9.866, 11.34, 10.36
-  Rotation: 0.000330425, 77.938, 3.002
+  Rotation: 0.00032685, 77.938, 3.002
   Scale: 5, 2, 10
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -419,7 +410,7 @@ Object: Star5_Copy0_Copy0
 
 Object: Star6
   Position: 183.547, 67.77, 18.299
-  Rotation: 1.08719e-07, -11, 9.99999
+  Rotation: 3.26158e-07, -11, 9.99999
   Scale: 3, 3, 3
   Mesh: gem
   Material: magentaMat
@@ -441,7 +432,7 @@ Object: Platform16
 
 Object: Platform16_Copy0
   Position: 13.004, 24.735, 36.634
-  Rotation: 1.60694e-07, 5, -11
+  Rotation: 4.82082e-07, 5, -11
   Scale: 5, 2, 8
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -452,7 +443,7 @@ Object: Platform16_Copy0
 
 Object: Platform16_Copy0_Copy0
   Position: 5.804, 27.535, 39.934
-  Rotation: -9.66959e-07, 28, -13
+  Rotation: -2.65914e-06, 28, -13
   Scale: 8, 2, 8
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -502,8 +493,62 @@ Object: Platform16_Copy0_Copy0_Copy0_Copy0
   SpecularTexture: TexWhite
   BoxCollider: size=0.5,0.5,0.5 isTrigger=0
 
+Object: Tree0
+  Position: 9.184, 22.009, -18.991
+  Rotation: -90, 0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: tree1
+  Material: tree1Mat
+  DiffuseTexture: tree1_diffuse
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=5.33753,4.78748,9.49322 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Pine Tree0
+  Position: 61.5234, 25.1328, -7.3763
+  Rotation: 0, -0, 0
+  Scale: 5, 5, 5
+  Mesh: tree3_0
+  Material: tree3Mat0
+  DiffuseTexture: tree3_diffuse
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=0.368336,0.990229,0.344723 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Pine Tree0_Copy0
+  Position: 65.523, 23.733, -10.176
+  Rotation: 0, 55, 0
+  Scale: 5, 3.5, 5
+  Mesh: tree3_0
+  Material: tree3Mat0
+  DiffuseTexture: tree3_diffuse
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=0.368336,0.990229,0.344723 isTrigger=0
+
+Object: Winding Tree0
+  Position: 59.5294, 24.127, 25.8477
+  Rotation: 0, -0, 0
+  Scale: 1, 1, 1
+  Mesh: tree2
+  Material: tree2Mat
+  DiffuseTexture: tree2_diffuse
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=2.03748,3.73172,2.52369 isTrigger=0
+  RigidBody: type=0 mass=1
+
 Object: JumpBoost0
-  Position: -202.165, 12.4031, -17.012
+  Position: 130, 29.3186, 74.3841
+  Rotation: 5.0091e-06, 89.9802, 5.0091e-06
+  Scale: 0.11, 0.31, 0.5
+  Mesh: JumpBoost
+  Material: blueMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=4
+
+Object: JumpBoost1
+  Position: -201.608, 12.605, -17.526
   Rotation: 0, -0, 0
   Scale: 0.11, 0.31, 0.5
   Mesh: JumpBoost
@@ -514,9 +559,20 @@ Object: JumpBoost0
   Collectable: type=4
 
 Object: speedBoost0
-  Position: -199.102, 12.4031, -11.2047
+  Position: 28.497, 24.757, 24.2529
   Rotation: 0, -0, 0
-  Scale: 0.5, 0.4, 0.5
+  Scale: 0.31, 0.21, 0.5
+  Mesh: speedBoost
+  Material: redMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=3
+
+Object: speedBoost1
+  Position: -189.108, 12.2959, 1.61071
+  Rotation: 0, -0, 0
+  Scale: 0.31, 0.21, 0.5
   Mesh: speedBoost
   Material: redMat
   DiffuseTexture: defaultGrayTex

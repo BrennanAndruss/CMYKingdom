@@ -60,6 +60,14 @@ namespace engine
 		Handle<Cubemap> getSkybox() const { return _skybox; }
 		bool hasSkybox() const { return _skybox.valid(); }
 
+		void setIrradianceMap(Handle<Cubemap> cubemap)
+		{
+			_irradianceMap = cubemap;
+		}
+
+		Handle<Cubemap> getIrradianceMap() const { return _irradianceMap; }
+		bool hasIrradianceMap() const { return _irradianceMap.valid(); }
+
 	private:
 		std::vector<std::unique_ptr<Object>> _objects;
 		bool _started = false;
@@ -70,6 +78,7 @@ namespace engine
 		std::vector<Light*> _lights;
 
 		Handle<Cubemap> _skybox;
+		Handle<Cubemap> _irradianceMap;
 
 		void cleanupDeleted();
 		void resolveTransforms(Transform& t, const glm::mat4& parentWorld);
