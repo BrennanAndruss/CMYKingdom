@@ -4,6 +4,7 @@
 #include <memory>
 #include "renderer/passes/RenderPass.h"
 #include "renderer/passes/BlitPass.h"
+#include "renderer/RenderingPath.h"
 #include "renderer/RenderContext.h"
 #include "renderer/UniformBuffer.h"
 #include "scene/Scene.h"
@@ -18,16 +19,10 @@ namespace engine
 {
 	constexpr int MAX_LIGHTS = 16;
 
-	enum class RenderMode
-	{
-		Forward,
-		Deferred
-	};
-
 	class Renderer
 	{
 	public:
-		Renderer(int width, int height, RenderMode mode);
+		Renderer(int width, int height, RenderingPath renderingPath);
 		~Renderer() = default;
 
 		void init(AssetManager& assets);
@@ -48,7 +43,7 @@ namespace engine
 		std::vector<std::unique_ptr<RenderPass>> _postProcessPasses;
 		std::unique_ptr<BlitPass> _blitPass;
 
-		RenderMode _renderMode;
+		RenderingPath _renderingPath;
 		Handle<Shader> _baseShader, _skinnedShader, _terrainShader;
 		
 		int _width, _height;

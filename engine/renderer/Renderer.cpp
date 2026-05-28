@@ -13,17 +13,17 @@
 
 namespace engine
 {
-	Renderer::Renderer(int width, int height, RenderMode mode) : 
+	Renderer::Renderer(int width, int height, RenderingPath renderingPath) : 
 		_width(width), 
 		_height(height),
-		_renderMode(mode),
+		_renderingPath(renderingPath),
 		_cameraUBO(sizeof(CameraData), static_cast<GLuint>(UBOBindings::Camera)),
 		_lightsUBO(MAX_LIGHTS * sizeof(LightData), static_cast<GLuint>(UBOBindings::Light)) {}
 
 	void Renderer::init(AssetManager& assets)
 	{
 		// Load engine shaders
-		if (_renderMode == RenderMode::Forward)
+		if (_renderingPath == RenderingPath::Forward)
 		{
 			_baseShader = assets.loadEngineShader(
 				"EngineForward", "shaders/forward.vert", "shaders/forward.frag"
@@ -38,7 +38,7 @@ namespace engine
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
 		}
-		else if (_renderMode == RenderMode::Deferred)
+		else if (_renderingPath == RenderingPath::Deferred)
 		{
 			_baseShader = assets.loadEngineShader(
 				"EngineGeometry", "shaders/geometry.vert", "shaders/geometry.frag"

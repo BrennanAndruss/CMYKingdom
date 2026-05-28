@@ -9,7 +9,7 @@ namespace engine
     Application::Application(const AppConfig& config) : 
         _config(config),
         _window(config.width, config.height, config.title),
-        _renderer(config.width, config.height, RenderMode::Deferred),
+        _renderer(config.width, config.height, config.renderingPath),
         _assets(config.assetsDir)        
     {
         if (config.depthTest) glEnable(GL_DEPTH_TEST);
