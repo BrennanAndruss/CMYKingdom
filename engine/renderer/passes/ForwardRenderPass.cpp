@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Mesh.h"
@@ -118,7 +119,7 @@ namespace engine
 				return;
 			}
 
-			drawObject(object, scene, assets);
+			drawObject(object, scene, assets, camera, sceneCopy);
 		}
 
 		// Recurse into children
@@ -204,7 +205,7 @@ namespace engine
 
 			if (sceneCopy)
 			{
-				const GLuint sceneColor = sceneCopy->getAttachment(AttachmentFormat::RGBA8);
+				const GLuint sceneColor = sceneCopy->getColorAttachment(0);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, sceneColor);

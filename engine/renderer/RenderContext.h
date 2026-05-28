@@ -16,8 +16,15 @@ namespace engine
 	// Named texture slots
 	namespace BufferNames
 	{
+		// Scene outputs
 		inline constexpr const char* SceneColor = "SceneColor";
 		inline constexpr const char* SceneDepth = "SceneDepth";
+
+		// G-buffer
+		inline constexpr const char* GPosition = "GPosition";
+		inline constexpr const char* GNormal = "GNormal";
+		inline constexpr const char* GAlbedo = "GAlbedo";
+		inline constexpr const char* GSpecular = "GSpecular";
 	}
 
 	struct RenderContext

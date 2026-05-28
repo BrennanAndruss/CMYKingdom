@@ -5,31 +5,65 @@
 #include <iostream>
 #include "renderer/RenderContext.h"
 #include "renderer/passes/ForwardRenderPass.h"
+#include "renderer/passes/DeferredGeometryPass.h"
+#include "renderer/passes/DeferredLightingPass.h"
 #include "renderer/passes/SkyboxRenderPass.h"
 #include "renderer/passes/DebugRenderPass.h"
 #include "resources/AssetManager.h"
 
 namespace engine
 {
-	Renderer::Renderer(int width, int height) : 
+	Renderer::Renderer(int width, int height, RenderMode mode) : 
 		_width(width), 
-		_height(height), 
+		_height(height),
+		_renderMode(mode),
 		_cameraUBO(sizeof(CameraData), static_cast<GLuint>(UBOBindings::Camera)),
 		_lightsUBO(MAX_LIGHTS * sizeof(LightData), static_cast<GLuint>(UBOBindings::Light)) {}
 
 	void Renderer::init(AssetManager& assets)
 	{
 		// Load engine shaders
-		Handle<Shader> forwardShader = assets.loadEngineShader(
-			"EngineForward", "shaders/forward.vert", "shaders/forward.frag"
-		);
+		if (_renderMode == RenderMode::Forward)
+		{
+			_baseShader = assets.loadEngineShader(
+				"EngineForward", "shaders/forward.vert", "shaders/forward.frag"
+			);
+			_skinnedShader = assets.loadEngineShader(
+				"EngineSkinnedForward", "shaders/skinned.vert", "shaders/forward.frag"
+			);
+			_terrainShader = assets.loadEngineShader(
+				"EngineTerrainForward", "shaders/forward.vert", "shaders/terrain.frag"
+			);
+
+			assets.setDefaultShader(_baseShader);
+			addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
+		}
+		else if (_renderMode == RenderMode::Deferred)
+		{
+			_baseShader = assets.loadEngineShader(
+				"EngineGeometry", "shaders/geometry.vert", "shaders/geometry.frag"
+			);
+			_skinnedShader = assets.loadEngineShader(
+				"EngineSkinnedGeometry", "shaders/skinned.vert", "shaders/geometry.frag"
+			);
+			_terrainShader = assets.loadEngineShader(
+				"EngineTerrainGeometry", "shaders/geometry.vert", "shaders/terrainGeom.frag"
+			);
+
+			Handle<Shader> lightingShader = assets.loadEngineShader(
+				"EngineLighting", "shaders/passthrough.vert", "shaders/lighting.frag"
+			);
+
+			assets.setDefaultShader(_baseShader);
+			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height));
+			addRenderPass(std::make_unique<DeferredLightingPass>(_width, _height, lightingShader));
+		}
+
 		Handle<Shader> skyboxShader = assets.loadEngineShader(
 			"EngineSkybox", "shaders/skybox.vert", "shaders/skybox.frag"
 		);
-		assets.setDefaultShader(forwardShader);
 
 		// Construct render passes
-		addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
 		addRenderPass(std::make_unique<DebugRenderPass>());
 		addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		_blitPass = std::make_unique<BlitPass>();
