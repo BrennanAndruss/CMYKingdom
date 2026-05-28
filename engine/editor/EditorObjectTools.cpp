@@ -520,6 +520,59 @@ namespace engine
 
             selectedObject = &tree;
         }
+        ImGui::SameLine();
+        if (ImGui::Button("speedBoost"))
+        {
+            const std::string speedBoostName = makeUniqueName(scene, "speedBoost", "");
+            auto& speedBoost = scene.createObject(speedBoostName);
+            speedBoost.transform.setScale(glm::vec3(0.31f, 0.21f, 0.5f));
+
+            auto& meshRenderer = speedBoost.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("speedBoost");
+            meshRenderer.material = assets.getMaterialHandle("redMat");
+            if (!meshRenderer.material.valid())
+            {
+                meshRenderer.material = assets.getDefaultMaterial();
+            }
+
+            auto& collider = speedBoost.addComponent<BoxCollider>();
+            collider.size = glm::vec3(1.0f);
+            collider.isTrigger = true;
+
+            auto& collectable = speedBoost.addComponent<Collectable>();
+            collectable.type = Collectable::Type::speedBoost;
+            collectable.defaultMat = meshRenderer.material;
+            collectable.collectedMat = assets.getDefaultMaterial();
+
+            selectedObject = &speedBoost;
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("JumpBoost"))
+        {
+            const std::string jumpBoostName = makeUniqueName(scene, "JumpBoost", "");
+            auto& jumpBoost = scene.createObject(jumpBoostName);
+            jumpBoost.transform.setScale(glm::vec3(0.110f, 0.310f, 0.5f));
+
+            auto& meshRenderer = jumpBoost.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("JumpBoost");
+            meshRenderer.material = assets.getMaterialHandle("blueMat");
+            if (!meshRenderer.material.valid())
+            {
+                meshRenderer.material = assets.getDefaultMaterial();
+            }
+
+            auto& collider = jumpBoost.addComponent<BoxCollider>();
+            collider.size = glm::vec3(1.0f);
+            collider.isTrigger = true;
+
+            auto& collectable = jumpBoost.addComponent<Collectable>();
+            collectable.type = Collectable::Type::JumpBoost;
+            collectable.defaultMat = meshRenderer.material;
+            collectable.collectedMat = assets.getDefaultMaterial();
+
+            selectedObject = &jumpBoost;
+        }
 
         
 

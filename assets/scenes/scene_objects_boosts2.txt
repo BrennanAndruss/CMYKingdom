@@ -1,0 +1,559 @@
+Object: Platform0
+  Position: -178.066, 9.366, -3.267
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Star0
+  Position: -226.984, 29.38, -0.106
+  Rotation: 0, 29, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Platform0_Copy0
+  Position: -168.366, 9.366, -6.867
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform0_Copy0_Copy0
+  Position: -160.466, 9.866, -3.667
+  Rotation: 0, -9, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform0_Copy0_Copy0_Copy0
+  Position: -153.266, 11.466, 0.033
+  Rotation: 0, 4, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform1
+  Position: -144.574, 12.739, -2.49256
+  Rotation: 0, 3, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform1_Copy0
+  Position: -135.874, 14.139, -2.49256
+  Rotation: 0, 17, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform1_Copy0_Copy0
+  Position: -124.974, 14.139, -0.293
+  Rotation: 0, -22, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform1_Copy0_Copy0_Copy0
+  Position: -115.174, 15.439, -0.293
+  Rotation: -4.34877e-07, 11, 15
+  Scale: 7.8, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform1_Copy0_Copy0_Copy0_Copy0
+  Position: -104.774, 14.939, -0.293
+  Rotation: 0, -14, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Star1
+  Position: -104.584, 18.267, -1.057
+  Rotation: 0, -15, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star2
+  Position: -195.773, 13.1119, -28.7828
+  Rotation: 5.00894e-06, 80.02, 5.00894e-06
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Platform2
+  Position: -197.446, 8.882, 25.246
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform3
+  Position: -198.297, 9.524, 32.826
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Star3
+  Position: -198.393, 13.155, 32.897
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Platform4
+  Position: -101.187, 12.877, -0.549
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform5
+  Position: -91.177, 12.196, 1.339
+  Rotation: 5.00001, -3, 8
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform6
+  Position: -85.289, 13.386, 3.32687
+  Rotation: -9, 6, -10
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform7
+  Position: -77.226, 14.511, -4.69
+  Rotation: 21, 5.00002, 6.00001
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform8
+  Position: -67.039, 16.383, -3.1233
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform9
+  Position: -60.774, 13.954, -1.836
+  Rotation: 0, -23, 0
+  Scale: 7.8, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform10
+  Position: -46.6498, 9.089, -1.21588
+  Rotation: 0, -0, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform11
+  Position: -38.867, 8.883, 1.99549
+  Rotation: 0, 14, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform12
+  Position: -28.451, 9.398, 1.035
+  Rotation: 0, -19, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform13
+  Position: -18.6, 8.8, 6.1
+  Rotation: 0, 8, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Star4_Copy0
+  Position: 8.44621, 12.081, 2.63418
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star4_Copy0_Copy0
+  Position: 11.046, 12.481, -1.766
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star4_Copy0_Copy0_Copy0_Copy0_Copy0
+  Position: 12.246, 12.881, 0.934
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star1_Copy0
+  Position: -46.184, 12.167, -1.757
+  Rotation: 0, -15, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Platform14
+  Position: 9.866, 11.34, 10.36
+  Rotation: 0.000330425, 77.938, 3.002
+  Scale: 5, 2, 10
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform14_Copy0
+  Position: 19.166, 13.74, 7.66
+  Rotation: -2, -38.0591, 23.002
+  Scale: 6, 2, 6
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform15
+  Position: 68.7012, 22.69, -16.7656
+  Rotation: 0, -0, 0
+  Scale: 5, 6, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform15_Copy0
+  Position: 63.001, 20.99, -16.7656
+  Rotation: 0, -37, 0
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform15_Copy0_Copy0
+  Position: 68.501, 21.59, -21.566
+  Rotation: 0, -11, 0
+  Scale: 5, 4, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Star4
+  Position: 68.704, 28.068, -17.684
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star4_Copy1
+  Position: 62.804, 24.368, -17.684
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star4_Copy1_Copy0
+  Position: 68.204, 26.668, -22.784
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star5
+  Position: 68.2395, 23.137, 5.77158
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star5_Copy0
+  Position: 69.2395, 24.137, 10.172
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star5_Copy0_Copy0
+  Position: 70.2395, 23.737, 0.072
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star6
+  Position: 183.547, 67.77, 18.299
+  Rotation: 1.08719e-07, -11, 9.99999
+  Scale: 3, 3, 3
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Platform16
+  Position: 22.104, 22.435, 31.834
+  Rotation: 0, 16, -18
+  Scale: 6, 2, 6
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform16_Copy0
+  Position: 13.004, 24.735, 36.634
+  Rotation: 1.60694e-07, 5, -11
+  Scale: 5, 2, 8
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform16_Copy0_Copy0
+  Position: 5.804, 27.535, 39.934
+  Rotation: -9.66959e-07, 28, -13
+  Scale: 8, 2, 8
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+  RigidBody: type=0 mass=1
+
+Object: Platform16_Copy0_Copy0_Copy0
+  Position: -3.796, 32.135, 45.234
+  Rotation: -164.947, -37.981, 148
+  Scale: 10, 2, 10
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Star7
+  Position: -0.013, 44.037, 49.7599
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Platform14_Copy0_Copy0
+  Position: 26.266, 16.84, 4.06
+  Rotation: -20, -38.059, 34.002
+  Scale: 6, 2, 6
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: Platform16_Copy0_Copy0_Copy0_Copy0
+  Position: -4.296, 36.535, 53.734
+  Rotation: -159.947, -1.981, -180
+  Scale: 5, 2, 5
+  Mesh: square-platform
+  Material: platformCMYKMaterial
+  DiffuseTexture: platformCMYKTex
+  SpecularTexture: TexWhite
+  BoxCollider: size=0.5,0.5,0.5 isTrigger=0
+
+Object: JumpBoost0
+  Position: -203.977, 12.497, -16.684
+  Rotation: 0, -0, 0
+  Scale: 0.11, 0.31, 0.5
+  Mesh: JumpBoost
+  Material: blueMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=4
+
+Object: speedBoost0
+  Position: -188.511, 12.497, -1.821
+  Rotation: 0, 43, 0
+  Scale: 0.31, 0.21, 0.5
+  Mesh: speedBoost
+  Material: redMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=3
+
+Object: speedBoost1
+  Position: 88.769, 23.265, -16.018
+  Rotation: 0, -0, 0
+  Scale: 0.31, 0.21, 0.5
+  Mesh: speedBoost
+  Material: redMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=3
+
+Object: JumpBoost1
+  Position: 126.438, 30.374, 71.9562
+  Rotation: 180, 89.9802, 180
+  Scale: 0.11, 0.31, 0.5
+  Mesh: JumpBoost
+  Material: blueMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=4
+
+Object: JumpBoost2
+  Position: 161.726, 30.374, -9.56938
+  Rotation: -5.0091e-06, 89.9802, -5.0091e-06
+  Scale: 0.11, 0.31, 0.5
+  Mesh: JumpBoost
+  Material: blueMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=4
+

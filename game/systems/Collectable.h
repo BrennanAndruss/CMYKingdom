@@ -15,7 +15,9 @@ public:
 	{
 		Cyan = 0,
 		Magenta = 1,
-		Yellow = 2
+		Yellow = 2,
+		speedBoost = 3,
+		JumpBoost = 4
 	};
 
 	Handle<engine::Material> defaultMat;

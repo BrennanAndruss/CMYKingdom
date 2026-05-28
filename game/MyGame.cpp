@@ -183,6 +183,10 @@ void MyGame::init(engine::AssetManager& assets,
 	}
 
 	cubeMesh = assets.loadMesh("cube", "models/cube.obj");
+	//load in a powerup meshes
+	assets.loadMeshAssimp("speedBoost", "models/speedBoost.fbx");
+	assets.loadMeshAssimp("JumpBoost", "models/jumpBoost.fbx");
+
 	platformMesh = assets.loadMeshAssimp("square-platform", "models/square-platform.fbx");
 
 	// Load tree models from assets/models/trees
@@ -348,7 +352,23 @@ void MyGame::init(engine::AssetManager& assets,
 	mat->difTex = defaultGrayTex;
 	mat->specTex = defaultGrayTex;
 
+	Handle<engine::Material> redMat = assets.loadMaterial("redMat");
+	mat = assets.getMaterial(redMat);
+	mat->ambient  = glm::vec3(0.25f, 0.10f, 0.02f);
+	mat->diffuse  = glm::vec3(1.00f, 0.45f, 0.05f);
+	mat->specular = glm::vec3(0.90f, 0.65f, 0.30f);
+	mat->shininess = 24.0f;
+	mat->difTex = defaultGrayTex;
+	mat->specTex = defaultGrayTex;
 
+	Handle<engine::Material> blueMat = assets.loadMaterial("blueMat");
+	mat = assets.getMaterial(blueMat);
+	mat->ambient  = glm::vec3(0.03f, 0.06f, 0.20f);
+	mat->diffuse  = glm::vec3(0.10f, 0.35f, 1.00f);
+	mat->specular = glm::vec3(0.70f, 0.85f, 1.00f);
+	mat->shininess = 40.0f;
+	mat->difTex = defaultGrayTex;
+	mat->specTex = defaultGrayTex;
 
 	Handle<engine::Material> gemMat = assets.loadMaterial("gemMat");
 	mat = assets.getMaterial(gemMat);
@@ -445,10 +465,10 @@ void MyGame::init(engine::AssetManager& assets,
 	}
 
 	auto& playerController = cube->addComponent<PlayerController>();
-	playerController.moveSpeed = 0.1f;
 	playerController.eyeHeight = 0.3f;
 	playerController.cameraDistance = 4.0f;
 	playerController.jumpForce = 48.0f;
+	playerController.baseJumpForce = playerController.jumpForce;
 	playerController.locomotionCrossfade = 0.14f;
 	playerController.jumpCrossfade = 0.10f;
 
