@@ -273,8 +273,8 @@ namespace engine
 				_debugPrinted = false;
 				if (debugClipLogging)
 				{
-					std::cout << "[Animator] crossfade start: sourceHandle=" << clip.index << " targetHandle=" << targetClip.index
-						<< " duration=" << blendDuration << "\n";
+					//std::cout << "[Animator] crossfade start: sourceHandle=" << clip.index << " targetHandle=" << targetClip.index
+					//	<< " duration=" << blendDuration << "\n";
 				}
 			}
 			else

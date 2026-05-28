@@ -104,7 +104,6 @@ void MyGame::init(engine::AssetManager& assets,
 
 	Handle<engine::Texture> terrainGrass =
 		assets.loadTexture("terrainGrass", "textures/terrain/grass.png", true);
-		std::cout << "terrainGrass handle index: " << terrainGrass.index << "\n";
 
 	// Using Terrain Grass Texture for Grass Instances <Can change later on> 
 	Handle<engine::Texture> grassBladeTex = terrainGrass; 
@@ -626,7 +625,7 @@ void MyGame::update(float deltaTime)
 	if (cube)
 	{
 		glm::vec3 playerPos = cube->transform.getPosition();
-		std::cout << "Player Y Position: " << playerPos.y << "\n";
+		// std::cout << "Player Y Position: " << playerPos.y << "\n";
 
 		if (playerPos.y < 9.0f && _teleportCooldown <= 0.0f)
 		{

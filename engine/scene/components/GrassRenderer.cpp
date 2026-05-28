@@ -294,8 +294,8 @@ namespace engine
 		_currentCenterPatch = playerPatch;
 		centerPosition = playerPos;
 
-		std::cout << "Grass streaming update. Player patch: "
-				<< playerPatch.x << ", " << playerPatch.y << "\n";
+		//std::cout << "Grass streaming update. Player patch: "
+		//		<< playerPatch.x << ", " << playerPatch.y << "\n";
 
 		updatePatchesAround(playerPos);
 	}
@@ -506,13 +506,13 @@ namespace engine
 
 			if (frameCounter % 120 == 0)
 			{
-				std::cout << "Grass VFC: drawn "
-						<< drawnPatches
-						<< " / "
-						<< totalPatches
-						<< " patches, instances: "
-						<< drawnInstances
-						<< "\n";
+				//std::cout << "Grass VFC: drawn "
+				//		<< drawnPatches
+				//		<< " / "
+				//		<< totalPatches
+				//		<< " patches, instances: "
+				//		<< drawnInstances
+				//		<< "\n";
 			}
 
 			glBindVertexArray(0);

@@ -223,7 +223,7 @@ void PlayerController::update(float deltaTime)
 			// play jump animation when jumping; start from beginning and don't loop
 			// play jump with a short crossfade from current animation
 			animator->play(jumpClip, false, 0.0f, jumpCrossfade);
-			std::cout << "Jump initiated! Playing jump animation.\n";
+			// std::cout << "Jump initiated! Playing jump animation.\n";
 		}
 	}
 	
