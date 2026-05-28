@@ -59,6 +59,18 @@ void Collectable::tryRegisterCallback()
 				return;
 			}
 
+			if (auto* playerController = otherOwner->getComponent<PlayerController>())
+			{
+				if (type == Type::speedBoost)
+				{
+					playerController->activateSpeedBoost();
+				}
+				else if (type == Type::JumpBoost)
+				{
+					playerController->activateJumpBoost();
+				}
+			}
+
 			onCollected();
 		});
 	_callbackRegistered = true;
@@ -89,16 +101,14 @@ void Collectable::onCollected()
 
     isCollected = true;
 
-	// Trigger game effects
-	if (auto* game = MyGame::getActiveGame())
-	{
-		game->onCollectableCollected();
-	}
+    // Trigger color restoration only for color collectables
+    if (auto* game = MyGame::getActiveGame())
+    {
+        if (type == Type::Cyan || type == Type::Magenta || type == Type::Yellow)
+        {
+            game->onCollectableCollected();
+        }
+    }
 
-	// to-do: hide collectable
-	// (add enable/disable to components + disable MeshRenderer)
-	// (update loop deletion happens constantly so the difference prob isn't noticable)
-
-	// Mark object for deletion
-	owner->markedForDeletion = true;
+    owner->markedForDeletion = true;
 }

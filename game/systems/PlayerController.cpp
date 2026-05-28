@@ -105,6 +105,29 @@ void PlayerController::update(float deltaTime)
 		return;
 	}
 
+	if (speedBoostTimer > 0.0f)
+	{
+    	speedBoostTimer -= deltaTime;
+
+    	if (speedBoostTimer <= 0.0f)
+    	{
+        	speedBoostTimer = 0.0f;
+        	moveSpeed = baseMoveSpeed;
+    	}
+	}
+
+	if (jumpBoostTimer > 0.0f)
+	{
+		jumpBoostTimer -= deltaTime;
+
+		if (jumpBoostTimer <= 0.0f)
+		{
+			jumpBoostTimer = 0.0f;
+			jumpForce = baseJumpForce;
+		}
+	}
+	
+
 	const glm::vec3 currentPlayerWorldPosition = _characterController->getCurrentSyncedWorldPosition();
 	const glm::vec3 previousPlayerWorldPosition = _characterController->getPreviousSyncedWorldPosition();
 	const glm::vec3 playerDelta = currentPlayerWorldPosition - previousPlayerWorldPosition;
@@ -132,7 +155,7 @@ void PlayerController::update(float deltaTime)
 	if (engine::Input::isKeyDown(GLFW_KEY_D)) input.x += 1.0f;
 
 	bool isGrounded = _characterController->isOnGround();
-bool isMoving = input.x != 0.0f || input.z != 0.0f;
+	bool isMoving = input.x != 0.0f || input.z != 0.0f;
 
 	if (animator)
 	{
@@ -259,3 +282,16 @@ void PlayerController::postPhysicsUpdate(float deltaTime)
 	cameraTransform->setPosition(focus + cameraOffset);
 	cameraTransform->lookAt(focus);
 }
+
+void PlayerController::activateSpeedBoost()
+{
+    speedBoostTimer = speedBoostDuration;
+    moveSpeed = baseMoveSpeed * speedBoostMultiplier;
+}
+
+void PlayerController::activateJumpBoost()
+{
+    jumpBoostTimer = jumpBoostDuration;
+    jumpForce = baseJumpForce * jumpBoostMultiplier;
+}
+

@@ -242,7 +242,7 @@ namespace engine
                 if (auto* collectable = _selectedObject->getComponent<Collectable>())
                 {
                     int selectedType = static_cast<int>(collectable->type);
-                    const char* collectableTypes[] = { "Cyan", "Magenta", "Yellow" };
+                    const char* collectableTypes[] = { "Cyan", "Magenta", "Yellow", "speedBoost", "JumpBoost" };
                     if (ImGui::Combo("Collectable Type", &selectedType, collectableTypes, IM_ARRAYSIZE(collectableTypes)))
                     {
                         collectable->type = static_cast<Collectable::Type>(selectedType);
@@ -259,6 +259,26 @@ namespace engine
                                 break;
                             case 2: // Yellow
                                 colorMat = assets.getMaterialHandle("yellowMat");
+                                break;
+                            case 3: // speedBoost
+                                colorMat = assets.getMaterialHandle("redMat");
+                                {
+                                    Handle<engine::Mesh> speedBoostMesh = assets.getMeshHandle("speedBoost");
+                                    if (speedBoostMesh.valid())
+                                    {
+                                        meshRenderer->mesh = speedBoostMesh;
+                                    }
+                                }
+                                break;
+                            case 4: // JumpBoost
+                                colorMat = assets.getMaterialHandle("jumpBoostMat");
+                                {
+                                    Handle<engine::Mesh> jumpBoostMesh = assets.getMeshHandle("JumpBoost");
+                                    if (jumpBoostMesh.valid())
+                                    {
+                                        meshRenderer->mesh = jumpBoostMesh;
+                                    }
+                                }
                                 break;
                             default:
                                 break;
@@ -511,6 +531,10 @@ namespace engine
                         return assets.getMaterialHandle("magentaMat");
                     case 2:
                         return assets.getMaterialHandle("yellowMat");
+                    case 3: 
+                        return assets.getMaterialHandle("redMat");
+                    case 4: 
+                        return assets.getMaterialHandle("blueMat");
                     default:
                         return assets.getDefaultMaterial();
                     }
@@ -554,10 +578,28 @@ namespace engine
 
                     if (auto* meshRenderer = object.getComponent<MeshRenderer>())
                     {
+                        if (data.collectableType == static_cast<int>(Collectable::Type::speedBoost))
+                        {
+                            const Handle<Mesh> speedBoostMesh = assets.getMeshHandle("speedBoost");
+                            if (speedBoostMesh.valid())
+                            {
+                                meshRenderer->mesh = speedBoostMesh;
+                            }
+                        }
+                        else if (data.collectableType == static_cast<int>(Collectable::Type::JumpBoost))
+                        {
+                            const Handle<Mesh> jumpBoostMesh = assets.getMeshHandle("JumpBoost");
+                            if (jumpBoostMesh.valid())
+                            {
+                                meshRenderer->mesh = jumpBoostMesh;
+                            }
+                        }
+
                         const Handle<Material> collectableMaterial = getCollectableMaterial(data.collectableType);
                         if (collectableMaterial.valid())
                         {
                             meshRenderer->material = collectableMaterial;
+                            collectable.defaultMat = collectableMaterial;
                         }
                     }
                 }

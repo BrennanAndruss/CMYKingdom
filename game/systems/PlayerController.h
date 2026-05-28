@@ -12,12 +12,20 @@
 class PlayerController : public engine::Component
 {
 public:
-	float moveSpeed = 28.0f;
+	float baseMoveSpeed = 0.1f;
+	float moveSpeed = 0.1f;
+	float speedBoostMultiplier = 2.0f;
+	float speedBoostDuration = 15.0f;
+	float speedBoostTimer = 0.0f;
 	float rotationSpeed = 1.0f;
 	float eyeHeight = 0.4f;
 	float cameraDistance = 4.5f;
 	float sensitivity = 0.1f;
 	float jumpForce = 32.0f;
+	float baseJumpForce = 32.0f;
+	float jumpBoostMultiplier = 2.0f;
+	float jumpBoostDuration = 15.0f;
+	float jumpBoostTimer = 0.0f;
 	float platformCarryFactor = 1.5f;
 	bool invertMouseMove = false;
 	bool enabled = true;
@@ -28,6 +36,8 @@ public:
 	void start() override;
 	void update(float deltaTime) override;
 	void postPhysicsUpdate(float deltaTime) override;
+	void activateSpeedBoost();
+	void activateJumpBoost();
 	engine::Animator* animator = nullptr;
 	Handle<engine::AnimationClip> idleClip;
 	Handle<engine::AnimationClip> sprintClip;
