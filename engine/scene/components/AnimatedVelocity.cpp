@@ -6,6 +6,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include "scene/Object.h"
+#include "scene/components/RigidBody.h"
 #include "scene/Transform.h"
 
 namespace engine
@@ -45,6 +46,14 @@ namespace engine
             _lastFrameDisplacementWorld = glm::vec3(0.0f);
             return;
         }
+
+		if (auto* rigidBody = owner->getComponent<RigidBody>())
+		{
+			if (rigidBody->getBodyType() != RigidBody::BodyType::Kinematic)
+			{
+				rigidBody->setBodyType(RigidBody::BodyType::Kinematic);
+			}
+		}
 
         const float safeFrequency = std::max(0.0f, frequency);
         const float waveValue = evalWave(waveMode, _elapsed, safeFrequency, phase);

@@ -365,8 +365,6 @@ namespace engine
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
                 glm::vec3 halfExtents = 0.5f * (bounds.max - bounds.min);
-                // Make collider slimmer in X and Z so it better matches a tree trunk
-                halfExtents *= glm::vec3(0.5f, 1.0f, 0.5f);
                 collider.size = halfExtents;
             }
             else

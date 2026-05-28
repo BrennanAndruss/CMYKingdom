@@ -5,9 +5,45 @@
 #include "scene/Scene.h"
 #include "scene/Object.h"
 #include "scene/components/RigidBody.h"
+#include "scene/components/AnimatedVelocity.h"
 
 namespace engine
 {
+	namespace
+	{
+		bool usesAnimatedVelocity(const Object* owner)
+		{
+			return owner && owner->getComponent<AnimatedVelocity>();
+		}
+
+		void configureCollisionFlags(btCollisionObject* object, bool isTrigger, bool isKinematic)
+		{
+			if (!object) return;
+
+			int flags = object->getCollisionFlags();
+			flags &= ~(btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT);
+			if (isKinematic)
+			{
+				flags |= btCollisionObject::CF_KINEMATIC_OBJECT;
+			}
+			else
+			{
+				flags |= btCollisionObject::CF_STATIC_OBJECT;
+			}
+
+			if (isTrigger)
+			{
+				flags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
+			}
+
+			object->setCollisionFlags(flags);
+			if (isTrigger || isKinematic)
+			{
+				object->setActivationState(DISABLE_DEACTIVATION);
+			}
+		}
+	}
+
 	void Collider::update(float deltaTime)
 	{
 		if (!_object)
@@ -66,11 +102,7 @@ namespace engine
 				_shape.get(), owner->transform.getWorldPosition() + worldCenter, isTrigger);
 			_object->setUserPointer(owner);
 
-			// Keep trigger objects active
-			if (isTrigger)
-			{
-				_object->setActivationState(DISABLE_DEACTIVATION);
-			}
+			configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 		}
 	}
 
@@ -82,6 +114,7 @@ namespace engine
 			_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
 			if (_object)
 			{
+				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
 				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));
@@ -116,10 +149,7 @@ namespace engine
 				_shape.get(), owner->transform.getWorldPosition() + worldCenter, isTrigger);
 			_object->setUserPointer(owner);
 			
-			if (isTrigger)
-			{
-				_object->setActivationState(DISABLE_DEACTIVATION);
-			}
+			configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 		}
 	}
 
@@ -154,11 +184,7 @@ namespace engine
 				_shape.get(), owner->transform.getWorldPosition() + worldCenter, isTrigger);
 			_object->setUserPointer(owner);
 
-			// Keep trigger objects active
-			if (isTrigger)
-			{
-				_object->setActivationState(DISABLE_DEACTIVATION);
-			}
+			configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 		}
 	}
 
@@ -170,6 +196,7 @@ namespace engine
 			_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
 			if (_object)
 			{
+				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
 				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));
@@ -226,11 +253,7 @@ namespace engine
 				_shape.get(), owner->transform.getWorldPosition() + worldCenter, isTrigger);
 			_object->setUserPointer(owner);
 
-			// Keep trigger objects active
-			if (isTrigger)
-			{
-				_object->setActivationState(DISABLE_DEACTIVATION);
-			}
+			configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 		}
 	}
 
@@ -242,6 +265,7 @@ namespace engine
 			_shape->setLocalScaling(PhysicsSystem::toBullet(worldScale));
 			if (_object)
 			{
+				configureCollisionFlags(_object, isTrigger, usesAnimatedVelocity(owner));
 				btTransform t;
 				t.setIdentity();
 				t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition() + (center * worldScale)));

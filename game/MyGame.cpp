@@ -558,9 +558,9 @@ void MyGame::update(float deltaTime)
 	if (cube)
 	{
 		glm::vec3 playerPos = cube->transform.getPosition();
-		//std::cout << "Player Y Position: " << playerPos.y << "\n";
+		std::cout << "Player Y Position: " << playerPos.y << "\n";
 
-		if (playerPos.y < 9.0f && _teleportCooldown <= 0.0f)
+		if (playerPos.y < 7.0f && _teleportCooldown <= 0.0f)
 		{
 			glm::vec3 respawnPos(-200.0f, 17.0f, -8.0f);
 			// Teleport back to spawn
