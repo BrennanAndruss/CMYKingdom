@@ -47,7 +47,7 @@ namespace engine
 		_ghostObject->setActivationState(DISABLE_DEACTIVATION);
 
 		// Configure controller logic
-		float stepHeight = 0.0f;
+		const float stepHeight = glm::max(0.05f, radius * 0.25f);
 		_controller = new btKinematicCharacterController(_ghostObject, _shape.get(), stepHeight);
 		_controller->setUp(btVector3(0, 1, 0));
 		_controller->setGravity(btVector3(0, -gravity, 0));

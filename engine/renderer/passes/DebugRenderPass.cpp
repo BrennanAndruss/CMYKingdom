@@ -282,7 +282,7 @@ namespace engine
 			if (auto* boxCollider = obj->getComponent<BoxCollider>())
 			{
 				const glm::vec3 worldScale = glm::abs(obj->transform.getWorldScale());
-				const glm::vec3 origin = worldPos + (boxCollider->center * worldScale);
+				const glm::vec3 origin = worldPos + (glm::mat3_cast(worldRot) * (boxCollider->center * worldScale));
 				const glm::vec3 halfExtents = boxCollider->size * worldScale;
 				appendBoxWireframe(lineVerts, origin, rotation, halfExtents);
 				if (!lineVerts.empty())

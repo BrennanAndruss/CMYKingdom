@@ -393,7 +393,19 @@ namespace engine
             meshRenderer.material = assets.getDefaultMaterial();
 
             auto& collider = star.addComponent<BoxCollider>();
-            collider.size = glm::vec3(1.0f);
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                glm::vec3 halfExtents = 0.5f * (bounds.max - bounds.min);
+                collider.size = halfExtents;
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
             collider.isTrigger = true;
 
             auto& collectable = star.addComponent<Collectable>();
@@ -405,6 +417,11 @@ namespace engine
             }
             collectable.defaultMat = meshRenderer.material;
             collectable.collectedMat = assets.getDefaultMaterial();
+
+            //add slight floating animation to make it more visually distinct
+            auto& animatedVelocity = star.addComponent<AnimatedVelocity>();
+            animatedVelocity.linearAmplitude.y = 0.1f;
+            animatedVelocity.frequency = 0.5f;
 
             selectedObject = &star;
         }
@@ -433,7 +450,11 @@ namespace engine
                 collider.center = glm::vec3(0.0f);
                 collider.size = glm::vec3(1.0f);
             }
+
+            
             collider.rebuild();
+
+
 
             auto& rigidBody = tree.addComponent<RigidBody>();
             rigidBody.setBodyType(RigidBody::BodyType::Static);

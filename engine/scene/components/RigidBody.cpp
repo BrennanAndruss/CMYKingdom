@@ -2,12 +2,50 @@
 
 #include <btBulletDynamicsCommon.h>
 #include <cassert>
+#include <glm/gtc/quaternion.hpp>
 #include "physics/PhysicsSystem.h"
 #include "scene/Scene.h"
 #include "scene/Object.h"
 
 namespace engine
 {
+	namespace
+	{
+		glm::vec3 getColliderWorldCenter(const Collider* collider, const Object* owner)
+		{
+			if (!collider || !owner)
+			{
+				return glm::vec3(0.0f);
+			}
+
+			const glm::vec3 worldScale = glm::abs(owner->transform.getWorldScale());
+			const glm::quat worldRotation = owner->transform.getWorldRotation();
+
+			if (const auto* boxCollider = dynamic_cast<const BoxCollider*>(collider))
+			{
+				return glm::mat3_cast(worldRotation) * (boxCollider->center * worldScale);
+			}
+
+			if (const auto* sphereCollider = dynamic_cast<const SphereCollider*>(collider))
+			{
+				return glm::mat3_cast(worldRotation) * (sphereCollider->center * worldScale);
+			}
+
+			if (const auto* capsuleCollider = dynamic_cast<const CapsuleCollider*>(collider))
+			{
+				return glm::mat3_cast(worldRotation) * (capsuleCollider->center * worldScale);
+			}
+
+			return glm::vec3(0.0f);
+		}
+
+		glm::vec3 getColliderWorldPosition(const Collider* collider, const Object* owner)
+		{
+			return owner ? owner->transform.getWorldPosition() + getColliderWorldCenter(collider, owner)
+				: glm::vec3(0.0f);
+		}
+	}
+
 	RigidBody::~RigidBody()
 	{
 		destroyBody();
@@ -56,7 +94,7 @@ namespace engine
 
 		const float effectiveMass = bodyType == BodyType::Dynamic ? mass : 0.0f;
 		_body = physics->createBody(
-			_collider->getShape(), owner->transform.getWorldPosition(), 
+			_collider->getShape(), getColliderWorldPosition(_collider, owner), 
 			effectiveMass, _collider->isTrigger
 		);
 
@@ -103,7 +141,7 @@ namespace engine
 		{
 			btTransform t;
 			t.setIdentity();
-			t.setOrigin(PhysicsSystem::toBullet(owner->transform.getWorldPosition()));
+			t.setOrigin(PhysicsSystem::toBullet(getColliderWorldPosition(_collider, owner)));
 			t.setRotation(PhysicsSystem::toBullet(owner->transform.getWorldRotation()));
 			_body->setWorldTransform(t);
 			if (auto* motionState = _body->getMotionState())
@@ -123,7 +161,7 @@ namespace engine
 		_body->getMotionState()->getWorldTransform(t);
 
 		// Sync the engine transform with the physics world transform
-		owner->transform.setPosition(PhysicsSystem::toGlm(t.getOrigin()));
+		owner->transform.setPosition(PhysicsSystem::toGlm(t.getOrigin()) - getColliderWorldCenter(_collider, owner));
 		owner->transform.setRotation(PhysicsSystem::toGlm(t.getRotation()));
 		_lastFrameDisplacementWorld = owner->transform.getWorldPosition() - previousWorldPosition;
 		_lastWorldPosition = owner->transform.getWorldPosition();
