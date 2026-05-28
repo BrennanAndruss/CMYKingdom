@@ -9,7 +9,7 @@ namespace engine
     Application::Application(const AppConfig& config) : 
         _config(config),
         _window(config.width, config.height, config.title),
-        _renderer(config.width, config.height),
+        _renderer(config.width, config.height, config.renderingPath),
         _assets(config.assetsDir)        
     {
         if (config.depthTest) glEnable(GL_DEPTH_TEST);
@@ -119,6 +119,15 @@ namespace engine
         {
             _renderer.enablePostProcessing(true);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
+        if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
+        {
+            _renderer.enablePostProcessing(false);
+        }
+        if (key == GLFW_KEY_F4 && action == GLFW_RELEASE)
+        {
+            _renderer.enablePostProcessing(true);
         }
     }
 

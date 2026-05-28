@@ -60,24 +60,10 @@ void MyGame::init(engine::AssetManager& assets,
 	std::cout << "Loading shaders...\n";
 	Handle<engine::Shader> colorRestoreShader = assets.loadShader(
 		"colorRestoreShader", "shaders/colorRestore.vert", "shaders/colorRestore.frag");
-	Handle<engine::Shader> skinnedShader = assets.loadShader(
-		"skinned", "shaders/skinned.vert", "shaders/simple.frag");
 	Handle<engine::Shader> waterShader = assets.loadShader(
 		"waterShader", "shaders/water.vert", "shaders/water.frag");
-	
-	// terrain shader
-	Handle<engine::Shader> terrainShader = assets.loadShader(
-    "terrainShader",
-    "shaders/terrain.vert",
-    "shaders/terrain.frag"
-	);	
-
-	// grass shader
 	Handle<engine::Shader> grassShader = assets.loadShader(
-	"grassShader",
-	"shaders/grass.vert",
-	"shaders/grass.frag"
-	);
+		"grassShader", "shaders/grass.vert", "shaders/grass.frag");
 
 
 	//loading textures
@@ -392,7 +378,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 	Handle<engine::Material> skinnedGemMat = assets.loadMaterial("skinnedGemMat");
 	mat = assets.getMaterial(skinnedGemMat);
-	mat->shader = skinnedShader;
+	mat->shader = renderer.getSkinnedShader();
 	mat->ambient = glm::vec3(0.2f);
 	mat->diffuse = glm::vec3(0.8f);
 	mat->specular = glm::vec3(1.0f);
@@ -403,7 +389,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 	Handle<engine::Material> charTex = assets.loadMaterial("charBaseTex");
 	mat = assets.getMaterial(charTex);
-	mat->shader = skinnedShader;
+	mat->shader = renderer.getSkinnedShader();
 	mat->ambient = glm::vec3(0.2f);
 	mat->diffuse = glm::vec3(0.8f);
 	mat->specular = glm::vec3(1.0f);
@@ -415,7 +401,7 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Material> terrainMat = assets.loadMaterial("terrainMat");
 	mat = assets.getMaterial(terrainMat);
 
-	mat->shader = terrainShader;
+	mat->shader = renderer.getTerrainShader();
 	mat->isTerrain = true;
 
 	mat->splat0 = terrainSplat0;
