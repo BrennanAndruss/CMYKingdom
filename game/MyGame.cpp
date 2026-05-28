@@ -453,7 +453,6 @@ void MyGame::init(engine::AssetManager& assets,
 		animator.clip = idleClip;
 		animator.debugClipLogging = true;
 		animator.debugClipFilter = "jump";
-		// animator.playbackSpeed = 3.0f;
 
 		auto& characterController = cube->addComponent<engine::CharacterController>();
 		characterController.gravity = 9.81f;
