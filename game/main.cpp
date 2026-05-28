@@ -6,6 +6,7 @@ int main() {
     config.title = "My Game";
     config.width = 640;
     config.height = 480;
+    config.renderingPath = engine::RenderingPath::Deferred;
 
     engine::Application app(config);
     // Blue background (132, 217, 224)

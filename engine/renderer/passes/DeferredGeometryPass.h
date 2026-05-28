@@ -8,34 +8,30 @@ namespace engine
 {
 	class Scene;
 	class Object;
-	class Camera;
 	class AssetManager;
 	class RenderContext;
+	class Shader;
 	struct Frustum;
 }
 
 namespace engine
 {
-	class ForwardRenderPass : public RenderPass
+	class DeferredGeometryPass : public RenderPass
 	{
 	public:
-		ForwardRenderPass(int width, int height);
-		~ForwardRenderPass();
+		DeferredGeometryPass(int width, int height);
+		~DeferredGeometryPass();
 
 		void resize(int width, int height) override;
 		void execute(const Scene& scene, const AssetManager& assets,
 			RenderContext& ctx) override;
 
 	private:
-		Framebuffer _framebuffer;
-		Framebuffer _waterSceneCopy;
+		Framebuffer _gBuffer;
 
 		void drawObject(Object* object, const Scene& scene,
-			const AssetManager& assets, const Camera* camera,
-			const Framebuffer* sceneCopy = nullptr);
+			const AssetManager& assets);
 		void drawObjectCulled(Object* object, const Scene& scene,
-			const AssetManager& assets, const Frustum& frustum,
-			const Camera* camera, bool waterOnly = false,
-			const Framebuffer* sceneCopy = nullptr);
+			const AssetManager& assets, const Frustum& frustum);
 	};
 }
