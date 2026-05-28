@@ -32,6 +32,42 @@ namespace engine
         {
             return config.assetsDir + "scenes/" + sceneName + ".txt";
         }
+        
+        static void addModelToScene(Scene& scene, AssetManager& assets, const std::string& meshName, const glm::vec3& position = glm::vec3(0.0f))
+        {
+            Handle<Mesh> meshHandle = assets.getMeshHandle(meshName);
+            if (!meshHandle.valid())
+            {
+                const std::size_t slash = meshName.find_last_of("/\\");
+                if (slash != std::string::npos)
+                {
+                    const std::string base = meshName.substr(slash + 1);
+                    meshHandle = assets.getMeshHandle(base);
+                }
+            }
+
+            if (!meshHandle.valid())
+            {
+                try
+                {
+                    meshHandle.index = static_cast<std::size_t>(std::stoull(meshName));
+                }
+                catch (const std::exception&)
+                {
+                    meshHandle = {};
+                }
+            }
+
+            Object& object = scene.createObject(meshName);
+            object.transform.setPosition(position);
+
+            auto& meshRenderer = object.addComponent<MeshRenderer>();
+            if (assets.getMesh(meshHandle))
+            {
+                meshRenderer.mesh = meshHandle;
+            }
+            meshRenderer.material = assets.getDefaultMaterial();
+        }
     }
 
     static float getFPS()
@@ -152,6 +188,10 @@ namespace engine
                 if (editorCamera->owner && ImGui::Button("Move To Editor Camera"))
                 {
                     _selectedObject->transform.setPosition(editorCamera->owner->transform.getPosition());
+                    if (auto* animatedVelocity = _selectedObject->getComponent<AnimatedVelocity>())
+                    {
+                        animatedVelocity->savedPosition = _selectedObject->transform.getPosition();
+                    }
                 }
             }
 
@@ -162,6 +202,10 @@ namespace engine
             if (ImGui::DragFloat3("Position", &position.x, 0.1f))
             {
                 _selectedObject->transform.setPosition(position);
+                if (auto* animatedVelocity = _selectedObject->getComponent<AnimatedVelocity>())
+                {
+                    animatedVelocity->savedPosition = position;
+                }
             }
 
             if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f))
@@ -212,7 +256,8 @@ namespace engine
             if (!hasAnimatedVelocity) {
                 if (ImGui::Button("Add Animated Velocity"))
                 {
-                    _selectedObject->addComponent<AnimatedVelocity>();
+                    auto& animatedVelocity = _selectedObject->addComponent<AnimatedVelocity>();
+                    animatedVelocity.savedPosition = _selectedObject->transform.getPosition();
                 }
             }
 
@@ -362,11 +407,13 @@ namespace engine
             for (std::size_t i = startIndex; i < objects.size(); ++i)
             {
                 const auto& object = objects[i];
+                 const auto* animatedVelocity = object->getComponent<AnimatedVelocity>();
                 file << "Object: " << object->name << "\n";
                 // transforms
-                file << "  Position: " << object->transform.getPosition().x << ", "
-                     << object->transform.getPosition().y << ", "
-                     << object->transform.getPosition().z << "\n";
+                 const glm::vec3 positionToSave = animatedVelocity ? animatedVelocity->savedPosition : object->transform.getPosition();
+                 file << "  Position: " << positionToSave.x << ", "
+                     << positionToSave.y << ", "
+                     << positionToSave.z << "\n";
                 file << "  Rotation: " << object->transform.getEulerAngles().x << ", "
                      << object->transform.getEulerAngles().y << ", "
                      << object->transform.getEulerAngles().z << "\n";
@@ -401,7 +448,7 @@ namespace engine
                 {
                     file << "  Collectable: type=" << static_cast<int>(collectable->type) << "\n";
                 }
-                if (auto* animatedVelocity = object->getComponent<AnimatedVelocity>())
+                if (animatedVelocity)
                 {
                     file << "  AnimatedVelocity: "
                          << "enabled=" << (animatedVelocity->enabled ? 1 : 0)
@@ -609,6 +656,7 @@ namespace engine
                     auto& animatedVelocity = object.addComponent<AnimatedVelocity>();
                     animatedVelocity.enabled = data.animatedVelocityEnabled;
                     animatedVelocity.useLocalSpace = data.animatedVelocityUseLocalSpace;
+                    animatedVelocity.savedPosition = data.position;
                     animatedVelocity.waveMode = data.animatedVelocityWaveMode;
                     animatedVelocity.frequency = data.animatedVelocityFrequency;
                     animatedVelocity.phase = data.animatedVelocityPhase;

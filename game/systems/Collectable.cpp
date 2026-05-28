@@ -106,7 +106,7 @@ void Collectable::onCollected()
     {
         if (type == Type::Cyan || type == Type::Magenta || type == Type::Yellow)
         {
-            game->onCollectableCollected();
+            game->onCollectableCollected(static_cast<int>(type));
         }
     }
 

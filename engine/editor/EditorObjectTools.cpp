@@ -21,6 +21,97 @@
 
 namespace
 {
+    bool isTrackedEditorObject(const std::vector<std::unique_ptr<engine::Object>>& objects,
+        const engine::Object* object,
+        std::size_t initialObjectCount)
+    {
+        for (std::size_t i = initialObjectCount; i < objects.size(); ++i)
+        {
+            if (objects[i].get() == object)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    std::string buildHierarchyLabel(const engine::Object* object)
+    {
+        std::string label = object->name;
+
+        if (const auto* parentTransform = object->transform.getParent())
+        {
+            if (const auto* parentObject = parentTransform->owner)
+            {
+                label += "  [child of ";
+                label += parentObject->name;
+                label += ']';
+            }
+            else
+            {
+                label += "  [child]";
+            }
+        }
+
+        const std::size_t childCount = object->transform.getChildren().size();
+        if (childCount > 0)
+        {
+            label += "  [" + std::to_string(childCount) + (childCount == 1 ? " child]" : " children]");
+        }
+
+        return label;
+    }
+
+    void drawHierarchyEntry(engine::Object* object,
+        engine::Object*& selectedObject,
+        const std::vector<std::unique_ptr<engine::Object>>& objects,
+        std::size_t initialObjectCount)
+    {
+        if (!object || !isTrackedEditorObject(objects, object, initialObjectCount))
+        {
+            return;
+        }
+
+        const bool hasChildren = !object->transform.getChildren().empty();
+        const bool isSelected = selectedObject == object;
+        const std::string label = buildHierarchyLabel(object);
+
+        ImGui::PushID(object);
+
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow;
+        if (isSelected)
+        {
+            flags |= ImGuiTreeNodeFlags_Selected;
+        }
+
+        if (!hasChildren)
+        {
+            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        }
+
+        const bool open = ImGui::TreeNodeEx("##object", flags, "%s", label.c_str());
+        if (ImGui::IsItemClicked())
+        {
+            selectedObject = object;
+        }
+
+        if (open && hasChildren)
+        {
+            for (auto* childTransform : object->transform.getChildren())
+            {
+                if (childTransform && childTransform->owner)
+                {
+                    drawHierarchyEntry(childTransform->owner, selectedObject, objects, initialObjectCount);
+                }
+            }
+
+            ImGui::TreePop();
+        }
+
+        ImGui::PopID();
+    }
+
     bool rayIntersectsAabb(const glm::vec3& rayOrigin,
         const glm::vec3& rayDirection,
         const glm::vec3& boundsMin,
@@ -273,7 +364,10 @@ namespace engine
             {
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
-                collider.size = 0.5f * (bounds.max - bounds.min);
+                glm::vec3 halfExtents = 0.5f * (bounds.max - bounds.min);
+                // Make collider slimmer in X and Z so it better matches a tree trunk
+                halfExtents *= glm::vec3(0.5f, 1.0f, 0.5f);
+                collider.size = halfExtents;
             }
             else
             {
@@ -315,6 +409,116 @@ namespace engine
             collectable.collectedMat = assets.getDefaultMaterial();
 
             selectedObject = &star;
+        }
+        if (ImGui::Button("Maple Tree")) {
+            const std::string treeName = makeUniqueName(scene, "Maple Tree", "");
+            auto& tree = scene.createObject(treeName);
+            tree.transform.setScale(glm::vec3(0.5f));
+            
+            tree.transform.setEulerAngles(-90.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = tree.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("tree1");
+            const Handle<Material> treeMaterial = assets.getMaterialHandle("tree1Mat");
+            meshRenderer.material = treeMaterial.valid() ? treeMaterial : assets.getDefaultMaterial();
+
+            auto& collider = tree.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = tree.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &tree;
+        }
+
+        if (ImGui::Button("Winding Tree")) {
+            const std::string treeName = makeUniqueName(scene, "Winding Tree", "");
+            auto& tree = scene.createObject(treeName);
+            tree.transform.setScale(glm::vec3(1.0f));
+            
+            tree.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = tree.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("tree2");
+            const Handle<Material> treeMaterial = assets.getMaterialHandle("tree2Mat");
+            meshRenderer.material = treeMaterial.valid() ? treeMaterial : assets.getDefaultMaterial();
+
+            auto& collider = tree.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = tree.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &tree;
+        }
+
+        if (ImGui::Button("Pine Tree")) {
+            const std::string treeName = makeUniqueName(scene, "Pine Tree", "");
+            auto& tree = scene.createObject(treeName);
+            tree.transform.setScale(glm::vec3(5.0f));
+            
+            tree.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = tree.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("tree3_0");
+            if (!meshRenderer.mesh.valid())
+            {
+                meshRenderer.mesh = assets.getMeshHandle("tree3");
+            }
+
+            Handle<Material> treeMaterial = assets.getMaterialHandle("tree3Mat0");
+            if (!treeMaterial.valid())
+            {
+                treeMaterial = assets.getMaterialHandle("tree3Mat");
+            }
+            meshRenderer.material = treeMaterial.valid() ? treeMaterial : assets.getDefaultMaterial();
+
+            auto& collider = tree.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = tree.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &tree;
         }
         ImGui::SameLine();
         if (ImGui::Button("speedBoost"))
@@ -426,6 +630,7 @@ namespace engine
                     auto& newAnimatedVelocity = newObject.addComponent<AnimatedVelocity>();
                     newAnimatedVelocity.enabled = animatedVelocity->enabled;
                     newAnimatedVelocity.useLocalSpace = animatedVelocity->useLocalSpace;
+                    newAnimatedVelocity.savedPosition = newObject.transform.getPosition();
                     newAnimatedVelocity.linearBase = animatedVelocity->linearBase;
                     newAnimatedVelocity.linearAmplitude = animatedVelocity->linearAmplitude;
                     newAnimatedVelocity.angularBase = animatedVelocity->angularBase;
@@ -453,17 +658,7 @@ namespace engine
         const auto& objects = scene.getObjects();
         if (selectedObject)
         {
-            bool selectedStillListed = false;
-            for (std::size_t i = initialObjectCount; i < objects.size(); ++i)
-            {
-                if (objects[i].get() == selectedObject)
-                {
-                    selectedStillListed = true;
-                    break;
-                }
-            }
-
-            if (!selectedStillListed)
+            if (!isTrackedEditorObject(objects, selectedObject, initialObjectCount))
             {
                 selectedObject = nullptr;
             }
@@ -472,11 +667,12 @@ namespace engine
         for (std::size_t i = initialObjectCount; i < objects.size(); ++i)
         {
             const auto& object = objects[i];
-            const bool isSelected = selectedObject == object.get();
-            if (ImGui::Selectable(object->name.c_str(), isSelected))
+            if (!object || object->transform.getParent())
             {
-                selectedObject = object.get();
+                continue;
             }
+
+            drawHierarchyEntry(object.get(), selectedObject, objects, initialObjectCount);
         }
     }
 }

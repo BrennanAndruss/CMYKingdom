@@ -27,6 +27,9 @@ public:
 	float jumpBoostDuration = 15.0f;
 	float jumpBoostTimer = 0.0f;
 	float platformCarryFactor = 1.5f;
+	// Tune blend feel from game setup without touching Animator internals.
+	float locomotionCrossfade = 0.22f;
+	float jumpCrossfade = 0.1f;
 	bool invertMouseMove = false;
 	bool enabled = true;
 	bool hasJumped = false;

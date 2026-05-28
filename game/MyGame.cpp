@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <vector>
 #include <glm/glm.hpp>
 #include "core/Input.h"
 #include "resources/AssetManager.h"
@@ -61,6 +62,8 @@ void MyGame::init(engine::AssetManager& assets,
 		"colorRestoreShader", "shaders/colorRestore.vert", "shaders/colorRestore.frag");
 	Handle<engine::Shader> skinnedShader = assets.loadShader(
 		"skinned", "shaders/skinned.vert", "shaders/simple.frag");
+	Handle<engine::Shader> waterShader = assets.loadShader(
+		"waterShader", "shaders/water.vert", "shaders/water.frag");
 	
 	// terrain shader
 	Handle<engine::Shader> terrainShader = assets.loadShader(
@@ -76,6 +79,32 @@ void MyGame::init(engine::AssetManager& assets,
 	// Heighmap Texture
 	Handle<engine::Heightmap> terrainHeightmap = assets.loadHeightmap("terrainHM", "textures/heightmaps/unityterrain04.png", 400.0f);
 	auto* heightmap = assets.getHeightmap(terrainHeightmap);
+
+	// Build a grayscale texture from the same terrain height data so the water shader
+	// can query actual terrain contact instead of reacting to foreground silhouettes.
+	Handle<engine::Texture> terrainHeightTex;
+	if (heightmap)
+	{
+		const auto& srcPixels = heightmap->getPixels();
+		const int hWidth = heightmap->getWidth();
+		const int hLength = heightmap->getLength();
+		const int hChannels = heightmap->getChannels();
+		std::vector<unsigned char> heightRgba(static_cast<std::size_t>(hWidth * hLength * 4));
+		for (int y = 0; y < hLength; ++y)
+		{
+			for (int x = 0; x < hWidth; ++x)
+			{
+				const std::size_t srcIdx = static_cast<std::size_t>((y * hWidth + x) * hChannels);
+				const unsigned char value = srcPixels[srcIdx];
+				const std::size_t dstIdx = static_cast<std::size_t>((y * hWidth + x) * 4);
+				heightRgba[dstIdx + 0] = value;
+				heightRgba[dstIdx + 1] = value;
+				heightRgba[dstIdx + 2] = value;
+				heightRgba[dstIdx + 3] = 255;
+			}
+		}
+		terrainHeightTex = assets.loadTexture("terrainHeightTex", heightRgba.data(), hWidth, hLength);
+	}
 	// Splatmap Texture
 	Handle<engine::Texture> terrainSplat0 =
     assets.loadTexture("terrainSplat0", "textures/splatmaps/splatmap0.png", true); 
@@ -106,6 +135,29 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Texture> defaultGrayTex = assets.createSolidTexture("defaultGrayTex", { 128, 128, 128, 255 });
 	Handle<engine::Texture> gemDiffuseTex = assets.loadTexture("gemDiffuseTex", "textures/cyan_gem_texture.png", true);
 	Handle<engine::Texture> charBaseTex = assets.loadTexture("charBaseTex", "textures/char_Base_color.png", true);
+
+	// Procedural noise texture used by the water shader for stylized distortion/foam breakup.
+	{
+		const int noiseSize = 64;
+		std::vector<unsigned char> noiseData(static_cast<std::size_t>(noiseSize * noiseSize * 4));
+		for (int y = 0; y < noiseSize; ++y)
+		{
+			for (int x = 0; x < noiseSize; ++x)
+			{
+				const std::size_t idx = static_cast<std::size_t>((y * noiseSize + x) * 4);
+				unsigned int n = static_cast<unsigned int>(x * 1973 + y * 9277 + x * y * 26699 + 911);
+				n ^= (n << 13);
+				n ^= (n >> 17);
+				n ^= (n << 5);
+				unsigned char value = static_cast<unsigned char>((n & 0xFFu));
+				noiseData[idx + 0] = value;
+				noiseData[idx + 1] = static_cast<unsigned char>((value * 167u) & 0xFFu);
+				noiseData[idx + 2] = static_cast<unsigned char>((value * 37u) & 0xFFu);
+				noiseData[idx + 3] = 255;
+			}
+		}
+		assets.loadTexture("waterNoiseTex", noiseData.data(), noiseSize, noiseSize);
+	}
 	
 	// Load CMYK platform texture
 	Handle<engine::Texture> platformCMYKTex = assets.loadTexture("platformCMYKTex", "textures/heightmaps/cmyk_platform_openPBR_shader1_BaseMap.png", true);
@@ -136,12 +188,98 @@ void MyGame::init(engine::AssetManager& assets,
 	assets.loadMeshAssimp("JumpBoost", "models/jumpBoost.fbx");
 
 	platformMesh = assets.loadMeshAssimp("square-platform", "models/square-platform.fbx");
+
+	// Load tree models from assets/models/trees
+	Handle<engine::Mesh> tree_1;
+	Handle<engine::Mesh> tree_2;
+	std::vector<Handle<engine::Mesh>> tree_3Meshes;
+	try {
+		Handle<engine::Texture> tree1_texture = assets.loadTexture("tree1_diffuse", "textures/trees/tree-maple-D.jpeg", true);
+		tree_1 = assets.loadMeshAssimp("tree1", "models/trees/tree-maple-low-poly-Anim.fbx");
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("tree1Mat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = tree1_texture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for tree1\n";
+		}
+		
+
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load tree_1, falling back to cube: " << e.what() << "\n";
+		tree_1 = cubeMesh;
+		
+	}
+
+	// tree 2
+	try {
+		Handle<engine::Texture> tree2_texture = assets.loadTexture("tree2_diffuse", "textures/trees/PP_Texture_256.png", true);
+		tree_2 = assets.loadMeshAssimp("tree2", "models/trees/PP_Tree_winding_01.fbx");
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("tree2Mat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = tree2_texture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for tree2\n";
+		}
+		
+
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load tree_2, falling back to cube: " << e.what() << "\n";
+		tree_2 = cubeMesh;
+		
+	}
+
+	// tree 3
+	try
+	{
+		Handle<engine::Texture> tree3_texture = assets.loadTexture("tree3_diffuse", "textures/trees/Evergreen_Geometry_0801193826_texture.png", true);
+		tree_3Meshes = assets.loadModelMeshesAssimp("tree3", "models/trees/Evergreen_Geometry_0801193826_texture.fbx");
+		for (std::size_t i = 0; i < tree_3Meshes.size(); ++i)
+		{
+			if (auto* mat = assets.getMaterial(assets.loadMaterial("tree3Mat" + std::to_string(i))))
+			{
+				mat->shader = assets.getDefaultShader();
+				mat->ambient = glm::vec3(0.2f);
+				mat->diffuse = glm::vec3(0.8f);
+				mat->specular = glm::vec3(0.5f);
+				mat->shininess = 16.0f;
+				mat->difTex = tree3_texture;
+				mat->specTex = defaultGrayTex;
+			}
+			else
+			{
+				std::cerr << "Failed to get material for tree3 mesh " << i << "\n";
+			}
+		}
+
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Failed to load tree_3, falling back to cube: " << e.what() << "\n";
+		tree_3Meshes.clear();
+	}
+	// character mesh and animations
 	Handle<engine::Mesh> sprintMesh;
 	Handle<engine::Skeleton> sprintSkeleton;
 	Handle<engine::AnimationClip> idleClip;
 	Handle<engine::AnimationClip> sprintClip;
-	//still trying to find a good jumping animation
-	//Handle<engine::AnimationClip> jumpClip;
+	// still trying to find a good jumping animation
+	Handle<engine::AnimationClip> jumpClip;
 
 	try
 	{
@@ -150,7 +288,12 @@ void MyGame::init(engine::AssetManager& assets,
 
 		idleClip = assets.loadAnimationClipAssimp("playerIdleAnimation", "models/Idle.fbx");
 		sprintClip = assets.loadAnimationClipAssimp("playerSprintAnimation", "models/walking.fbx");
-		//jumpClip = assets.loadAnimationClipAssimp("playerJumpAnimation", "models/jump.fbx");
+		// load jump animation if available in assets/models/jump.fbx
+		try {
+			jumpClip = assets.loadAnimationClipAssimp("playerJumpAnimation", "models/jump.fbx");
+		} catch (...) {
+			// keep jumpClip empty if not found
+		}
 	}
 	catch (const std::exception& e)
 	{
@@ -305,6 +448,8 @@ void MyGame::init(engine::AssetManager& assets,
 	auto& animator = visual.addComponent<engine::Animator>();
 	animator.skeleton = sprintSkeleton;
 	animator.clip = idleClip;
+	animator.debugClipLogging = true;
+	animator.debugClipFilter = "jump";
 
 	auto& characterController = cube->addComponent<engine::CharacterController>();
 	characterController.gravity = 9.81f;
@@ -324,11 +469,13 @@ void MyGame::init(engine::AssetManager& assets,
 	playerController.cameraDistance = 4.0f;
 	playerController.jumpForce = 48.0f;
 	playerController.baseJumpForce = playerController.jumpForce;
+	playerController.locomotionCrossfade = 0.14f;
+	playerController.jumpCrossfade = 0.10f;
 
 	playerController.animator = &animator;
 	playerController.idleClip = idleClip;
 	playerController.sprintClip = sprintClip;
-	//playerController.jumpClip = jumpClip;
+	playerController.jumpClip = jumpClip;
 }
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");
@@ -357,12 +504,16 @@ void MyGame::init(engine::AssetManager& assets,
 		
 		Handle<engine::Material> waterMat = assets.loadMaterial("waterMat");
 		auto* matPtr = assets.getMaterial(waterMat);
+		matPtr->shader = waterShader;
 		matPtr->ambient = glm::vec3(0.15f, 0.25f, 0.35f);
 		matPtr->diffuse = glm::vec3(0.45f, 0.70f, 0.90f);
 		matPtr->specular = glm::vec3(0.85f, 0.90f, 1.0f);
 		matPtr->shininess = 64.0f;
 		matPtr->difTex = defaultGrayTex;
 		matPtr->specTex = defaultGrayTex;
+		matPtr->terrainHeightTex = terrainHeightTex;
+		matPtr->terrainPlaneLen = planeLen;
+		matPtr->terrainHeightScale = 400.0f;
 		mr.material = waterMat;
 
 
@@ -446,8 +597,8 @@ void MyGame::update(float deltaTime)
 		_colorRestorePass->cyan = std::min(_collectedCyan, 1.0f);
 		_colorRestorePass->magenta = std::min(_collectedMagenta, 1.0f);
 		_colorRestorePass->yellow = std::min(_collectedYellow, 1.0f);
-		const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
-		_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
+		//const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
+		//_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
 	}
 }
 

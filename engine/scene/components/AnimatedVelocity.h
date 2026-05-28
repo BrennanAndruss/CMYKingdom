@@ -18,6 +18,7 @@ namespace engine
 
         bool enabled = true;
         bool useLocalSpace = false;
+        glm::vec3 savedPosition = glm::vec3(0.0f);
 
         glm::vec3 linearBase = glm::vec3(0.0f);
         glm::vec3 linearAmplitude = glm::vec3(0.0f);

@@ -29,8 +29,8 @@ void main()
 	float activeY = y * yellow;
 	vec3 restored = vec3(1.0 - activeC, 1.0 - activeM, 1.0 - activeY);
 
-	// Blend between gray and restored based on how much is restored
-	float restoredAmount = max(cyan, max(magenta, yellow));
+	// Blend between gray and restored based on the average restored channel strength
+	float restoredAmount = (cyan + magenta + yellow) / 3.0;
 	restoredAmount *= (1.0 - key);
 
 	color = vec4(mix(grayscale, restored, restoredAmount), 1.0);
