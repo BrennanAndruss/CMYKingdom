@@ -4,7 +4,8 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
-#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "core/Input.h"
 #include "scene/Object.h"
 #include "scene/Scene.h"
@@ -108,13 +109,13 @@ void PlayerController::update(float deltaTime)
 
 	if (speedBoostTimer > 0.0f)
 	{
-    	speedBoostTimer -= deltaTime;
+					speedBoostTimer -= deltaTime;
 
-    	if (speedBoostTimer <= 0.0f)
-    	{
-        	speedBoostTimer = 0.0f;
-        	moveSpeed = baseMoveSpeed;
-    	}
+					if (speedBoostTimer <= 0.0f)
+					{
+									speedBoostTimer = 0.0f;
+									moveSpeed = baseMoveSpeed;
+					}
 	}
 
 	if (jumpBoostTimer > 0.0f)
@@ -179,12 +180,27 @@ void PlayerController::update(float deltaTime)
 	if (engine::Input::isKeyDown(GLFW_KEY_A)) input.x -= 1.0f;
 	if (engine::Input::isKeyDown(GLFW_KEY_D)) input.x += 1.0f;
 	bool isMoving = input.x != 0.0f || input.z != 0.0f;
+	bool isSprinting = engine::Input::isKeyDown(GLFW_KEY_LEFT_SHIFT);
 
 	if (animator && !hasJumped)
 	{
 		Handle<engine::AnimationClip> desired = {};
 		if (isMoving && sprintClip.valid()) desired = sprintClip;
 		else if (idleClip.valid()) desired = idleClip;
+
+		// Set playback speed for sprinting
+		if (desired.valid())
+		{
+			if (isMoving && isSprinting)
+			{
+				animator->playbackSpeed = sprintPlaybackSpeed;
+			}
+			else
+			{
+				animator->playbackSpeed = 1.0f;
+			}
+
+		}
 
 		// Only switch if desired clip matches neither current clip nor active blend target.
 		const bool currentMatches = animator->clip.valid() && animator->clip.index == desired.index;
@@ -220,6 +236,7 @@ void PlayerController::update(float deltaTime)
 
 		if (animator && jumpClip.valid())
 		{
+			animator->playbackSpeed = 1.0f;
 			// play jump animation when jumping; start from beginning and don't loop
 			// play jump with a short crossfade from current animation
 			animator->play(jumpClip, false, 0.0f, jumpCrossfade);
@@ -241,17 +258,28 @@ void PlayerController::update(float deltaTime)
 			walkDir = glm::normalize(walkDir);
 		}
 
-		glm::vec3 facingDir = yawQuat * glm::vec3(0.0f, 0.0f, -1.0f);
-		facingDir.y = 0.0f;
-		facingDir = glm::normalize(facingDir);
+		// Rotate player to face movement direction (smoothly)
+		glm::vec3 desiredFacing = -walkDir;
+		if (glm::length(desiredFacing) < 1e-6f)
+		{
+			// fallback to camera forward if movement direction is degenerate
+			desiredFacing = yawQuat * glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+		desiredFacing.y = 0.0f;
+		desiredFacing = glm::normalize(desiredFacing);
 
-		owner->transform.setRotation(
-		glm::quatLookAt(facingDir, glm::vec3(0.0f, 1.0f, 0.0f))
-		);
+		glm::quat targetQuat = glm::quatLookAt(desiredFacing, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat currentQuat = owner->transform.getRotation();
+
+		// Interpolate rotation using rotationSpeed parameter (frame-rate independent)
+		const float slerpSpeed = 8.0f;
+		float t = glm::clamp(rotationSpeed * slerpSpeed * deltaTime, 0.0f, 1.0f);
+		owner->transform.setRotation(glm::slerp(currentQuat, targetQuat, t));
 	}
 	
 	// Apply horizontal movement through character controller
-	glm::vec3 desiredVelocity = walkDir * moveSpeed;
+	float speedFactor = (isMoving && isSprinting) ? 1.0f : walkSpeedFactor;
+	glm::vec3 desiredVelocity = walkDir * moveSpeed * speedFactor;
 	if ((groundedNow || _groundedGraceTimer > 0.0f) && platformCarryFactor > 0.0f)
 	{
 		engine::Object* groundCarrier = findGroundCarrier(*owner, *_characterController, _groundCarrier);
@@ -323,4 +351,3 @@ void PlayerController::activateJumpBoost()
     jumpBoostTimer = jumpBoostDuration;
     jumpForce = baseJumpForce * jumpBoostMultiplier;
 }
-
