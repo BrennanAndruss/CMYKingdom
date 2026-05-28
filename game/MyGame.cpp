@@ -520,7 +520,7 @@ void MyGame::init(engine::AssetManager& assets,
 		grassRenderer->patchSize = 25.0f;
 		grassRenderer->patchRadius = 2;
 		grassRenderer->bladesPerPatch = 2500;
-		grassRenderer->reloadDistance = 25.0f;
+		grassRenderer->reloadDistance = 25.0f; // not needed anymore 
 		// Grass Mesh Data
 		grassRenderer->bladeCount = 100000;
 		grassRenderer->minHeight = 0.3f;
