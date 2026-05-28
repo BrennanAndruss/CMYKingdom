@@ -130,6 +130,15 @@ void MyGame::init(engine::AssetManager& assets,
 		"textures/skybox/nz.png"
 	});
 	scene.setSkybox(skyboxCubemap);
+	Handle<engine::Cubemap> irradianceCubemap = assets.loadCubemap("dayIrradiance", {
+		"textures/irradiance/ipx.png",
+		"textures/irradiance/inx.png",
+		"textures/irradiance/ipy.png",
+		"textures/irradiance/iny.png",
+		"textures/irradiance/ipz.png",
+		"textures/irradiance/inz.png"
+	});
+	scene.setIrradianceMap(irradianceCubemap);
 
 
 	Handle<engine::Texture> defaultGrayTex = assets.createSolidTexture("defaultGrayTex", { 128, 128, 128, 255 });
@@ -599,6 +608,12 @@ void MyGame::update(float deltaTime)
 		_colorRestorePass->yellow = std::min(_collectedYellow, 1.0f);
 		//const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
 		//_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
+	}
+
+	if (engine::Input::isKeyPressed(GLFW_KEY_L))
+	{
+   		terrainSkyLightingEnabled = !terrainSkyLightingEnabled;
+    	std::cout << "Terrain sky lighting: "<< (terrainSkyLightingEnabled ? "ON" : "OFF") << "\n";
 	}
 }
 

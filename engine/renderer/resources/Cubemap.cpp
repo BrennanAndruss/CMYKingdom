@@ -69,4 +69,22 @@ namespace engine
 		glActiveTexture(GL_TEXTURE0 + _unit);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
+
+	void Cubemap::bindToUnit(GLint uniformHandle, GLint unit) const
+	{
+		if (uniformHandle < 0)
+		{
+			return;
+		}
+
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, _tid);
+		glUniform1i(uniformHandle, unit);
+	}
+
+	void Cubemap::unbindFromUnit(GLint unit) const
+	{
+		glActiveTexture(GL_TEXTURE0 + unit);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
 }

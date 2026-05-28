@@ -13,10 +13,12 @@
 #include "renderer/resources/Mesh.h"
 #include "renderer/resources/Material.h"
 #include "renderer/resources/Texture.h"
+#include "renderer/resources/Cubemap.h"
 #include "resources/AssetManager.h"
 #include "scene/Scene.h"
 #include "scene/components/Animator.h"
 #include "scene/components/MeshRenderer.h"
+#include "../game/MyGame.h"
 
 namespace engine
 {
@@ -160,21 +162,22 @@ namespace engine
 
 		const bool isWaterObject = (object->name == "TempWaterPlane");
 
-		//Cubemap* irradianceMap = nullptr;
-		//if (scene.hasIrradianceMap())
-		//{
-		//	irradianceMap = assets.getCubemap(scene.getIrradianceMap());
-		//	if (irradianceMap)
-		//	{
-		//		irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 10);
-		//		shader->setInt("useIrradianceMap", 1);
-		//		shader->setFloat("irradianceStrength", 1.2f);
-		//	}
-		//}
-		//else
-		//{
-		//	shader->setInt("useIrradianceMap", 0);
-		//}
+		Cubemap* irradianceMap = nullptr;
+		if (scene.hasIrradianceMap() && MyGame::getActiveGame()->terrainSkyLightingEnabled)
+		{
+			irradianceMap = assets.getCubemap(scene.getIrradianceMap());
+			if (irradianceMap)
+			{
+				irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 10);
+				shader->setInt("useIrradianceMap", 1);
+				shader->setFloat("irradianceStrength", 1.2f);
+				shader->setFloat("irradianceStrength", 1.2f);
+			}
+		}
+		else
+		{
+			shader->setInt("useIrradianceMap", 0);
+		}
 
 		shader->setMat4("model", object->transform.getWorldMatrix());
 		shader->setVec3("mat.ambient", mat->ambient);
@@ -314,10 +317,10 @@ namespace engine
 			if (specTex) specTex->unbind();
 		}
 
-		//if (irradianceMap)
-		//{
-		//	irradianceMap->unbindFromUnit(10);
-		//}
+		if (irradianceMap)
+		{
+			irradianceMap->unbindFromUnit(10);
+		}
 
 		shader->unbind();
 	}

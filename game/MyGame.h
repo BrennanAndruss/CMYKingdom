@@ -30,6 +30,7 @@ public:
 	void setEditorSelectionLock(bool locked, engine::Scene& scene) override;
 	void onCollectableCollected();
 	void onCollectableCollected(int type);
+	bool terrainSkyLightingEnabled = false;
 
 private:
 	engine::Object* gem = nullptr;
