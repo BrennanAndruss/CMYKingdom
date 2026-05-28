@@ -182,7 +182,7 @@ namespace engine
 				<< (showSkeletons ? "enabled" : "disabled") << " (F3)\n";
 		}
 
-		if (Input::isKeyPressed(GLFW_KEY_F4))
+		if (Input::isKeyPressed(GLFW_KEY_F5))
 		{
 			showColliders = !showColliders;
 			std::cout << "[DebugRenderPass] Collider visualizer "
