@@ -9,3 +9,4 @@
 #include "scene/components/Light.h"
 #include "scene/components/Camera.h"
 #include "scene/components/AnimatedVelocity.h"
+#include "scene/components/GrassRenderer.h"

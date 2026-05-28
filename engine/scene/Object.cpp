@@ -30,7 +30,18 @@ namespace engine
 	{
 		for (auto& component : _components)
 		{
-			component->update(deltaTime);
+			if (dynamic_cast<AnimatedVelocity*>(component.get()))
+			{
+				component->update(deltaTime);
+			}
+		}
+
+		for (auto& component : _components)
+		{
+			if (!dynamic_cast<AnimatedVelocity*>(component.get()))
+			{
+				component->update(deltaTime);
+			}
 		}
 	}
 
@@ -57,7 +68,18 @@ namespace engine
 	{
 		for (auto& component : _components)
 		{
-			component->update(deltaTime, assets);
+			if (dynamic_cast<AnimatedVelocity*>(component.get()))
+			{
+				component->update(deltaTime, assets);
+			}
+		}
+
+		for (auto& component : _components)
+		{
+			if (!dynamic_cast<AnimatedVelocity*>(component.get()))
+			{
+				component->update(deltaTime, assets);
+			}
 		}
 	}
 

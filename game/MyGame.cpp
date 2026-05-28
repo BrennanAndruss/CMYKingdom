@@ -60,17 +60,10 @@ void MyGame::init(engine::AssetManager& assets,
 	std::cout << "Loading shaders...\n";
 	Handle<engine::Shader> colorRestoreShader = assets.loadShader(
 		"colorRestoreShader", "shaders/colorRestore.vert", "shaders/colorRestore.frag");
-	Handle<engine::Shader> skinnedShader = assets.loadShader(
-		"skinned", "shaders/skinned.vert", "shaders/simple.frag");
 	Handle<engine::Shader> waterShader = assets.loadShader(
 		"waterShader", "shaders/water.vert", "shaders/water.frag");
-	
-	// terrain shader
-	Handle<engine::Shader> terrainShader = assets.loadShader(
-    "terrainShader",
-    "shaders/terrain.vert",
-    "shaders/terrain.frag"
-	);	
+	Handle<engine::Shader> grassShader = assets.loadShader(
+		"grassShader", "shaders/grass.vert", "shaders/grass.frag");
 
 
 	//loading textures
@@ -108,9 +101,12 @@ void MyGame::init(engine::AssetManager& assets,
 	// Splatmap Texture
 	Handle<engine::Texture> terrainSplat0 =
     assets.loadTexture("terrainSplat0", "textures/splatmaps/splatmap0.png", true); 
+
 	Handle<engine::Texture> terrainGrass =
 		assets.loadTexture("terrainGrass", "textures/terrain/grass.png", true);
-		std::cout << "terrainGrass handle index: " << terrainGrass.index << "\n";
+
+	// Using Terrain Grass Texture for Grass Instances <Can change later on> 
+	Handle<engine::Texture> grassBladeTex = terrainGrass; 
 
 	Handle<engine::Texture> terrainSand =
 		assets.loadTexture("terrainSand", "textures/terrain/sand.png", true);
@@ -314,6 +310,14 @@ void MyGame::init(engine::AssetManager& assets,
 	float planeLen = 500.0f;
 	Handle<engine::Mesh> terrainMesh = assets.createHeightmapMesh("terrain", terrainHeightmap, planeRes, planeLen);
 
+	//planeRes = 1;
+	//planeLen = 3000.0f;
+	//Handle<engine::Mesh> floorMesh = assets.createPlaneMesh("floor", planeRes, planeLen);
+
+	int waterPlaneRes = 256;
+	float waterPlaneLen = 1000.0f;
+	Handle<engine::Mesh> waterMesh = assets.createPlaneMesh("water", waterPlaneRes, waterPlaneLen);
+
 	std::cout << "Loading materials...\n";
 	Handle<engine::Material> defaultMat = assets.getDefaultMaterial();
 	auto* mat = assets.getMaterial(defaultMat);
@@ -390,7 +394,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 	Handle<engine::Material> skinnedGemMat = assets.loadMaterial("skinnedGemMat");
 	mat = assets.getMaterial(skinnedGemMat);
-	mat->shader = skinnedShader;
+	mat->shader = renderer.getSkinnedShader();
 	mat->ambient = glm::vec3(0.2f);
 	mat->diffuse = glm::vec3(0.8f);
 	mat->specular = glm::vec3(1.0f);
@@ -401,7 +405,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 	Handle<engine::Material> charTex = assets.loadMaterial("charBaseTex");
 	mat = assets.getMaterial(charTex);
-	mat->shader = skinnedShader;
+	mat->shader = renderer.getSkinnedShader();
 	mat->ambient = glm::vec3(0.2f);
 	mat->diffuse = glm::vec3(0.8f);
 	mat->specular = glm::vec3(1.0f);
@@ -413,7 +417,7 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Material> terrainMat = assets.loadMaterial("terrainMat");
 	mat = assets.getMaterial(terrainMat);
 
-	mat->shader = terrainShader;
+	mat->shader = renderer.getTerrainShader();
 	mat->isTerrain = true;
 
 	mat->splat0 = terrainSplat0;
@@ -489,27 +493,79 @@ void MyGame::init(engine::AssetManager& assets,
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");
 	// pointLightCenter->transform.setPosition(glm::vec3(0.0f, 3.5f, -5.0f));
-
+	// ---- Terrain Object ----
 	{
-		auto& terrain = scene.createObject("Floor");
+		auto& terrain = scene.createObject("Terrain");
 
 		auto& collider = terrain.addComponent<engine::HeightmapCollider>();
 		collider.heightmap = heightmap;
 		collider.planeLen = planeLen;
-
 		// TERRAIN MATERIAL
 		auto& meshRenderer = terrain.addComponent<engine::MeshRenderer>();
 		meshRenderer.mesh = terrainMesh;
 		meshRenderer.material = terrainMat;
 	}
 
+	//{
+	//	auto& floor = scene.createObject("Floor");
+
+	//	auto& mr = floor.addComponent<engine::MeshRenderer>();
+	//	mr.mesh = floorMesh;
+	//}
+
+	// ---- Grass Object ----
+	{
+		auto& grassObj = scene.createObject("GrassField");
+
+		grassRenderer = &grassObj.addComponent<engine::GrassRenderer>();
+		grassRenderer->shader = grassShader;
+		grassRenderer->texture = grassBladeTex;
+		grassRenderer->heightmap = heightmap;
+		grassRenderer->terrainPlaneLen = planeLen;
+		// Keeping track of player position --> Chunking State Variables 
+		grassRenderer->centerPosition = cube->transform.getPosition();
+		grassRenderer->spawnRadius = 400.0f;
+		grassRenderer->usePatchStreaming = true;
+		// Grass Patches
+		grassRenderer->patchSize = 25.0f;
+		grassRenderer->patchRadius = 2;
+		grassRenderer->bladesPerPatch = 2500;
+		grassRenderer->reloadDistance = 25.0f; // not needed anymore 
+		// Grass Mesh Data
+		grassRenderer->bladeCount = 100000;
+		grassRenderer->minHeight = 0.3f;
+		grassRenderer->maxHeight = 0.8f;
+		grassRenderer->minWidth = 0.05f;
+		grassRenderer->maxWidth = 0.1f;
+		grassRenderer->maxBend = 0.84f;
+
+		// Wind Simulation Variables
+		grassRenderer->windDirection = glm::normalize(glm::vec2(1.0f, 0.3f));
+		grassRenderer->windStrength = 0.95f;
+		grassRenderer->windSpeed = 1.2f;
+
+		// Splatmapping Filtering 
+		grassRenderer->splatmap = terrainSplat0;
+		grassRenderer->useSplatmapPlacement = true;
+		grassRenderer->minGrassSplatWeight = 0.35f;
+		grassRenderer->maxPlacementAttemptsMultiplier = 3;
+		grassRenderer->setSplatTextureCpu(assets.getTexture(terrainSplat0));
+
+		// Clumping Noise
+		grassRenderer->useDensityNoise = true;
+		grassRenderer->densityNoiseScale = 0.025f; // higher value small noisy clumps
+		grassRenderer->densityNoiseStrength = 0.95f;
+
+	}
+	// ---- Water Plane Object ----
 	{
 		auto& tempWaterPlane = scene.createObject("TempWaterPlane");
-		tempWaterPlane.transform.setPosition(glm::vec3(0.0f, 8.0f, 0.0f));
-		tempWaterPlane.transform.setScale(glm::vec3(5000.0f, 1.0f, 5000.0f));
+		tempWaterPlane.transform.setPosition(glm::vec3(0.0f, 8.5f, 0.0f));
+		// tempWaterPlane.transform.setScale(glm::vec3(5000.0f, 1.0f, 5000.0f));
 
 		auto& mr = tempWaterPlane.addComponent<engine::MeshRenderer>();
-		mr.mesh = assets.loadMesh("waterPlane", "models/cube.obj");
+		mr.mesh = waterMesh;
+		// mr.mesh = assets.loadMesh("waterPlane", "models/cube.obj");
 		
 		Handle<engine::Material> waterMat = assets.loadMaterial("waterMat");
 		auto* matPtr = assets.getMaterial(waterMat);
@@ -578,7 +634,7 @@ void MyGame::update(float deltaTime)
 	if (cube)
 	{
 		glm::vec3 playerPos = cube->transform.getPosition();
-		//std::cout << "Player Y Position: " << playerPos.y << "\n";
+		// std::cout << "Player Y Position: " << playerPos.y << "\n";
 
 		if (playerPos.y < 9.0f && _teleportCooldown <= 0.0f)
 		{
@@ -591,6 +647,11 @@ void MyGame::update(float deltaTime)
 			}
 			
 		}
+	}
+	if (cube && grassRenderer)
+	{
+		const glm::vec3 playerPos = cube->transform.getPosition();
+		grassRenderer->updateStreaming(playerPos);
 	}
 
 	if (engine::Input::isKeyDown(GLFW_KEY_C)) _collectedCyan += 0.002f;

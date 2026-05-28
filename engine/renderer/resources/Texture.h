@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <vector>
 
 namespace engine
 {
@@ -12,6 +13,12 @@ namespace engine
 
 		void setUnit(GLint unit) { _unit = unit; }
 		GLint getUnit() const { return _unit; }
+
+		int getWidth() const { return _width; }
+		int getHeight() const { return _height; }
+		int getChannels() const { return _channels; }
+		const std::vector<unsigned char>& getPixels() const { return _pixels; }
+
 		void bindToUnit(GLint handle, GLint unit) const;
 		void unbindFromUnit(GLint unit) const;
 		
@@ -19,10 +26,16 @@ namespace engine
 		void unbind() const;
 
 	private:
-		int _width, _height;
-		GLint _internalFormat, _imageFormat;
+		int _width = 0;
+		int _height = 0;
+		int _channels = 4;
+
+		GLint _internalFormat;
+		GLint _imageFormat;
 
 		GLuint _tid;
 		GLuint _unit;
+
+		std::vector<unsigned char> _pixels;
 	};
 }

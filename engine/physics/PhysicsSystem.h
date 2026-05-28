@@ -38,6 +38,7 @@ namespace engine
 		using CollisionCallback = std::function<void(btCollisionObject* other)>;
 		void registerCallback(btCollisionObject* object, CollisionCallback callback);
 		void unregisterCallback(btCollisionObject* object);
+		btDiscreteDynamicsWorld* getWorld() const { return _world.get(); }
 
 		// Type conversion helpers
 		static glm::vec3 toGlm(const btVector3& v) { return glm::vec3(v.x(), v.y(), v.z()); }

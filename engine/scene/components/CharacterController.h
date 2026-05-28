@@ -23,6 +23,7 @@ namespace engine
 		float mass = 1.0f;
 		float radiusScale = 0.95f;
 		float targetHeight = 1.0f;
+		glm::vec3 colliderOffset = glm::vec3(0.0f, -2.0f, 0.0f);
 
 		engine::Transform* visualTransform = nullptr;
 
@@ -43,10 +44,12 @@ namespace engine
 	private:
 		btPairCachingGhostObject* _ghostObject = nullptr;
 		btKinematicCharacterController* _controller = nullptr;
-		std::unique_ptr<btCapsuleShape> _shape;
+		std::unique_ptr<btBoxShape> _shape;
 
 		glm::vec3 _walkDirection = glm::vec3(0.0f);
 		bool _justTeleported = false;
+		bool _hasGroundAnchor = false;
+		float _groundAnchorY = 0.0f;
 		glm::vec3 _currentSyncedWorldPosition = glm::vec3(0.0f);
 		glm::vec3 _previousSyncedWorldPosition = glm::vec3(0.0f);
 		glm::vec3 _postPhysicsSyncedWorldPosition = glm::vec3(0.0f);

@@ -39,7 +39,8 @@ namespace engine
 		void bind() const;
 		void unbind() const;
 
-		GLuint getAttachment(AttachmentFormat format) const;
+		GLuint getColorAttachment(int index) const;
+		GLuint getDepthAttachment() const;
 
 		int getWidth() const { return _width; }
 		int getHeight() const { return _height; }

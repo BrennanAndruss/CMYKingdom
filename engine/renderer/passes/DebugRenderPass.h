@@ -23,6 +23,7 @@ namespace engine
 			RenderContext& ctx) override;
 
 		bool showSkeletons = false;
+		bool showColliders = false;
 
 	private:
 		std::unique_ptr<Shader> _lineShader;
@@ -32,6 +33,7 @@ namespace engine
 		size_t _vboCapacity = 0;
 
 		void drawSkeletons(const Scene& scene, const AssetManager& assets);
+		void drawColliders(const Scene& scene);
 		void uploadLineVerts(const std::vector<glm::vec3>& verts);
 	};
 }

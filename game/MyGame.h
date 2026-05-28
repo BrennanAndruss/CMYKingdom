@@ -12,6 +12,10 @@
 #include "passes/ColorRestorationPass.h"
 #include "systems/FreeCameraController.h"
 #include "systems/PlayerController.h"
+namespace engine
+{
+	class GrassRenderer;
+}
 
 class MyGame : public engine::Game, public engine::EventCallbacks
 {
@@ -38,11 +42,15 @@ private:
 	engine::Object* gameplayCameraObject = nullptr;
 	engine::Object* editorCameraObject = nullptr;
 	engine::Object* pointLightCenter = nullptr;
+	engine::GrassRenderer* grassRenderer = nullptr;
+
 	Handle<engine::Mesh> cubeMesh;
 	Handle<engine::Mesh> platformMesh;
 	Handle<engine::Material> platformMaterial;
+
 	PlayerController* gameplayController = nullptr;
 	FreeCameraController* editorController = nullptr;
+
 	bool editorModeActive = false;
 	bool editorCameraLocked = false;
 	std::vector<engine::Object*> objects;

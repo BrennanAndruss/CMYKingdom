@@ -1,12 +1,9 @@
 #include "renderer/passes/ForwardRenderPass.h"
 
-#include <algorithm>
 #include <glad/glad.h>
+#include <algorithm>
 #include <string>
-#include <memory>
 #include <vector>
-#include <iostream>
-#include "core/Input.h"
 #include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
@@ -18,14 +15,14 @@
 #include "scene/Scene.h"
 #include "scene/components/Animator.h"
 #include "scene/components/MeshRenderer.h"
+#include "scene/components/GrassRenderer.h"
 #include "../game/MyGame.h"
 
 namespace engine
 {
 	static constexpr std::size_t MAX_SHADER_BONES = 100;
 
-	ForwardRenderPass::ForwardRenderPass(int width, int height, Handle<Shader> shader) :
-		_shader(shader),
+	ForwardRenderPass::ForwardRenderPass(int width, int height) :
 		_framebuffer(width, height, {
 			{ AttachmentFormat::RGBA8 },
 			{ AttachmentFormat::Depth24Stencil8 }
@@ -52,9 +49,7 @@ namespace engine
 
 		Camera* camera = scene.getMainCamera();
 		if (!camera) return;
-
-		const CameraData& camData = camera->getCameraData();
-		Frustum frustum = Frustum::fromCamera(camData);
+		Frustum frustum = Frustum::fromCamera(camera->getCameraData());
 
 		// Cull and draw
 		for (const auto& object : scene.getRootObjects())
@@ -79,15 +74,13 @@ namespace engine
 			drawObjectCulled(object, scene, assets, frustum, camera, true, &_waterSceneCopy);
 		}
 
-		// Cleanup state for next pass
+		// Clean up state for next pass
 		glDisable(GL_STENCIL_TEST);
 		glStencilMask(0x00);
 		_framebuffer.unbind();
 
-		ctx.setBuffer(BufferNames::SceneColor, 
-			_framebuffer.getAttachment(AttachmentFormat::RGBA8));
-		ctx.setBuffer(BufferNames::SceneDepth, 
-			_framebuffer.getAttachment(AttachmentFormat::Depth24Stencil8));
+		ctx.setBuffer(BufferNames::SceneColor, _framebuffer.getColorAttachment(0));
+		ctx.setBuffer(BufferNames::SceneDepth, _framebuffer.getDepthAttachment());
 		ctx.sceneFramebuffer = &_framebuffer;
 	}
 
@@ -124,15 +117,16 @@ namespace engine
 		if (auto* mr = object->getComponent<MeshRenderer>())
 		{
 			const BBox& worldBBox = object->getWorldBBox(assets);
-			if (worldBBox.intersectsFrustum(frustum))
+			if (!worldBBox.intersectsFrustum(frustum))
 			{
-				drawObject(object, scene, assets, camera, sceneCopy);
-			}
-			else
-			{
-				// std::cout << "Culled " << object->name << "\n";
 				return;
 			}
+
+			drawObject(object, scene, assets, camera, sceneCopy);
+		}
+		if (auto* grass = object->getComponent<GrassRenderer>())
+		{
+			grass->draw(assets, frustum, Time::time());
 		}
 
 		// Recurse into children
@@ -157,6 +151,19 @@ namespace engine
 
 		auto* shader = assets.getShader(mat->shader);
 		if (!shader) return;
+
+		// Write stencil
+		if (meshRenderer->writeStencil)
+		{
+			glEnable(GL_STENCIL_TEST);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+			glStencilMask(0xFF);
+		}
+		else
+		{
+			glStencilMask(0x00);
+		}
 
 		shader->bind();
 
@@ -199,14 +206,14 @@ namespace engine
 			shader->setFloat("u_waveHeight", 0.35f);
 			shader->setFloat("u_refractionStrength", 0.01f);
 			shader->setFloat("u_depthScale", 0.50f);
-			shader->setVec3("u_shallowColor", glm::vec3(0.4f, 0.914f, 0.98f));
-			shader->setVec3("u_deepColor", glm::vec3(0.0627f, 0.2196f, 0.91f));
+			shader->setVec3("u_shallowColor", glm::vec3(0.3f, 0.66f, 0.9f));
+			shader->setVec3("u_deepColor", glm::vec3(0.24f, 0.48f, 0.81f));
 			shader->setFloat("u_terrainPlaneLen", mat->terrainPlaneLen);
 			shader->setFloat("u_terrainHeightScale", mat->terrainHeightScale);
 
 			if (sceneCopy)
 			{
-				const GLuint sceneColor = sceneCopy->getAttachment(AttachmentFormat::RGBA8);
+				const GLuint sceneColor = sceneCopy->getColorAttachment(0);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, sceneColor);
@@ -222,18 +229,6 @@ namespace engine
 					terrainHeightTex->bindToUnit(shader->getUniform("u_terrainHeightTex"), 2);
 				}
 			}
-		}
-
-		if (meshRenderer->writeStencil)
-		{
-			glEnable(GL_STENCIL_TEST);
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-			glStencilMask(0xFF);
-		}
-		else
-		{
-			glStencilMask(0x00);
 		}
 
 		// Bind textures
@@ -276,6 +271,7 @@ namespace engine
 			if (specTex) specTex->bind(shader->getUniform("mat.specTex"));
 		}
 
+		// Bone matrices for skinned meshes
 		Animator* animator = nullptr;
 		if (mesh->isSkinned() && (animator = object->getComponent<Animator>()))
 		{

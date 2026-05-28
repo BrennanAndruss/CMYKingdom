@@ -26,7 +26,9 @@ public:
 	float jumpBoostMultiplier = 2.0f;
 	float jumpBoostDuration = 15.0f;
 	float jumpBoostTimer = 0.0f;
-	float platformCarryFactor = 1.5f;
+	float jumpBufferDuration = 0.20f;
+	float groundedGraceDuration = 0.12f;
+	float platformCarryFactor = 1.0f;
 	// Tune blend feel from game setup without touching Animator internals.
 	float locomotionCrossfade = 0.22f;
 	float jumpCrossfade = 0.1f;
@@ -52,6 +54,8 @@ private:
 	glm::vec3 _lastGroundCarrierWorldPosition = glm::vec3(0.0f);
 	glm::vec3 _pendingCarrierDelta = glm::vec3(0.0f);
 	std::string _pendingCarrierName;
+	float _jumpBufferTimer = 0.0f;
+	float _groundedGraceTimer = 0.0f;
 
 	float _yaw = 0.0f;
 	float _pitch = 0.0f;

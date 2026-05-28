@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "renderer/RenderingPath.h"
 
 namespace engine
 {
@@ -9,6 +10,7 @@ namespace engine
 		std::string title = "engine";
 		int width = 640;
 		int height = 480;
+		RenderingPath renderingPath = RenderingPath::Forward;
 		bool depthTest = true;
 		bool cullFace = true;
 

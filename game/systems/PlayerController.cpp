@@ -127,6 +127,30 @@ void PlayerController::update(float deltaTime)
 			jumpForce = baseJumpForce;
 		}
 	}
+
+	if (_jumpBufferTimer > 0.0f)
+	{
+		_jumpBufferTimer -= deltaTime;
+		if (_jumpBufferTimer < 0.0f)
+		{
+			_jumpBufferTimer = 0.0f;
+		}
+	}
+
+	const bool groundedNow = _characterController->isOnGround();
+
+	if (groundedNow)
+	{
+		_groundedGraceTimer = groundedGraceDuration;
+	}
+	else if (_groundedGraceTimer > 0.0f)
+	{
+		_groundedGraceTimer -= deltaTime;
+		if (_groundedGraceTimer < 0.0f)
+		{
+			_groundedGraceTimer = 0.0f;
+		}
+	}
 	
 
 	const glm::vec3 currentPlayerWorldPosition = _characterController->getCurrentSyncedWorldPosition();
@@ -154,8 +178,6 @@ void PlayerController::update(float deltaTime)
 	if (engine::Input::isKeyDown(GLFW_KEY_S)) input.z -= 1.0f;
 	if (engine::Input::isKeyDown(GLFW_KEY_A)) input.x -= 1.0f;
 	if (engine::Input::isKeyDown(GLFW_KEY_D)) input.x += 1.0f;
-
-	bool isGrounded = _characterController->isOnGround();
 	bool isMoving = input.x != 0.0f || input.z != 0.0f;
 
 	if (animator && !hasJumped)
@@ -173,18 +195,26 @@ void PlayerController::update(float deltaTime)
 		}
 	}
 
-	if (isGrounded)
+	if (groundedNow)
 	{
 		hasJumped = false;
 	}
-	else
+	else if (_groundedGraceTimer <= 0.0f)
 	{
 		_groundCarrier = nullptr;
+		_lastGroundCarrierWorldPosition = glm::vec3(0.0f);
 	}
 
-	if (engine::Input::isKeyDown(GLFW_KEY_SPACE) && !hasJumped && _characterController->canJump())
+	if (engine::Input::isKeyPressed(GLFW_KEY_SPACE))
+	{
+		_jumpBufferTimer = jumpBufferDuration;
+	}
+
+	if (_jumpBufferTimer > 0.0f && !hasJumped && _groundedGraceTimer > 0.0f)
 	{
 		hasJumped = true;
+		_jumpBufferTimer = 0.0f;
+		_groundedGraceTimer = 0.0f;
 		const float effectiveMass = glm::max(_characterController->mass, 0.001f);
 		_characterController->jump(glm::vec3(0.0f, jumpForce / effectiveMass, 0.0f));
 
@@ -193,7 +223,7 @@ void PlayerController::update(float deltaTime)
 			// play jump animation when jumping; start from beginning and don't loop
 			// play jump with a short crossfade from current animation
 			animator->play(jumpClip, false, 0.0f, jumpCrossfade);
-			std::cout << "Jump initiated! Playing jump animation.\n";
+			// std::cout << "Jump initiated! Playing jump animation.\n";
 		}
 	}
 	
@@ -222,7 +252,7 @@ void PlayerController::update(float deltaTime)
 	
 	// Apply horizontal movement through character controller
 	glm::vec3 desiredVelocity = walkDir * moveSpeed;
-	if (isGrounded && platformCarryFactor > 0.0f)
+	if ((groundedNow || _groundedGraceTimer > 0.0f) && platformCarryFactor > 0.0f)
 	{
 		engine::Object* groundCarrier = findGroundCarrier(*owner, *_characterController, _groundCarrier);
 		glm::vec3 carried(0.0f);
@@ -253,11 +283,7 @@ void PlayerController::update(float deltaTime)
 			_pendingCarrierName.clear();
 		}
 
-		const glm::vec3 carriedOffset(
-			carried.x * platformCarryFactor,
-			carried.y * platformCarryFactor,
-			carried.z * platformCarryFactor);
-		desiredVelocity += carriedOffset;
+		_characterController->moveWorldOffset(carried * platformCarryFactor);
 	}
 
 	_characterController->move(desiredVelocity);
