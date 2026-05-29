@@ -103,7 +103,7 @@ void MyGame::init(engine::AssetManager& assets,
     assets.loadTexture("terrainSplat0", "textures/splatmaps/splatmap0.png", true); 
 
 	Handle<engine::Texture> terrainGrass =
-		assets.loadTexture("terrainGrass", "textures/terrain/grass.png", true);
+		assets.loadTexture("terrainGrass", "textures/terrain/stylized_grass.png", true);
 
 	// Using Terrain Grass Texture for Grass Instances <Can change later on> 
 	Handle<engine::Texture> grassBladeTex = terrainGrass; 
@@ -112,7 +112,7 @@ void MyGame::init(engine::AssetManager& assets,
 		assets.loadTexture("terrainSand", "textures/terrain/sand.png", true);
 
 	Handle<engine::Texture> terrainRock =
-		assets.loadTexture("terrainRock", "textures/terrain/rock.png", true);
+		assets.loadTexture("terrainRock", "textures/terrain/stylized_stone.png", true);
 
 	Handle<engine::Texture> terrainSnow =
 		assets.loadTexture("terrainSnow", "textures/terrain/snow.png", true); 
