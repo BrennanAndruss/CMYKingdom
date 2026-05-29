@@ -52,14 +52,11 @@ namespace engine
 		_framebuffer.bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
 
 		Shader* shader = assets.getShader(_shader);
 		if (!shader) return;
-
-		// todo: handle water in TransparentPass
-		static Shader* waterShader = assets.getShader("waterShader");
-		if (shader == waterShader)
-			return;
 
 		shader->bind();
 
@@ -86,7 +83,10 @@ namespace engine
 		FullscreenQuad::getInstance().draw();
 
 		shader->unbind();
+
+		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
+
 		_framebuffer.unbind();
 
 		ctx.setBuffer(BufferNames::SceneColor, _framebuffer.getColorAttachment(0));

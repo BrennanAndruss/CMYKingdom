@@ -418,7 +418,7 @@ void MyGame::init(engine::AssetManager& assets,
 	mat = assets.getMaterial(terrainMat);
 
 	mat->shader = renderer.getTerrainShader();
-	mat->isTerrain = true;
+	mat->renderMode = engine::RenderMode::Terrain;
 
 	mat->splat0 = terrainSplat0;
 
@@ -568,6 +568,7 @@ void MyGame::init(engine::AssetManager& assets,
 		
 		Handle<engine::Material> waterMat = assets.loadMaterial("waterMat");
 		auto* matPtr = assets.getMaterial(waterMat);
+		matPtr->renderMode = engine::RenderMode::Water;
 		matPtr->shader = waterShader;
 		matPtr->ambient = glm::vec3(0.15f, 0.25f, 0.35f);
 		matPtr->diffuse = glm::vec3(0.45f, 0.70f, 0.90f);

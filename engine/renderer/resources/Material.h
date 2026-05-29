@@ -12,8 +12,18 @@ namespace engine
 
 namespace engine
 {
+	enum class RenderMode
+	{
+		Opaque,
+		Transparent,
+		Terrain,
+		Water,
+	};
+
 	struct Material
 	{
+		RenderMode renderMode = RenderMode::Opaque;
+
 		Handle<Shader> shader;
 		Handle<Texture> difTex;
 		Handle<Texture> specTex;
@@ -22,8 +32,6 @@ namespace engine
 		glm::vec3 ambient = glm::vec3(0.0f);
 		glm::vec3 diffuse = glm::vec3(0.0f);
 		glm::vec3 specular = glm::vec3(0.0f);
-
-		bool isTerrain = false;
 
 		Handle<Texture> splat0;
 

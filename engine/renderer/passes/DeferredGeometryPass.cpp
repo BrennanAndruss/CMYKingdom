@@ -106,7 +106,8 @@ namespace engine
 
 		auto* mesh = assets.getMesh(meshRenderer->mesh);
 		auto* mat = assets.getMaterial(meshRenderer->material);
-		if (!mesh || !mat) return;
+		if (!mesh || !mat || mat->renderMode == RenderMode::Transparent
+			|| mat->renderMode == RenderMode::Water) return;
 
 		auto* shader = assets.getShader(mat->shader);
 		if (!shader) return;
@@ -132,7 +133,7 @@ namespace engine
 		shader->setFloat("mat.shininess", mat->shininess);
 
 		// Bind textures
-		if (mat->isTerrain)
+		if (mat->renderMode == RenderMode::Terrain)
 		{
 			if (auto* t = assets.getTexture(mat->splat0))
 				t->bindToUnit(shader->getUniform("splat0"), 0);

@@ -13,7 +13,11 @@ namespace engine
         _assets(config.assetsDir)        
     {
         if (config.depthTest) glEnable(GL_DEPTH_TEST);
-        if (config.cullFace) glEnable(GL_CULL_FACE);
+        if (config.cullFace)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
 
         _window.setEventCallbacks(this);
         _scene.setPhysicsSystem(&_physics);
