@@ -19,12 +19,21 @@ namespace engine
 
 		// Depth formats
 		Depth24,
-		Depth24Stencil8
+		Depth24Stencil8,
+		Depth32F,
+
+		// Shadow formats
+		// Enable hardware PCF sampling
+		Depth32FShadow,
+		Depth32FShadowArray
 	};
 
 	struct FramebufferAttachment
 	{
 		AttachmentFormat format;
+		GLint wrapMode = GL_CLAMP_TO_EDGE;
+		bool borderWhite = false;
+		int layerCount = 1;
 		GLuint textureId = 0;
 	};
 
@@ -38,6 +47,8 @@ namespace engine
 
 		void bind() const;
 		void unbind() const;
+
+		void attachLayer(int index) const;
 
 		GLuint getColorAttachment(int index) const;
 		GLuint getDepthAttachment() const;

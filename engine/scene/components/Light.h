@@ -5,18 +5,25 @@
 
 namespace engine
 {
+	constexpr int MAX_LIGHTS = 16;
+
 	enum class LightType
 	{
 		Directional,
 		Point,
 	};
 
-	// Light data struct for the Light UBO
 	struct LightData
 	{
 		glm::vec4 color_intensity = glm::vec4(0.0f);
 		glm::vec4 position_range = glm::vec4(0.0f);
 		glm::vec4 direction_type = glm::vec4(0.0f);
+	};
+
+	struct LightUBO
+	{
+		LightData lights[MAX_LIGHTS];
+		int numLights;
 	};
 
 	class Light : public Component
@@ -39,6 +46,7 @@ namespace engine
 	{
 	public:
 		LightData getLightData() const override;
+		glm::vec3 getDirection() const;
 	};
 
 	class PointLight : public Light

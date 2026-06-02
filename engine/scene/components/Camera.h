@@ -24,11 +24,13 @@ namespace engine
 		void start() override;
 
 		void setFov(float fov);
+		float getFov() const { return _fov; }
 		void setAspect(float aspect);
-
-		const CameraData& getCameraData() const { return _cameraData; }
+		float getAspect() const { return _aspect; }
 		float getNearPlane() const { return _near; }
 		float getFarPlane() const { return _far; }
+
+		const CameraData& getCameraData() const { return _cameraData; }
 
 		void updateViewMatrix();
 

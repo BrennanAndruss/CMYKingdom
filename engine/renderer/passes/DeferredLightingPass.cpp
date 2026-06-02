@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include "core/Input.h"
+#include "renderer/passes/ShadowPass.h"
 #include "renderer/RenderContext.h"
 #include "renderer/FullscreenQuad.h"
 #include "renderer/resources/Shader.h"
@@ -29,7 +30,7 @@ namespace engine
 	void DeferredLightingPass::execute(const Scene& scene, const AssetManager& assets,
 		RenderContext& ctx)
 	{
-		// Debug views for G-buffer textures
+		// Debug views for G-buffer textures and shadow cascades
 		static int debugView = -1;
 		if (Input::isKeyDown(GLFW_KEY_F4))
 		{
@@ -39,6 +40,12 @@ namespace engine
 		}
 		else
 			debugView = -1;
+
+		int showCascades = 0;
+		if (Input::isKeyDown(GLFW_KEY_F2))
+		{
+			showCascades = 1;
+		}
 
 		// Blit stencil from gBuffer to lighting framebuffer
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.sceneFramebuffer->getFboId());
@@ -79,7 +86,15 @@ namespace engine
 		shader->setInt("gAlbedoSpec", 2);
 
 		shader->setInt("numLights", static_cast<int>(scene.getLights().size()));
+		
 		shader->setInt("debugView", debugView);
+		shader->setInt("showCascades", showCascades);
+
+		// Bind shadow maps
+		GLuint shadowMap = ctx.getBuffer(BufferNames::Shadow);
+		glActiveTexture(GL_TEXTURE0 + 11);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, shadowMap);
+		shader->setInt("shadowMaps", 11);
 
 		if (scene.hasIrradianceMap())
 		{

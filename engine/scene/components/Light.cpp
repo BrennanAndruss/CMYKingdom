@@ -19,6 +19,11 @@ namespace engine
 		};
 	}
 
+	glm::vec3 DirectionalLight::getDirection() const
+	{
+		return owner->transform.getForward();
+	}
+
 	LightData PointLight::getLightData() const
 	{
 		return {
