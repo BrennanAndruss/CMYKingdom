@@ -1,5 +1,7 @@
 #version 410 core
 
+#define MAX_SHADER_BONES 100
+
 layout (location = 0) in vec3 vertPos;
 layout (location = 1) in vec3 vertNor;
 layout (location = 2) in vec2 vertTexCoord;
@@ -20,7 +22,7 @@ layout (std140) uniform CameraData
 uniform mat4 model;
 uniform int isSkinned;
 uniform int numBones;
-uniform mat4 bones[100];
+uniform mat4 bones[MAX_SHADER_BONES];
 
 mat4 getSkinMatrix()
 {

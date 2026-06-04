@@ -60,6 +60,7 @@ namespace engine
 		// Bind uniform blocks
 		GLuint cameraIndex = glGetUniformBlockIndex(_pid, "CameraData");
 		GLuint lightIndex = glGetUniformBlockIndex(_pid, "LightData");
+		GLuint shadowIndex = glGetUniformBlockIndex(_pid, "ShadowData");
 
 		if (cameraIndex != GL_INVALID_INDEX)
 		{
@@ -68,6 +69,10 @@ namespace engine
 		if (lightIndex != GL_INVALID_INDEX)
 		{
 			glUniformBlockBinding(_pid, lightIndex, static_cast<GLuint>(UBOBindings::Light));
+		}
+		if (shadowIndex != GL_INVALID_INDEX)
+		{
+			glUniformBlockBinding(_pid, shadowIndex, static_cast<GLuint>(UBOBindings::Shadow));
 		}
 	}
 

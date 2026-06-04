@@ -565,7 +565,8 @@ void MyGame::init(engine::AssetManager& assets,
 	{
 		auto& obj = scene.createObject("DirLight");
 		auto& dirLight = obj.addComponent<engine::DirectionalLight>();
-		obj.transform.lookAt(glm::vec3(0.8f, -1.0f, 0.6f));
+		obj.transform.lookAt(glm::vec3(-0.8f, -0.5f, 0.0f));
+		// obj.transform.lookAt(glm::vec3(0.0f, 0.0f, -1.0f));
 		dirLight.setColor(glm::vec3(1.0f));
 		dirLight.setIntensity(0.3f);
 	}

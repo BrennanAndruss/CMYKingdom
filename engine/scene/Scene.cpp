@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "resources/AssetManager.h"
+#include "renderer/BoundingVolume.h"
 #include "scene/components/Components.h"
 
 namespace engine
@@ -172,5 +173,20 @@ namespace engine
 			}
 		}
 		return roots;
+	}
+
+	BBox Scene::getSceneBBox(const AssetManager& assets) const
+	{
+		// todo: cache scene bbox and recompute when dirty
+		BBox sceneBBox;
+		for (const auto& object : _objects)
+		{
+			if (auto* mr = object->getComponent<MeshRenderer>())
+			{
+				sceneBBox.expand(object->getWorldBBox(assets));
+			}
+		}
+
+		return sceneBBox;
 	}
 }

@@ -9,6 +9,7 @@
 namespace engine
 {
 	class Framebuffer;
+	class ShadowUBO;
 }
 
 namespace engine
@@ -25,13 +26,17 @@ namespace engine
 		inline constexpr const char* GNormal = "GNormal";
 		inline constexpr const char* GAlbedo = "GAlbedo";
 		inline constexpr const char* GSpecular = "GSpecular";
+
+		// Shadow maps
+		inline constexpr const char* Shadow = "ShadowMap";
 	}
 
 	struct RenderContext
 	{
 		int width = 0, height = 0;
 		
-		Framebuffer* sceneFramebuffer;
+		Framebuffer* sceneFramebuffer = nullptr;
+		const ShadowUBO* shadowUBO = nullptr;
 		std::unordered_map<std::string, GLuint> buffers;
 
 		void setBuffer(const std::string& name, GLuint textureId)
