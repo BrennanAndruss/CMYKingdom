@@ -9,6 +9,7 @@
 #include "core/Input.h"
 #include "scene/Object.h"
 #include "scene/Scene.h"
+#include "scene/components/Audio.h"
 #include "scene/components/Collider.h"
 #include "scene/components/RigidBody.h"
 
@@ -100,6 +101,11 @@ void PlayerController::start()
 	cameraTransform->lookAt(focus);
 }
 
+void PlayerController::setAudioEngine(engine::AudioEngine* audioEngine)
+{
+	_audio = audioEngine;
+}
+
 void PlayerController::update(float deltaTime)
 {
 	if (!enabled)
@@ -157,7 +163,6 @@ void PlayerController::update(float deltaTime)
 	const glm::vec3 currentPlayerWorldPosition = _characterController->getCurrentSyncedWorldPosition();
 	const glm::vec3 previousPlayerWorldPosition = _characterController->getPreviousSyncedWorldPosition();
 	const glm::vec3 playerDelta = currentPlayerWorldPosition - previousPlayerWorldPosition;
-
 	
 
 	// Mouse look and click
@@ -181,6 +186,7 @@ void PlayerController::update(float deltaTime)
 	if (engine::Input::isKeyDown(GLFW_KEY_D)) input.x += 1.0f;
 	bool isMoving = input.x != 0.0f || input.z != 0.0f;
 	bool isSprinting = engine::Input::isKeyDown(GLFW_KEY_LEFT_SHIFT);
+	const bool isFastMovement = isSprinting || moveSpeed > (baseMoveSpeed * 1.01f);
 
 	if (animator && !hasJumped)
 	{
@@ -231,8 +237,17 @@ void PlayerController::update(float deltaTime)
 		hasJumped = true;
 		_jumpBufferTimer = 0.0f;
 		_groundedGraceTimer = 0.0f;
+		if (_audio)
+		{
+			_audio->stopLoopingEffect();
+			_activeLoopingSoundPath.clear();
+		}
 		const float effectiveMass = glm::max(_characterController->mass, 0.001f);
 		_characterController->jump(glm::vec3(0.0f, jumpForce / effectiveMass, 0.0f));
+		if (_audio && !jumpSoundPath.empty())
+		{
+			_audio->playOneShot(jumpSoundPath);
+		}
 
 		if (animator && jumpClip.valid())
 		{
@@ -241,6 +256,29 @@ void PlayerController::update(float deltaTime)
 			// play jump with a short crossfade from current animation
 			animator->play(jumpClip, false, 0.0f, jumpCrossfade);
 			// std::cout << "Jump initiated! Playing jump animation.\n";
+		}
+	}
+
+	if (_audio)
+	{
+		const bool wantsLoop = isMoving && !hasJumped;
+		std::string desiredLoopPath;
+		if (wantsLoop)
+		{
+			desiredLoopPath = isFastMovement && !runFastSoundPath.empty() ? runFastSoundPath : runSoundPath;
+		}
+
+		if (desiredLoopPath != _activeLoopingSoundPath)
+		{
+			if (desiredLoopPath.empty())
+			{
+				_audio->stopLoopingEffect();
+				_activeLoopingSoundPath.clear();
+			}
+			else if (_audio->playLoopingEffect(desiredLoopPath, true))
+			{
+				_activeLoopingSoundPath = desiredLoopPath;
+			}
 		}
 	}
 	

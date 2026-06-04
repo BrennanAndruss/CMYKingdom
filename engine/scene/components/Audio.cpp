@@ -10,8 +10,10 @@ namespace engine
     {
         ma_engine engine{};
         ma_sound music{};
+        ma_sound loopingEffect{};
         bool initialized = false;
         bool musicLoaded = false;
+        bool loopingEffectLoaded = false;
     };
 }
 
@@ -54,6 +56,7 @@ namespace engine
         }
 
         stopMusic();
+        stopLoopingEffect();
         ma_engine_uninit(&_impl->engine);
         _impl->initialized = false;
     }
@@ -108,6 +111,59 @@ namespace engine
         if (_impl && _impl->musicLoaded)
         {
             ma_sound_set_volume(&_impl->music, volume);
+        }
+    }
+
+    bool AudioEngine::playLoopingEffect(const std::string& filePath, bool loop)
+    {
+        if (!_impl || !_impl->initialized)
+        {
+            return false;
+        }
+
+        if (_impl->loopingEffectLoaded)
+        {
+            ma_sound_uninit(&_impl->loopingEffect);
+            _impl->loopingEffectLoaded = false;
+        }
+
+        const ma_uint32 flags = MA_SOUND_FLAG_STREAM;
+        const ma_result result = ma_sound_init_from_file(&_impl->engine, filePath.c_str(), flags, nullptr, nullptr, &_impl->loopingEffect);
+        if (result != MA_SUCCESS)
+        {
+            std::cerr << "AudioEngine: failed to load looping effect '" << filePath << "' (" << result << ")" << std::endl;
+            return false;
+        }
+
+        ma_sound_set_looping(&_impl->loopingEffect, loop ? MA_TRUE : MA_FALSE);
+        if (ma_sound_start(&_impl->loopingEffect) != MA_SUCCESS)
+        {
+            std::cerr << "AudioEngine: failed to start looping effect '" << filePath << "'" << std::endl;
+            ma_sound_uninit(&_impl->loopingEffect);
+            return false;
+        }
+
+        _impl->loopingEffectLoaded = true;
+        return true;
+    }
+
+    void AudioEngine::stopLoopingEffect()
+    {
+        if (!_impl || !_impl->loopingEffectLoaded)
+        {
+            return;
+        }
+
+        ma_sound_stop(&_impl->loopingEffect);
+        ma_sound_uninit(&_impl->loopingEffect);
+        _impl->loopingEffectLoaded = false;
+    }
+
+    void AudioEngine::setLoopingEffectVolume(float volume)
+    {
+        if (_impl && _impl->loopingEffectLoaded)
+        {
+            ma_sound_set_volume(&_impl->loopingEffect, volume);
         }
     }
 

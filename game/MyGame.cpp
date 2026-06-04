@@ -27,7 +27,7 @@ MyGame* MyGame::getActiveGame()
 
 void MyGame::setBackgroundMusicPath(const std::string& path)
 {
-	backgroundMusicPath = "assets/sounds/audio-WIP.mp3";
+	backgroundMusicPath = path;
 }
 
 void MyGame::onCollectableCollected()
@@ -499,6 +499,10 @@ void MyGame::init(engine::AssetManager& assets,
 		playerController.idleClip = idleClip;
 		playerController.sprintClip = sprintClip;
 		playerController.jumpClip = jumpClip;
+		playerController.setAudioEngine(_audio); // set the audio engine pointer in the player controller
+		playerController.runSoundPath = runningSoundPath;
+		playerController.runFastSoundPath = runningFastSoundPath;
+		playerController.jumpSoundPath = jumpingSoundPath;
 	}
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");
