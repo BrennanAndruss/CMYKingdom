@@ -14,6 +14,7 @@ namespace engine
 	class RenderContext;
 	class Shader;
 	class Camera;
+	struct BBox;
 }
 
 namespace engine
@@ -26,7 +27,7 @@ namespace engine
 		glm::mat4 cascadeLightSpaces[NUM_CASCADES];
 		glm::vec4 cascadeSplits;
 		int numCascades = NUM_CASCADES;
-		float shadowBias = 0.005f;
+		float shadowBias = 0.0005f;
 		float _pad[2];
 	};
 
@@ -44,7 +45,7 @@ namespace engine
 
 		// Cascade parameters
 		float lambda = 0.15f;
-		float shadowBias = 0.005f;
+		float shadowBias = 0.001f;
 		float maxShadowDistance = 500.0f;
 
 	private:
@@ -56,9 +57,12 @@ namespace engine
 		ShadowUBO _shadowUBO;
 
 		void computeCascadeSplits(const Camera& camera);
-		glm::mat4 computeLightSpaceMatrix(const Camera& camera,
+		glm::mat4 computeLightSpaceMatrix(const Camera& camera, BBox sceneBBox, 
 			glm::vec3 lightDir, float camNear, float camFar);
 		void renderCascade(int index, const Scene& scene,
+			const AssetManager& assets);
+
+		void drawObject(int index, const Scene& scene,
 			const AssetManager& assets);
 	};
 }

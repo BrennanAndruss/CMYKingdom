@@ -16,6 +16,7 @@ namespace engine
 {
 	class Cubemap;
 	class AssetManager;
+	struct BBox;
 
 	class Scene
 	{
@@ -67,6 +68,8 @@ namespace engine
 
 		Handle<Cubemap> getIrradianceMap() const { return _irradianceMap; }
 		bool hasIrradianceMap() const { return _irradianceMap.valid(); }
+
+		BBox getSceneBBox(const AssetManager& assets) const;
 
 	private:
 		std::vector<std::unique_ptr<Object>> _objects;

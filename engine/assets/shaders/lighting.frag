@@ -177,7 +177,6 @@ void main()
 		float visibility = 1.0;
 		if (lightType == LIGHT_DIRECTIONAL && !primaryShadowApplied)
 		{
-			visibility = 0.0;
 			visibility = sampleShadow(fragPos, NdotL, layer);
 
 			// Shadow maps only match the first directional light

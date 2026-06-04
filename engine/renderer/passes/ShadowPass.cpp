@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <core/Input.h>
+#include "renderer/BoundingVolume.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Mesh.h"
@@ -66,12 +67,13 @@ namespace engine
 		computeCascadeSplits(*camera);
 
 		// Compute light space matrix for each cascade
+		BBox sceneBBox = scene.getSceneBBox(assets);
 		glm::vec3 lightDir = -dirLight->getDirection();
 		float prevSplit = camera->getNearPlane();
 		for (int i = 0; i < NUM_CASCADES; i++)
 		{
-			_shadowUBO.cascadeLightSpaces[i] = computeLightSpaceMatrix(
-				*camera, lightDir, prevSplit, _shadowUBO.cascadeSplits[i]);
+			_shadowUBO.cascadeLightSpaces[i] = computeLightSpaceMatrix(*camera, 
+				sceneBBox, lightDir, prevSplit, _shadowUBO.cascadeSplits[i]);
 			prevSplit = _shadowUBO.cascadeSplits[i];
 		}
 
@@ -81,7 +83,7 @@ namespace engine
 		// Cull front faces to resolve peter-panning
 		_shadowFramebuffer.bind();
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		// glCullFace(GL_FRONT);
 
 		// Render each cascade
 		for (int i = 0; i < NUM_CASCADES; i++)
@@ -93,7 +95,7 @@ namespace engine
 			renderCascade(i, scene, assets);
 		}
 
-		glCullFace(GL_BACK);
+		// glCullFace(GL_BACK);
 		_shadowFramebuffer.unbind();
 
 		// Register shadow maps to render context
@@ -124,8 +126,8 @@ namespace engine
 		}
 	}
 
-	glm::mat4 ShadowPass::computeLightSpaceMatrix(const Camera& camera, glm::vec3 lightDir,
-		float nearSplit, float farSplit)
+	glm::mat4 ShadowPass::computeLightSpaceMatrix(const Camera& camera, BBox sceneBBox,
+		glm::vec3 lightDir, float nearSplit, float farSplit)
 	{
 		const float backOff = 10.0f;
 		lightDir = glm::normalize(lightDir);
@@ -140,7 +142,7 @@ namespace engine
 		// Build perspective matrix for this cascade slice
 		glm::mat4 sliceP = glm::perspective(glm::radians(fov), aspect, 
 			nearSplit, farSplit);
-		glm::mat4 invPV = glm::inverse(camData.view) * glm::inverse(sliceP);
+		glm::mat4 invPV = glm::inverse(sliceP * camData.view);
 		
 		// Transform unit cube corners to world space
 		glm::vec3 corners[8];
@@ -167,11 +169,40 @@ namespace engine
 				radius = d;
 		}
 
-		// Construct light view so near plane sits just in front of all shadow casters
-		glm::vec3 lightPos = center + lightDir * (radius + backOff);
+		// Construct stable view frame so near plane sits just in front of all shadow casters
+		float sceneZExtent = glm::length(sceneBBox.max - sceneBBox.min);
+		glm::vec3 lightPos = center + lightDir * (radius + sceneZExtent);
 		glm::mat4 lightView = glm::lookAt(lightPos, center, up);
+
+		// Transform scene bbox corners to light space to find z-range of shadow casters
+		glm::vec3 sceneCorners[8] = {
+			{ sceneBBox.min.x, sceneBBox.min.y, sceneBBox.min.z },
+			{ sceneBBox.max.x, sceneBBox.min.y, sceneBBox.min.z },
+			{ sceneBBox.min.x, sceneBBox.max.y, sceneBBox.min.z },
+			{ sceneBBox.max.x, sceneBBox.max.y, sceneBBox.min.z },
+			{ sceneBBox.min.x, sceneBBox.min.y, sceneBBox.max.z },
+			{ sceneBBox.max.x, sceneBBox.min.y, sceneBBox.max.z },
+			{ sceneBBox.min.x, sceneBBox.max.y, sceneBBox.max.z },
+			{ sceneBBox.max.x, sceneBBox.max.y, sceneBBox.max.z }
+		};
+
+		float minZ = (std::numeric_limits<float>::max)();
+		float maxZ = -(std::numeric_limits<float>::max)();
+
+		for (int i = 0; i < 8; i++)
+		{
+			glm::vec4 lightSpaceCorner = lightView * glm::vec4(sceneCorners[i], 1.0f);
+			if (lightSpaceCorner.z < minZ) minZ = lightSpaceCorner.z;
+			if (lightSpaceCorner.z > maxZ) maxZ = lightSpaceCorner.z;
+		}
+
+		// Create orthographic projection that bounds shadow casters in light space
+		float padding = 5.0f;
+		float orthoNear = -maxZ - padding;
+		float orthoFar = -minZ + padding;
+
 		glm::mat4 lightProj = glm::ortho(-radius, radius, -radius, radius,
-			0.0f, 2.0f * radius + backOff);
+			orthoNear, orthoFar);
 
 		// Transform world origin to light clip space and scale to texel units
 		glm::mat4 lsNoSnap = lightProj * lightView;
@@ -206,7 +237,7 @@ namespace engine
 			auto* mesh = assets.getMesh(meshRenderer->mesh);
 			auto* mat = assets.getMaterial(meshRenderer->material);
 			if (!mesh || !mat || mat->renderMode == RenderMode::Transparent
-				|| mat->renderMode == RenderMode::Water) return;
+				|| mat->renderMode == RenderMode::Water) continue;
 
 			auto* animator = object->getComponent<Animator>();
 			bool skinned = mesh->isSkinned() && animator;
