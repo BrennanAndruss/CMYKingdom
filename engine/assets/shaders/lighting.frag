@@ -38,6 +38,7 @@ layout (std140) uniform LightData
 layout (std140) uniform ShadowData
 {
 	mat4 cascadeLightSpaces[NUM_CASCADES];
+	vec4 cascadeRadii;
 	vec4 cascadeSplits;
 	int numCascades;
 	float shadowBias;
@@ -53,6 +54,9 @@ uniform float irradianceStrength;
 // Debug variables
 uniform int debugView;
 uniform bool showCascades;
+
+// 1.0, 0.5, 0.2
+const float biasScales[3] = float[](1.0, 0.5, 0.2);
 
 const vec3 cascadeTints[3] = vec3[](
     vec3(1.4, 0.6, 0.6),
@@ -70,7 +74,9 @@ float sampleShadow(vec3 worldPos, float NdotL, int layer)
 	if (shifted.z > 1.0) return 0.0;
 
 	// Sloped-scaled bias to increase bias for surfaces at glancing angles
-	float bias = max(shadowBias * (1.0 - NdotL), shadowBias * 0.1);
+	// Further reduce bias for lower cascades to resolve peter panning
+	float biasModifier = cascadeRadii[layer] / cascadeRadii[0] * biasScales[layer];
+	float bias = max(shadowBias * (1.0 - NdotL), shadowBias * 0.1) * biasModifier;
 	
 	// Get lookup coordinate for 2D Array Shadow sampler
 	// Apply bias to reference for sample compare
@@ -95,11 +101,6 @@ int getCascade(float viewDepth)
 
 void main()
 {
-	// color = vec4(cascadeLightSpaces[0][0][0] * 10000, cascadeLightSpaces[1][0][0] * 10000, cascadeLightSpaces[2][0][0] * 10000, 1.0);
-	// color = vec4(cascadeSplits.x * 1000, cascadeSplits.y * 1000, cascadeSplits.z * 1000, 1.0);
-	// color = vec4(float(numCascades), shadowBias * 1000.0, 0.0, 1.0);
-	// return;
-
 	vec3 fragPos = texture(gPosition, fragTexCoord).rgb;
 	vec4 normalData = texture(gNormalShine, fragTexCoord);
 	vec4 albedoData = texture(gAlbedoSpec, fragTexCoord);

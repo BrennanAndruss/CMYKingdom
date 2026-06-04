@@ -25,6 +25,7 @@ namespace engine
 	struct ShadowUBO
 	{
 		glm::mat4 cascadeLightSpaces[NUM_CASCADES];
+		glm::vec4 cascadeRadii;
 		glm::vec4 cascadeSplits;
 		int numCascades = NUM_CASCADES;
 		float shadowBias = 0.0005f;
@@ -45,7 +46,7 @@ namespace engine
 
 		// Cascade parameters
 		float lambda = 0.15f;
-		float shadowBias = 0.001f;
+		float shadowBias = 0.0015f;
 		float maxShadowDistance = 500.0f;
 
 	private:
@@ -57,8 +58,8 @@ namespace engine
 		ShadowUBO _shadowUBO;
 
 		void computeCascadeSplits(const Camera& camera);
-		glm::mat4 computeLightSpaceMatrix(const Camera& camera, BBox sceneBBox, 
-			glm::vec3 lightDir, float camNear, float camFar);
+		void computeLightSpaceMatrices(const Camera& camera, 
+			BBox sceneBBox, glm::vec3 lightDir);
 		void renderCascade(int index, const Scene& scene,
 			const AssetManager& assets);
 
