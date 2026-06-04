@@ -6,6 +6,7 @@
 #include "renderer/FullscreenQuad.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Texture.h"
+#include "renderer/resources/Cubemap.h"
 #include "resources/AssetManager.h"
 #include "scene/Scene.h"
 
@@ -52,14 +53,11 @@ namespace engine
 		_framebuffer.bind();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
 
 		Shader* shader = assets.getShader(_shader);
 		if (!shader) return;
-
-		// todo: handle water in TransparentPass
-		static Shader* waterShader = assets.getShader("waterShader");
-		if (shader == waterShader)
-			return;
 
 		shader->bind();
 
@@ -83,10 +81,27 @@ namespace engine
 		shader->setInt("numLights", static_cast<int>(scene.getLights().size()));
 		shader->setInt("debugView", debugView);
 
+		if (scene.hasIrradianceMap())
+		{
+			auto* irradianceMap = assets.getCubemap(scene.getIrradianceMap());
+			assert(irradianceMap && "No irradiance map found.");
+
+			irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 10);
+			shader->setInt("useIrradianceMap", 1);
+			shader->setFloat("irradianceStrength", 1.2f);
+		}
+		else
+		{
+			shader->setInt("useIrradianceMap", 0);
+		}
+
 		FullscreenQuad::getInstance().draw();
 
 		shader->unbind();
+
+		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
+
 		_framebuffer.unbind();
 
 		ctx.setBuffer(BufferNames::SceneColor, _framebuffer.getColorAttachment(0));

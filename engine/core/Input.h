@@ -25,6 +25,8 @@ namespace engine
 		static void onMouseButton(int button, int action);
 		static void onScroll(double x, double y);
 		static void setMouseTrapped(bool trapped);
+		static void flushMouseDelta();
+
 
 	private:
 		static inline std::unordered_map<int, bool> _keys;

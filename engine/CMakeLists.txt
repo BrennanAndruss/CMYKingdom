@@ -22,6 +22,7 @@ target_compile_definitions(engine PUBLIC
 target_include_directories(engine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/external/glad/include
+    ${CMAKE_SOURCE_DIR}/external/miniaudio
     ${CMAKE_SOURCE_DIR}/external/stb_image
     ${CMAKE_SOURCE_DIR}/external/tiny_obj_loader
     ${bullet_SOURCE_DIR}/src

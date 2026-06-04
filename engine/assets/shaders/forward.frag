@@ -8,7 +8,7 @@ in vec2 fragTexCoord;
 
 out vec4 color;
 
-struct Material
+uniform struct Material
 {
 	vec3 ambient;
 	vec3 diffuse;
@@ -16,7 +16,7 @@ struct Material
 	vec3 specular;
 	sampler2D specTex;
 	float shininess;
-};
+} mat;
 
 struct Light
 {
@@ -42,7 +42,9 @@ layout(std140) uniform LightData
 
 uniform int numLights;
 
-uniform Material mat;
+uniform bool useIrradianceMap;
+uniform samplerCube irradianceMap;
+uniform float irradianceStrength;
 
 void main()
 {
@@ -52,9 +54,19 @@ void main()
 	vec3 sampledDif = mat.diffuse * texture(mat.difTex, fragTexCoord).rgb;
 	vec3 sampledSpec = mat.specular * texture(mat.specTex, fragTexCoord).rgb;
 
-	vec3 ambient = mat.ambient * sampledDif;
+	vec3 ambient;
 	vec3 diffuseSum = vec3(0.0);
 	vec3 specularSum = vec3(0.0);
+
+	if (useIrradianceMap)
+    {
+        vec3 skyAmbient = texture(irradianceMap, normal).rgb;
+        ambient = skyAmbient * sampledDif * irradianceStrength;
+    }
+    else
+    {
+        ambient = mat.ambient * sampledDif;
+    }
 
 	for (int i = 0; i < numLights; i++)
 	{

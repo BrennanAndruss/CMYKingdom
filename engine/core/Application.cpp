@@ -4,6 +4,8 @@
 #include "core/Input.h"
 #include "core/Time.h"
 
+#include <iostream>
+
 namespace engine 
 {
     Application::Application(const AppConfig& config) : 
@@ -13,11 +15,20 @@ namespace engine
         _assets(config.assetsDir)        
     {
         if (config.depthTest) glEnable(GL_DEPTH_TEST);
-        if (config.cullFace) glEnable(GL_CULL_FACE);
+        if (config.cullFace)
+        {
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_BACK);
+        }
 
         _window.setEventCallbacks(this);
         _scene.setPhysicsSystem(&_physics);
         _renderer.init(_assets);
+
+        if (!_audio.init())
+        {
+            std::cerr << "Application: audio initialization failed; continuing without background music." << std::endl;
+        }
 
         int framebufferWidth = 0, framebufferHeight = 0;
         glfwGetFramebufferSize(_window.getHandle(), &framebufferWidth, &framebufferHeight);
@@ -34,13 +45,14 @@ namespace engine
 
     Application::~Application()
     {
+		_audio.shutdown();
         _editor.shutdown();
     }
 
     void Application::run(std::unique_ptr<Game> game)
     {
 		_game = game.get();
-        game->init(_assets, _renderer, _scene, _config);
+        game->init(_assets, _renderer, _scene, _audio, _config);
 		_game->setEditorMode(_editorActive, _scene);
         _scene.start();
 
@@ -51,35 +63,31 @@ namespace engine
         while (!_window.shouldClose())
         {
             Time::update();
+
             Input::update();
             _window.pollEvents();
-            
-			if (_game)
-			{
-				_game->setEditorSelectionLock(_editorActive && _editor.hasSelectedObject(), _scene);
-			}
 
-            const bool editorEnabledThisFrame = _editorActive;
-            if (editorEnabledThisFrame)
+            if (_game)
             {
-                _editor.beginFrame();
-            }
+                _game->setEditorSelectionLock(_editorActive && _editor.hasSelectedObject(), _scene);
+            }   
 
-            // Update gameplay logic
+            _editor.beginFrame();
+
             game->update(Time::deltaTime());
             _scene.update(Time::deltaTime(), _assets);
-
-            // Render
             _renderer.render(_scene, _assets);
 
-            if (editorEnabledThisFrame)
+            game->drawUI();
+
+            if (_editorActive)
             {
                 _editor.draw(_scene, _assets, _config);
-                _editor.endFrame();
             }
-            
+
+            _editor.endFrame();
             _window.swapBuffers();
-        }
+        }   
     }
 
     void Application::setClearColor(float r, float g, float b, float a)

@@ -13,6 +13,7 @@ namespace engine
 
 		void setUnit(GLint unit) { _unit = unit; }
 		GLint getUnit() const { return _unit; }
+		GLuint getID() const { return _tid; }
 
 		int getWidth() const { return _width; }
 		int getHeight() const { return _height; }
@@ -24,6 +25,7 @@ namespace engine
 		
 		void bind(GLint handle) const;
 		void unbind() const;
+		
 
 	private:
 		int _width = 0;

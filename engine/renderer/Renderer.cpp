@@ -7,6 +7,7 @@
 #include "renderer/passes/ForwardRenderPass.h"
 #include "renderer/passes/DeferredGeometryPass.h"
 #include "renderer/passes/DeferredLightingPass.h"
+#include "renderer/passes/TransparentPass.h"
 #include "renderer/passes/SkyboxRenderPass.h"
 #include "renderer/passes/DebugRenderPass.h"
 #include "resources/AssetManager.h"
@@ -57,6 +58,7 @@ namespace engine
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height));
 			addRenderPass(std::make_unique<DeferredLightingPass>(_width, _height, lightingShader));
+			addRenderPass(std::make_unique<TransparentPass>(_width, _height));
 		}
 
 		Handle<Shader> skyboxShader = assets.loadEngineShader(

@@ -178,7 +178,6 @@ namespace engine
 				irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 10);
 				shader->setInt("useIrradianceMap", 1);
 				shader->setFloat("irradianceStrength", 1.2f);
-				shader->setFloat("irradianceStrength", 1.2f);
 			}
 		}
 		else
@@ -241,7 +240,7 @@ namespace engine
 		Texture* difTex = nullptr;
 		Texture* specTex = nullptr;
 
-		if (mat->isTerrain)
+		if (mat->renderMode == RenderMode::Terrain)
 		{
 			terrainSplat0 = assets.getTexture(mat->splat0);
 			terrainGrass = assets.getTexture(mat->terrainGrass);
@@ -299,19 +298,13 @@ namespace engine
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		if (mat->isTerrain)
-		{
-			if (terrainSplat0) terrainSplat0->unbindFromUnit(0);
-			if (terrainGrass)  terrainGrass->unbindFromUnit(1);
-			if (terrainSand)   terrainSand->unbindFromUnit(2);
-			if (terrainRock)   terrainRock->unbindFromUnit(3);
-			if (terrainSnow)   terrainSnow->unbindFromUnit(4);
-		}
-		else
-		{
-			if (difTex)  difTex->unbind();
-			if (specTex) specTex->unbind();
-		}
+		if (terrainSplat0)	terrainSplat0->unbindFromUnit(0);
+		if (terrainGrass)	terrainGrass->unbindFromUnit(1);
+		if (terrainSand)	terrainSand->unbindFromUnit(2);
+		if (terrainRock)	terrainRock->unbindFromUnit(3);
+		if (terrainSnow)	terrainSnow->unbindFromUnit(4);
+		if (difTex)			difTex->unbind();
+		if (specTex)		specTex->unbind();
 
 		if (irradianceMap)
 		{

@@ -33,6 +33,11 @@ layout (std140) uniform LightData
 };
 
 uniform int numLights;
+
+uniform bool useIrradianceMap;
+uniform samplerCube irradianceMap;
+uniform float irradianceStrength;
+
 uniform int debugView;
 
 void main()
@@ -77,6 +82,16 @@ void main()
 	vec3 diffuseSum = vec3(0.0);
 	vec3 specularSum = vec3(0.0);
 
+	if (useIrradianceMap)
+    {
+        vec3 skyAmbient = texture(irradianceMap, normal).rgb;
+        ambient = skyAmbient * albedo * irradianceStrength;
+    }
+    else
+    {
+        ambient = albedo * 0.1;
+    }
+
 	// Accumulate lights
 	for (int i = 0; i < numLights; i++)
 	{
@@ -105,9 +120,6 @@ void main()
 		vec3 halfDir = normalize(lightDir + view);
 		float sC = pow(max(dot(normal, halfDir), 0.0), shininess);
 		specularSum += vec3(specStrength) * sC * lightColor * attenuation;
-
-		// test
-		// ambient = vec3(1.0, 0.0, 0.0);
 	}
 
 	vec3 lighting = ambient + diffuseSum + specularSum;

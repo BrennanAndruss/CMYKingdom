@@ -11,17 +11,26 @@
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Mesh.h"
 #include "renderer/resources/Material.h"
+#include "renderer/resources/Texture.h"
 #include "renderer/resources/Cubemap.h"
 #include "scene/components/Components.h"
 #include "systems/PlayerController.h"
 #include "systems/Collectable.h"
+#include "ui/GameUI.h"
+#include <imgui.h>
 #include <stdio.h>
+
 
 MyGame* MyGame::_activeGame = nullptr;
 
 MyGame* MyGame::getActiveGame()
 {
 	return _activeGame;
+}
+
+void MyGame::setBackgroundMusicPath(const std::string& path)
+{
+	backgroundMusicPath = path;
 }
 
 void MyGame::onCollectableCollected()
@@ -31,30 +40,142 @@ void MyGame::onCollectableCollected()
 	_collectedYellow = std::min(_collectedYellow + 0.2f, 1.0f);
 }
 
+bool MyGame::allGemsCollected() const
+{
+    return _cyanGemCount >= _gameUI.maxGems &&
+           _magentaGemCount >= _gameUI.maxGems &&
+           _yellowGemCount >= _gameUI.maxGems;
+}
+
 void MyGame::onCollectableCollected(int type)
 {
 	// Only increment the color corresponding to the collectable type
-	if (type == 0) // Cyan
+	if (type == 0)
 	{
-		_collectedCyan = std::min(_collectedCyan + 0.2f, 1.0f);
+    	_collectedCyan = std::min(_collectedCyan + 0.2f, 1.0f);
+    	_cyanGemCount++;
 	}
-	else if (type == 1) // Magenta
+	else if (type == 1)
 	{
-		_collectedMagenta = std::min(_collectedMagenta + 0.2f, 1.0f);
+    	_collectedMagenta = std::min(_collectedMagenta + 0.2f, 1.0f);
+    	_magentaGemCount++;
 	}
-	else if (type == 2) // Yellow
+	else if (type == 2)
 	{
-		_collectedYellow = std::min(_collectedYellow + 0.2f, 1.0f);
+    	_collectedYellow = std::min(_collectedYellow + 0.2f, 1.0f);
+    	_yellowGemCount++;
 	}
+}
+
+	void MyGame::startGame()
+{
+    _gameUIState = GameUIState::Playing;
+    editorModeActive = false;
+    editorCameraLocked = false;
+
+    if (gameplayController) gameplayController->enabled = true;
+    if (editorController)   editorController->enabled = false;
+
+    if (gameplayCameraObject)
+    {
+        auto* camera = gameplayCameraObject->getComponent<engine::Camera>();
+        if (camera) gameplayCameraObject->getScene()->setMainCamera(camera);
+    }
+
+    engine::Input::setMouseTrapped(true);
+
+    // Explicitly flush any warp delta GLFW fires when cursor mode changes
+    engine::Input::flushMouseDelta();   // see below
+}
+
+void MyGame::continueGame()
+{
+    _gameUIState = GameUIState::Playing;
+
+    if (gameplayController)
+    {
+        gameplayController->enabled = true;
+    }
+
+    if (editorController)
+    {
+        editorController->enabled = false;
+    }
+
+    engine::Input::setMouseTrapped(true);
+}
+
+void MyGame::restartGame()
+{
+    resetGameProgress();
+
+    _endScreenShown = false;
+
+    _gameUIState = GameUIState::Playing;
+
+    if (gameplayController)
+    {
+        gameplayController->enabled = true;
+    }
+
+    if (editorController)
+    {
+        editorController->enabled = false;
+    }
+
+    engine::Input::setMouseTrapped(true);
+}
+
+void MyGame::resetGameProgress()
+{
+    _cyanGemCount = 0;
+    _magentaGemCount = 0;
+    _yellowGemCount = 0;
+
+    _collectedCyan = 0.0f;
+    _collectedMagenta = 0.0f;
+    _collectedYellow = 0.0f;
+
+    if (_colorRestorePass)
+    {
+        _colorRestorePass->cyan = 0.0f;
+        _colorRestorePass->magenta = 0.0f;
+        _colorRestorePass->yellow = 0.0f;
+    }
+}
+
+void MyGame::drawUI()
+{
+    GameUIAction action = _gameUI.draw(
+        _gameUIState,
+        _cyanGemCount,
+        _magentaGemCount,
+        _yellowGemCount
+    );
+
+    if (_gameUIState == GameUIState::Start && action == GameUIAction::Start)
+    {
+        _startRequested = true;
+    }
+    else if (_gameUIState == GameUIState::End && action == GameUIAction::Continue)
+    {
+        continueGame();
+    }
+    else if (_gameUIState == GameUIState::End && action == GameUIAction::Restart)
+    {
+        restartGame();
+    }
 }
 
 
 void MyGame::init(engine::AssetManager& assets, 
 				  engine::Renderer& renderer, 
 				  engine::Scene& scene,
+				  engine::AudioEngine& audio,
 				  const engine::AppConfig& config)
 {
 	_activeGame = this;
+	_audio = &audio;
 
 	// Initialize resources
 	std::cout << "Loading shaders...\n";
@@ -136,6 +257,11 @@ void MyGame::init(engine::AssetManager& assets,
 	});
 	scene.setIrradianceMap(irradianceCubemap);
 
+	if (_audio)
+	{
+		_audio->playMusic(backgroundMusicPath, true);
+	}	//load in game UI
+	_gameUI.loadAssets(assets);
 
 	Handle<engine::Texture> defaultGrayTex = assets.createSolidTexture("defaultGrayTex", { 128, 128, 128, 255 });
 	Handle<engine::Texture> gemDiffuseTex = assets.loadTexture("gemDiffuseTex", "textures/cyan_gem_texture.png", true);
@@ -418,7 +544,7 @@ void MyGame::init(engine::AssetManager& assets,
 	mat = assets.getMaterial(terrainMat);
 
 	mat->shader = renderer.getTerrainShader();
-	mat->isTerrain = true;
+	mat->renderMode = engine::RenderMode::Terrain;
 
 	mat->splat0 = terrainSplat0;
 
@@ -488,6 +614,10 @@ void MyGame::init(engine::AssetManager& assets,
 		playerController.idleClip = idleClip;
 		playerController.sprintClip = sprintClip;
 		playerController.jumpClip = jumpClip;
+		playerController.setAudioEngine(_audio); // set the audio engine pointer in the player controller
+		playerController.runSoundPath = runningSoundPath;
+		playerController.runFastSoundPath = runningFastSoundPath;
+		playerController.jumpSoundPath = jumpingSoundPath;
 	}
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");
@@ -568,6 +698,7 @@ void MyGame::init(engine::AssetManager& assets,
 		
 		Handle<engine::Material> waterMat = assets.loadMaterial("waterMat");
 		auto* matPtr = assets.getMaterial(waterMat);
+		matPtr->renderMode = engine::RenderMode::Water;
 		matPtr->shader = waterShader;
 		matPtr->ambient = glm::vec3(0.15f, 0.25f, 0.35f);
 		matPtr->diffuse = glm::vec3(0.45f, 0.70f, 0.90f);
@@ -594,6 +725,8 @@ void MyGame::init(engine::AssetManager& assets,
 		
 		gameplayController = cube->getComponent<PlayerController>();
 		gameplayController->cameraTransform = &camObj.transform;
+		gameplayController->enabled = false;
+		engine::Input::setMouseTrapped(false);
 	}
 
 	{
@@ -618,14 +751,38 @@ void MyGame::init(engine::AssetManager& assets,
 		&renderer.addPostProcessPass(std::make_unique<ColorRestorationPass>(
 			config.width, config.height, colorRestoreShader)));
 
-	engine::Input::setMouseTrapped(true);
+	engine::Input::setMouseTrapped(false);
 
 	std::cout << "Game initialized!\n";
 }
 
 void MyGame::update(float deltaTime)
 {
+	    if (_startRequested)
+    {
+        _startRequested = false;
+        startGame();
+    }
+
+    if (_gameUIState == GameUIState::Start)
+    {
+        return;
+    }	
 	
+	if (_gameUIState == GameUIState::Playing && !_endScreenShown && allGemsCollected())
+	{
+    	_endScreenShown = true;
+    	_gameUIState = GameUIState::End;
+
+    	if (gameplayController)
+    	{
+       		gameplayController->enabled = false;
+    	}
+
+    	engine::Input::setMouseTrapped(false);
+
+    	return;
+	}
 
 	// Update teleport cooldown
 	_teleportCooldown -= deltaTime;
@@ -706,20 +863,33 @@ void MyGame::setEditorSelectionLock(bool locked, engine::Scene& scene)
 
 void MyGame::refreshEditorCameraState(engine::Scene& scene)
 {
-	if (!gameplayCameraObject || !editorCameraObject || !gameplayController || !editorController)
-	{
-		return;
-	}
+    if (!gameplayCameraObject || !editorCameraObject || !gameplayController || !editorController)
+        return;
 
-	gameplayController->enabled = !editorModeActive;
-	editorController->enabled = editorModeActive;
+    if (_gameUIState == GameUIState::Start || _gameUIState == GameUIState::End)
+    {
+        gameplayController->enabled = false;
+        editorController->enabled = false;
+        if (engine::Input::isMouseTrapped())
+            engine::Input::setMouseTrapped(false);
+        scene.setMainCamera(gameplayCameraObject->getComponent<engine::Camera>());
+        return;
+    }
 
-	if (editorModeActive)
-	{
-		scene.setMainCamera(editorCameraObject->getComponent<engine::Camera>());
-	}
-	else
-	{
-		scene.setMainCamera(gameplayCameraObject->getComponent<engine::Camera>());
-	}
+    gameplayController->enabled = !editorModeActive;
+    editorController->enabled = editorModeActive;
+
+    if (editorModeActive)
+    {
+        scene.setMainCamera(editorCameraObject->getComponent<engine::Camera>());
+        if (engine::Input::isMouseTrapped())
+            engine::Input::setMouseTrapped(false);
+    }
+    else
+    {
+        scene.setMainCamera(gameplayCameraObject->getComponent<engine::Camera>());
+        // Only call setMouseTrapped if not already trapped — avoids zeroing delta every frame
+        if (!engine::Input::isMouseTrapped())
+            engine::Input::setMouseTrapped(true);
+    }
 }

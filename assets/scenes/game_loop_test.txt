@@ -1,0 +1,330 @@
+Object: Star0
+  Position: -189.408, 13.115, 1.82671
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star1
+  Position: -189.857, 13.215, -2.37272
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star2
+  Position: -191.5, 13.315, -4.6448
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star3
+  Position: -190.279, 13.515, -6.31842
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star4
+  Position: -189.514, 13.215, -9.382
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star5
+  Position: -190.749, 13.315, -8.56184
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star6
+  Position: -192.195, 13.315, -8.78851
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star7
+  Position: -190.915, 13.215, -10.8672
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star8
+  Position: -192.189, 13.215, -15.6936
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star9
+  Position: -193.83, 13.274, -13.8634
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: cyanMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=0
+
+Object: Star10
+  Position: -201.547, 12.874, 4.04204
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star11
+  Position: -199.239, 12.974, 2.48716
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star12
+  Position: -202.404, 13.174, 1.74029
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star13
+  Position: -201.27, 13.074, -1.15758
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star14
+  Position: -204.634, 12.974, -2.4729
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star15
+  Position: -206.301, 12.874, 1.79118
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star16
+  Position: -200.488, 12.974, 4.91974
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star17
+  Position: -203.512, 13.074, 2.89199
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star18
+  Position: -206.548, 13.074, -0.974016
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star19
+  Position: -206.504, 13.374, -5.0533
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: yellowMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=2
+
+Object: Star20
+  Position: -197.374, 12.996, -21.307
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star21
+  Position: -201.43, 13.096, -20.1253
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star22
+  Position: -202.274, 12.996, -16.4347
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star23
+  Position: -202.821, 13.096, -14.0401
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star24
+  Position: -200.445, 13.096, -13.0167
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star25
+  Position: -197.385, 13.096, -17.2136
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star26
+  Position: -202.138, 12.996, -21.6662
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star27
+  Position: -199.108, 12.896, -20.77
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star28
+  Position: -198.901, 12.896, -24.2973
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
+Object: Star29
+  Position: -201.384, 13.096, -25.1848
+  Rotation: 0, -0, 0
+  Scale: 0.5, 0.5, 0.5
+  Mesh: gem
+  Material: magentaMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: size=1,1,1 isTrigger=1
+  Collectable: type=1
+
