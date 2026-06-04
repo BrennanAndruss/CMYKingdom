@@ -404,6 +404,131 @@ void MyGame::init(engine::AssetManager& assets,
 		std::cerr << "Failed to load tree_3, falling back to cube: " << e.what() << "\n";
 		tree_3Meshes.clear();
 	}
+
+
+	// cactus
+	Handle<engine::Mesh> cactusMesh;
+	try
+	{
+		// cactus is obj
+		cactusMesh = assets.loadMesh("cactus", "models/plants/Cattus_LowPoly.obj");
+		Handle<engine::Texture> cactusTexture = assets.loadTexture("cactus_diffuse", "textures/plants/cactus_Albedo.png", true);
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("cactusMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = cactusTexture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for cactus\n";
+		}
+
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Failed to load cactus mesh, falling back to cube: " << e.what() << "\n";
+		cactusMesh = cubeMesh;
+	}
+
+	Handle<engine::Mesh> desertHouse;
+	try {
+		desertHouse = assets.loadMeshAssimp("desert_house", "models/buildings/desert_house.fbx");
+		Handle<engine::Texture> houseTexture = assets.loadTexture("house_diffuse", "textures/buildings/desert_house_texture.png", true);
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("desertHouseMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = houseTexture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for desert house\n";
+		}
+		
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Failed to load desert house mesh, falling back to cube: " << e.what() << "\n";
+		desertHouse = cubeMesh;
+	}
+
+	Handle<engine::Mesh> rock_1;
+	try {
+		rock_1 = assets.loadMeshAssimp("rock", "models/rocks/rocks.obj");
+		Handle<engine::Texture> rockTexture = assets.loadTexture("rock_diffuse", "textures/rocks/rocks.jpg", true);
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("rockMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = rockTexture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for rock\n";
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load rock mesh, falling back to cube: " << e.what() << "\n";
+		rock_1 = cubeMesh;
+	}
+
+	Handle<engine::Mesh> desert_rock_1;
+	try {
+		desert_rock_1 = assets.loadMeshAssimp("desert_rock", "models/rocks/desert_rocks_1.fbx");
+		Handle<engine::Texture> desertRock1Texture = assets.loadTexture("desertRock1_diffuse", "textures/rocks/desert_rocks_1_albedo.jpg", true);
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("desertRockMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = desertRock1Texture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for desert rock 1\n";
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load desert rock 1 mesh, falling back to cube: " << e.what() << "\n";
+		desert_rock_1 = cubeMesh;
+	}
+	Handle<engine::Mesh> mushroom_1;
+	try {
+		mushroom_1 = assets.loadMeshAssimp("mushroom", "models/plants/mushroom_1.obj");
+		Handle<engine::Texture> mushroomTexture = assets.loadTexture("mushroom1_diffuse", "textures/plants/mushroom_1.png", true);
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("mushroomMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = mushroomTexture;
+			mat->specTex = defaultGrayTex;
+		}
+		else		{
+			std::cerr << "Failed to get material for mushroom\n";
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load mushroom mesh, falling back to cube: " << e.what() << "\n";
+		mushroom_1 = cubeMesh;
+	}
+
+
 	// character mesh and animations
 	Handle<engine::Mesh> sprintMesh;
 	Handle<engine::Skeleton> sprintSkeleton;

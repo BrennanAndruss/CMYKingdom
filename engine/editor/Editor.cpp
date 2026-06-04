@@ -23,6 +23,7 @@
 #include "scene/Scene.h"
 #include "scene/components/Components.h"
 #include "systems/Collectable.h"
+#include "renderer/passes/DebugRenderPass.h"
 
 namespace engine
 {
@@ -374,6 +375,18 @@ namespace engine
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %.1f", fpsDisplay);
         ImGui::Text("Frame Time: %.2f ms", (fpsDisplay > 0.0f) ? (1000.0f / fpsDisplay) : 0.0f);
+
+        bool skel = engine::DebugRenderPass::getShowSkeletons();
+        if (ImGui::Checkbox("Show Skeletons", &skel))
+        {
+            engine::DebugRenderPass::setShowSkeletons(skel);
+        }
+        ImGui::SameLine();
+        bool col = engine::DebugRenderPass::getShowColliders();
+        if (ImGui::Checkbox("Show Colliders", &col))
+        {
+            engine::DebugRenderPass::setShowColliders(col);
+        }
         ImGui::End();
     }
 
