@@ -14,6 +14,7 @@ enum class GameUIState
     End
 };
 
+
 enum class GameUIAction
 {
     None,
@@ -33,7 +34,7 @@ public:
         int magentaGemCount,
         int yellowGemCount
     );
-    const int maxGems = 1;
+    const int maxGems = 5;
 
 private:
     void drawHUD(int cyanGemCount, int magentaGemCount, int yellowGemCount);

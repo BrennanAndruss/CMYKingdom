@@ -405,6 +405,29 @@ void MyGame::init(engine::AssetManager& assets,
 		tree_3Meshes.clear();
 	}
 
+	Handle<engine::Mesh> palmTree;
+	try {
+		Handle<engine::Texture> palmTree_texture = assets.loadTexture("palmTree_diffuse", "textures/trees/palm_tree.png", true);
+		palmTree = assets.loadMeshAssimp("palmTree", "models/trees/palm_tree.fbx");
+		if (auto* mat = assets.getMaterial(assets.loadMaterial("palmTreeMat")))
+		{
+			mat->shader = assets.getDefaultShader();
+			mat->ambient = glm::vec3(0.2f);
+			mat->diffuse = glm::vec3(0.8f);
+			mat->specular = glm::vec3(0.5f);
+			mat->shininess = 16.0f;
+			mat->difTex = palmTree_texture;
+			mat->specTex = defaultGrayTex;
+		}
+		else
+		{
+			std::cerr << "Failed to get material for palm tree\n";
+		}
+	} catch (const std::exception& e) {
+		std::cerr << "Failed to load palm tree mesh, falling back to cube: " << e.what() << "\n";
+		palmTree = cubeMesh;
+	}
+
 
 	// cactus
 	Handle<engine::Mesh> cactusMesh;

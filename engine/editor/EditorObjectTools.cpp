@@ -542,6 +542,45 @@ namespace engine
 
             selectedObject = &tree;
         }
+
+
+        if (ImGui::Button("Palm Tree")) {
+            const std::string treeName = makeUniqueName(scene, "Palm Tree", "");
+            auto& tree = scene.createObject(treeName);
+            tree.transform.setScale(glm::vec3(3.0f));
+            
+            
+            tree.transform.setEulerAngles(-90.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = tree.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("palmTree");
+            const Handle<Material> treeMaterial = assets.getMaterialHandle("palmTreeMat");
+            meshRenderer.material = treeMaterial.valid() ? treeMaterial : assets.getDefaultMaterial();
+
+            auto& collider = tree.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.y *= 0.3f; 
+                collider.size.x *= 0.3f; 
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = tree.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &tree;
+        }
+        
         
         ImGui::SeparatorText("Desert");
         if (ImGui::Button("Cactus")) {

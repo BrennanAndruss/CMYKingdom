@@ -507,6 +507,7 @@ namespace engine
                         << " size=" << collider->size.x << "," << collider->size.y << "," << collider->size.z
                          << " isTrigger=" << collider->isTrigger << "\n";
                 }
+                
                 if (auto* rigidBody = object->getComponent<RigidBody>())
                 {
                     file << "  RigidBody: type=" << static_cast<int>(rigidBody->getBodyType()) << " mass=" << rigidBody->mass << "\n";
