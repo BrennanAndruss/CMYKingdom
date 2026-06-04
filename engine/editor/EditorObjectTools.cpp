@@ -341,6 +341,7 @@ namespace engine
             selectedObject = &cube;
         }
         */
+       
        if (ImGui::Button("Platform"))
         {
             const std::string platformName = makeUniqueName(scene, "Platform", "");
@@ -381,24 +382,28 @@ namespace engine
 
             selectedObject = &platform;
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Star"))
-        {
-            const std::string starName = makeUniqueName(scene, "Star", "");
-            auto& star = scene.createObject(starName);
-            star.transform.setScale(glm::vec3(0.5f));
+        ImGui::SeparatorText("General Nature");
+        if (ImGui::Button("Rock")) {
+            const std::string rockName = makeUniqueName(scene, "Rock", "");
+            auto& rock = scene.createObject(rockName);
+            rock.transform.setScale(glm::vec3(0.05f));
+            
+            rock.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
 
-            auto& meshRenderer = star.addComponent<MeshRenderer>();
-            meshRenderer.mesh = assets.getMeshHandle("gem");
-            meshRenderer.material = assets.getDefaultMaterial();
+            auto& meshRenderer = rock.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("rock");
+            const Handle<Material> rockMaterial = assets.getMaterialHandle("rockMat");
+            meshRenderer.material = rockMaterial.valid() ? rockMaterial : assets.getDefaultMaterial();
 
-            auto& collider = star.addComponent<BoxCollider>();
+            auto& collider = rock.addComponent<BoxCollider>();
+            collider.isTrigger = false;
             if (auto* mesh = assets.getMesh(meshRenderer.mesh))
             {
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
-                glm::vec3 halfExtents = 0.5f * (bounds.max - bounds.min);
-                collider.size = halfExtents;
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.x *= 0.3f; 
+                collider.size.z *= 0.3f; 
             }
             else
             {
@@ -406,25 +411,15 @@ namespace engine
                 collider.size = glm::vec3(1.0f);
             }
             collider.rebuild();
-            collider.isTrigger = true;
 
-            auto& collectable = star.addComponent<Collectable>();
-            collectable.type = Collectable::Type::Cyan;
-            Handle<engine::Material> cyanMat = assets.getMaterialHandle("cyanMat");
-            if (cyanMat.valid())
-            {
-                meshRenderer.material = cyanMat;
-            }
-            collectable.defaultMat = meshRenderer.material;
-            collectable.collectedMat = assets.getDefaultMaterial();
+            auto& rigidBody = rock.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
 
-            //add slight floating animation to make it more visually distinct
-            auto& animatedVelocity = star.addComponent<AnimatedVelocity>();
-            animatedVelocity.linearAmplitude.y = 0.1f;
-            animatedVelocity.frequency = 0.5f;
-
-            selectedObject = &star;
+            selectedObject = &rock;
         }
+
+
         if (ImGui::Button("Maple Tree")) {
             const std::string treeName = makeUniqueName(scene, "Maple Tree", "");
             auto& tree = scene.createObject(treeName);
@@ -462,6 +457,7 @@ namespace engine
 
             selectedObject = &tree;
         }
+        ImGui::SameLine();
 
         if (ImGui::Button("Winding Tree")) {
             const std::string treeName = makeUniqueName(scene, "Winding Tree", "");
@@ -496,6 +492,7 @@ namespace engine
 
             selectedObject = &tree;
         }
+        ImGui::SameLine();
 
         if (ImGui::Button("Pine Tree")) {
             const std::string treeName = makeUniqueName(scene, "Pine Tree", "");
@@ -538,6 +535,203 @@ namespace engine
             rigidBody.friction = 1.0f;
 
             selectedObject = &tree;
+        }
+        
+        ImGui::SeparatorText("Desert");
+        if (ImGui::Button("Cactus")) {
+            const std::string cactusName = makeUniqueName(scene, "Cactus", "");
+            auto& cactus = scene.createObject(cactusName);
+            cactus.transform.setScale(glm::vec3(0.5f));
+            
+            cactus.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = cactus.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("cactus");
+            const Handle<Material> cactusMaterial = assets.getMaterialHandle("cactusMat");
+            meshRenderer.material = cactusMaterial.valid() ? cactusMaterial : assets.getDefaultMaterial();
+
+            auto& collider = cactus.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.x *= 0.5f; // Adjust collider height to better fit cactus shape
+                collider.size.z *= 0.5f; // Adjust collider height to better fit cactus shape
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = cactus.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &cactus;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Desert Rock")) {
+            const std::string rockName = makeUniqueName(scene, "Desert Rock", "");
+            auto& rock = scene.createObject(rockName);
+            rock.transform.setScale(glm::vec3(1.0f));
+            
+            rock.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = rock.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("desert_rock");
+            const Handle<Material> rockMaterial = assets.getMaterialHandle("desertRockMat");
+            meshRenderer.material = rockMaterial.valid() ? rockMaterial : assets.getDefaultMaterial();
+
+            auto& collider = rock.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.x *= 0.5f; 
+                collider.size.z *= 0.5f; 
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = rock.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+            
+            selectedObject = &rock;
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Desert House")) {
+            const std::string houseName = makeUniqueName(scene, "Desert House", "");
+            auto& house = scene.createObject(houseName);
+            house.transform.setScale(glm::vec3(0.04f));
+            
+            house.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = house.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("desert_house");
+            const Handle<Material> houseMaterial = assets.getMaterialHandle("desertHouseMat");
+            meshRenderer.material = houseMaterial.valid() ? houseMaterial : assets.getDefaultMaterial();
+
+            auto& collider = house.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.x *= 0.8f; // Adjust collider size to better fit house shape
+                collider.size.z *= 0.8f; // Adjust collider size to better fit house shape
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = house.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &house;
+        }
+
+        
+
+        ImGui::SeparatorText("Mushroom Forest");
+
+        
+
+        if (ImGui::Button("Mushroom")) {
+            const std::string mushroomName = makeUniqueName(scene, "Mushroom", "");
+            auto& mushroom = scene.createObject(mushroomName);
+            mushroom.transform.setScale(glm::vec3(0.1f));
+            
+            mushroom.transform.setEulerAngles(0.0f, 0.0f, 0.0f);
+
+            auto& meshRenderer = mushroom.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("mushroom");
+            const Handle<Material> mushroomMaterial = assets.getMaterialHandle("mushroomMat");
+            meshRenderer.material = mushroomMaterial.valid() ? mushroomMaterial : assets.getDefaultMaterial();
+
+            auto& collider = mushroom.addComponent<BoxCollider>();
+            collider.isTrigger = false;
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                collider.size = 0.5f * (bounds.max - bounds.min);
+                collider.size.x *= 0.3f; // Adjust collider height to better fit mushroom shape
+                collider.size.z *= 0.3f; // Adjust collider height to better fit mushroom shape
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+
+            auto& rigidBody = mushroom.addComponent<RigidBody>();
+            rigidBody.setBodyType(RigidBody::BodyType::Static);
+            rigidBody.friction = 1.0f;
+
+            selectedObject = &mushroom;
+        }
+
+        ImGui::SeparatorText("Collectables");
+        if (ImGui::Button("Star"))
+        {
+            const std::string starName = makeUniqueName(scene, "Star", "");
+            auto& star = scene.createObject(starName);
+            star.transform.setScale(glm::vec3(0.5f));
+
+            auto& meshRenderer = star.addComponent<MeshRenderer>();
+            meshRenderer.mesh = assets.getMeshHandle("gem");
+            meshRenderer.material = assets.getDefaultMaterial();
+
+            auto& collider = star.addComponent<BoxCollider>();
+            if (auto* mesh = assets.getMesh(meshRenderer.mesh))
+            {
+                const auto bounds = mesh->getBBox();
+                collider.center = 0.5f * (bounds.max + bounds.min);
+                glm::vec3 halfExtents = 0.5f * (bounds.max - bounds.min);
+                collider.size = halfExtents;
+            }
+            else
+            {
+                collider.center = glm::vec3(0.0f);
+                collider.size = glm::vec3(1.0f);
+            }
+            collider.rebuild();
+            collider.isTrigger = true;
+
+            auto& collectable = star.addComponent<Collectable>();
+            collectable.type = Collectable::Type::Cyan;
+            Handle<engine::Material> cyanMat = assets.getMaterialHandle("cyanMat");
+            if (cyanMat.valid())
+            {
+                meshRenderer.material = cyanMat;
+            }
+            collectable.defaultMat = meshRenderer.material;
+            collectable.collectedMat = assets.getDefaultMaterial();
+
+            //add slight floating animation to make it more visually distinct
+            auto& animatedVelocity = star.addComponent<AnimatedVelocity>();
+            animatedVelocity.linearAmplitude.y = 0.1f;
+            animatedVelocity.frequency = 0.5f;
+
+            selectedObject = &star;
         }
         ImGui::SameLine();
         if (ImGui::Button("speedBoost"))

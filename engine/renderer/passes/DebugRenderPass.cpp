@@ -135,6 +135,9 @@ namespace
 
 namespace engine
 {
+bool DebugRenderPass::s_showSkeletons = false;
+bool DebugRenderPass::s_showColliders = false;
+
 	DebugRenderPass::DebugRenderPass()
 	{
 		// Setup VAO and VBO
@@ -175,21 +178,21 @@ namespace engine
 	void DebugRenderPass::execute(const Scene& scene, const AssetManager& assets,
 		RenderContext& ctx)
 	{
-		if (Input::isKeyPressed(GLFW_KEY_F3))
-		{
-			showSkeletons = !showSkeletons;
-			std::cout << "[DebugRenderPass] Skeleton visualizer "
-				<< (showSkeletons ? "enabled" : "disabled") << " (F3)\n";
-		}
+ 		if (Input::isKeyPressed(GLFW_KEY_F3))
+ 		{
+ 			s_showSkeletons = !s_showSkeletons;
+ 			std::cout << "[DebugRenderPass] Skeleton visualizer "
+ 				<< (s_showSkeletons ? "enabled" : "disabled") << " (F3)\n";
+ 		}
 
-		if (Input::isKeyPressed(GLFW_KEY_F5))
-		{
-			showColliders = !showColliders;
-			std::cout << "[DebugRenderPass] Collider visualizer "
-				<< (showColliders ? "enabled" : "disabled") << " (F4)\n";
-		}
+ 		if (Input::isKeyPressed(GLFW_KEY_F5))
+ 		{
+ 			s_showColliders = !s_showColliders;
+ 			std::cout << "[DebugRenderPass] Collider visualizer "
+ 				<< (s_showColliders ? "enabled" : "disabled") << " (F4)\n";
+ 		}
 
-		if (!showSkeletons && !showColliders) return;
+ 		if (!s_showSkeletons && !s_showColliders) return;
 
 		// Draw into scene framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, ctx.sceneFramebuffer->getFboId());
@@ -197,11 +200,11 @@ namespace engine
 		glDisable(GL_DEPTH_TEST);
 		glLineWidth(2.0f);
 
-		if (showSkeletons)
+		if (s_showSkeletons)
 		{
 			drawSkeletons(scene, assets);
 		}
-		if (showColliders)
+		if (s_showColliders)
 		{
 			drawColliders(scene);
 		}

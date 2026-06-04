@@ -25,6 +25,16 @@ namespace engine
 		bool showSkeletons = false;
 		bool showColliders = false;
 
+		// Global/static controls so the editor UI can toggle debug drawing
+		static bool s_showSkeletons;
+		static bool s_showColliders;
+
+		static void setShowSkeletons(bool v) { s_showSkeletons = v; }
+		static bool getShowSkeletons() { return s_showSkeletons; }
+
+		static void setShowColliders(bool v) { s_showColliders = v; }
+		static bool getShowColliders() { return s_showColliders; }
+
 	private:
 		std::unique_ptr<Shader> _lineShader;
 		GLuint _vao = 0, _vbo = 0;
