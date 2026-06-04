@@ -3,7 +3,9 @@
 #include <glad/glad.h>
 #include <cassert>
 #include <iostream>
+#include "core/Time.h"
 #include "renderer/RenderContext.h"
+#include "renderer/passes/ShadowPass.h"
 #include "renderer/passes/ForwardRenderPass.h"
 #include "renderer/passes/DeferredGeometryPass.h"
 #include "renderer/passes/DeferredLightingPass.h"
@@ -14,27 +16,37 @@
 
 namespace engine
 {
+	// Debug profiling
+	static int frameCount = 0;
+
 	Renderer::Renderer(int width, int height, RenderingPath renderingPath) : 
 		_width(width), 
 		_height(height),
 		_renderingPath(renderingPath),
 		_cameraUBO(sizeof(CameraData), static_cast<GLuint>(UBOBindings::Camera)),
-		_lightsUBO(MAX_LIGHTS * sizeof(LightData), static_cast<GLuint>(UBOBindings::Light)) {}
+		_lightsUBO(MAX_LIGHTS * sizeof(LightData), static_cast<GLuint>(UBOBindings::Light)),
+		_shadowUBO(sizeof(ShadowUBO), static_cast<GLuint>(UBOBindings::Shadow))
+	{}
 
 	void Renderer::init(AssetManager& assets)
 	{
-		// Load engine shaders
+		// Load engine shaders and construct render passes
+		Handle<Shader> depthShader = assets.loadEngineShader(
+			"EngineShadowDepth", "shaders/shadowDepth.vert", "shaders/shadowDepth.frag");
+		Handle<Shader> skinnedDepthShader = assets.loadEngineShader(
+			"EngineShadowDepthSkinned", "shaders/shadowDepthSkinned.vert", "shaders/shadowDepth.frag");
+
+		_shadowPass = std::make_unique<ShadowPass>(
+			SHADOW_RESOLUTION, depthShader, skinnedDepthShader);
+
 		if (_renderingPath == RenderingPath::Forward)
 		{
 			_baseShader = assets.loadEngineShader(
-				"EngineForward", "shaders/forward.vert", "shaders/forward.frag"
-			);
+				"EngineForward", "shaders/forward.vert", "shaders/forward.frag");
 			_skinnedShader = assets.loadEngineShader(
-				"EngineSkinnedForward", "shaders/skinned.vert", "shaders/forward.frag"
-			);
+				"EngineSkinnedForward", "shaders/skinned.vert", "shaders/forward.frag");
 			_terrainShader = assets.loadEngineShader(
-				"EngineTerrainForward", "shaders/forward.vert", "shaders/terrain.frag"
-			);
+				"EngineTerrainForward", "shaders/forward.vert", "shaders/terrain.frag");
 
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
@@ -42,18 +54,15 @@ namespace engine
 		else if (_renderingPath == RenderingPath::Deferred)
 		{
 			_baseShader = assets.loadEngineShader(
-				"EngineGeometry", "shaders/geometry.vert", "shaders/geometry.frag"
-			);
+				"EngineGeometry", "shaders/geometry.vert", "shaders/geometry.frag");
 			_skinnedShader = assets.loadEngineShader(
 				"EngineSkinnedGeometry", "shaders/skinned.vert", "shaders/geometry.frag"
 			);
 			_terrainShader = assets.loadEngineShader(
-				"EngineTerrainGeometry", "shaders/geometry.vert", "shaders/terrainGeom.frag"
-			);
+				"EngineTerrainGeometry", "shaders/geometry.vert", "shaders/terrainGeom.frag");
 
 			Handle<Shader> lightingShader = assets.loadEngineShader(
-				"EngineLighting", "shaders/passthrough.vert", "shaders/lighting.frag"
-			);
+				"EngineLighting", "shaders/passthrough.vert", "shaders/lighting.frag");
 
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height));
@@ -62,10 +71,8 @@ namespace engine
 		}
 
 		Handle<Shader> skyboxShader = assets.loadEngineShader(
-			"EngineSkybox", "shaders/skybox.vert", "shaders/skybox.frag"
-		);
+			"EngineSkybox", "shaders/skybox.vert", "shaders/skybox.frag");
 
-		// Construct render passes
 		addRenderPass(std::make_unique<DebugRenderPass>());
 		addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		_blitPass = std::make_unique<BlitPass>();
@@ -110,22 +117,45 @@ namespace engine
 			_lightsUBO.update(&data, sizeof(LightData), i * sizeof(LightData));
 		}
 
+		// Run shadow pass and upload shadow UBO
+		double startTime = glfwGetTime();
+		_shadowPass->execute(scene, assets, _ctx);
+		// glFinish();
+		double endTime = glfwGetTime();
+		if (frameCount == 0)
+			std::cout << "Shadow pass: " << (endTime - startTime) * 1000.0 << "ms\n";
+
+		ShadowUBO shadowData = _shadowPass->getShadowUBO();
+		_shadowUBO.update(&shadowData, sizeof(ShadowUBO));
+
 		// Run render pipeline
 		for (const auto& pass : _renderPasses)
 		{
+			startTime = glfwGetTime();
 			pass->execute(scene, assets, _ctx);
+			// glFinish();
+			endTime = glfwGetTime();
+			if (frameCount == 0)
+				std::cout << "Render pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 		}
 
 		if (_postProcessEnabled)
 		{
 			for (const auto& pass : _postProcessPasses)
 			{
+				startTime = glfwGetTime();
 				pass->execute(scene, assets, _ctx);
+				// glFinish();
+				endTime = glfwGetTime();
+				if (frameCount == 0)
+					std::cout << "Post pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 			}
 		}
 
 		// Blit processed frame to screen
 		_blitPass->execute(scene, assets, _ctx);
+
+		frameCount = (frameCount + 1) % 1000;
 	}
 
 	void Renderer::addRenderPass(std::unique_ptr<RenderPass> pass)

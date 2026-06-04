@@ -8,7 +8,8 @@ namespace engine
 	enum class UBOBindings
 	{
 		Camera,
-		Light
+		Light,
+		Shadow
 	};
 
 	class UniformBuffer

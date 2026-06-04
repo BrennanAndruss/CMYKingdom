@@ -65,7 +65,6 @@ namespace engine
 		auto* camera = scene.getMainCamera();
 		if (!shader || !cubemap || !camera) return;
 
-		// Bind framebuffer from forward pass
 		Framebuffer* framebuffer = ctx.sceneFramebuffer;
 		framebuffer->bind();
 

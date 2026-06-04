@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "renderer/passes/RenderPass.h"
+#include "renderer/passes/ShadowPass.h"
 #include "renderer/passes/BlitPass.h"
 #include "renderer/RenderingPath.h"
 #include "renderer/RenderContext.h"
@@ -17,8 +18,6 @@ namespace engine
 
 namespace engine
 {
-	constexpr int MAX_LIGHTS = 16;
-
 	class Renderer
 	{
 	public:
@@ -37,8 +36,10 @@ namespace engine
 		Handle<Shader> getTerrainShader() const { return _terrainShader; }
 
 		void enablePostProcessing(bool enable) { _postProcessEnabled = enable; }
+		bool isPostProcessingEnabled() const { return _postProcessEnabled; }
 
 	private:
+		std::unique_ptr<ShadowPass> _shadowPass;
 		std::vector<std::unique_ptr<RenderPass>> _renderPasses;
 		std::vector<std::unique_ptr<RenderPass>> _postProcessPasses;
 		std::unique_ptr<BlitPass> _blitPass;
@@ -48,7 +49,7 @@ namespace engine
 		
 		int _width, _height;
 		RenderContext _ctx;
-		UniformBuffer _cameraUBO, _lightsUBO;
+		UniformBuffer _cameraUBO, _lightsUBO, _shadowUBO;
 
 		bool _postProcessEnabled = true;
 	};

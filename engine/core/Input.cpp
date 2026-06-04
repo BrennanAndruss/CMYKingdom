@@ -14,11 +14,9 @@ namespace engine
 
 	void Input::update()
 	{
-		_prevKeys = _keys;
-		_mouseDelta = _mousePos - _prevMousePos;
-		_prevMousePos = _mousePos;
-		// _scrollDelta = glm::vec2(0.0f, 0.0f);
-	}
+    	_prevKeys = _keys;
+    	_mouseDelta = glm::vec2(0.0f);
+	}	
 
 	void Input::onKey(int key, int action)
 	{
@@ -28,8 +26,11 @@ namespace engine
 
 	void Input::onMouseMove(double x, double y)
 	{
-		_mousePos = glm::vec2(x, y);
-	}
+    	glm::vec2 newMousePos(x, y);
+
+    	_mouseDelta += newMousePos - _mousePos;
+    	_mousePos = newMousePos;
+	}	
 
 	void Input::onMouseButton(int button, int action)
 	{
@@ -45,25 +46,33 @@ namespace engine
 
 	void Input::setMouseTrapped(bool trapped)
 	{
-		_mouseTrapped = trapped;
-		double cursorX = 0.0;
-		double cursorY = 0.0;
-		if (GLFWwindow* window = glfwGetCurrentContext())
-		{
+    	_mouseTrapped = trapped;
+
+    // Change cursor mode FIRST — this may warp the cursor and fire onMouseMove
+    	if (trapped)
+        	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    	else
+        	glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    // Now snapshot position AFTER the warp, so prevMousePos matches the new position
+    	double cursorX = 0.0, cursorY = 0.0;
+    	if (GLFWwindow* window = glfwGetCurrentContext())
+        	glfwGetCursorPos(window, &cursorX, &cursorY);
+
+   		_mousePos     = glm::vec2(cursorX, cursorY);
+    	_prevMousePos = _mousePos;
+    	_mouseDelta   = glm::vec2(0.0f);
+	}
+
+	void Input::flushMouseDelta()
+	{
+    	double cursorX = 0.0, cursorY = 0.0;
+    	if (GLFWwindow* window = glfwGetCurrentContext()){
 			glfwGetCursorPos(window, &cursorX, &cursorY);
+    		_mousePos     = glm::vec2(cursorX, cursorY);
+   			_prevMousePos = _mousePos;
+    		_mouseDelta   = glm::vec2(0.0f);
 		}
-
-		_mousePos = glm::vec2(cursorX, cursorY);
-		_prevMousePos = _mousePos;
-		_mouseDelta = glm::vec2(0.0f);
-
-		if (trapped)
-		{
-			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		}
-		else
-		{
-			glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		}
+        	
 	}
 }
