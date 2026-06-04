@@ -75,7 +75,7 @@ private:
 	ColorRestorationPass* _colorRestorePass = nullptr;
 	engine::AudioEngine* _audio = nullptr;
 	// Set this to the file you want to loop until the game closes.
-	std::string backgroundMusicPath = "assets/sounds/audio-WIP.mp3";
+	std::string backgroundMusicPath = PROJECT_ROOT "/assets/sounds/audio-WIP.mp3";
 	float _collectedCyan = 0.0f, _collectedMagenta = 0.0f, _collectedYellow = 0.0f;
 	int _cyanGemCount = 0, _magentaGemCount = 0, _yellowGemCount = 0;
 	float _teleportCooldown = 0.0f;

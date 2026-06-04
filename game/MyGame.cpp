@@ -30,7 +30,7 @@ MyGame* MyGame::getActiveGame()
 
 void MyGame::setBackgroundMusicPath(const std::string& path)
 {
-	backgroundMusicPath = "assets/sounds/audio-WIP.mp3";
+	backgroundMusicPath = path;
 }
 
 void MyGame::onCollectableCollected()
