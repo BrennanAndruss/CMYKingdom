@@ -17,11 +17,17 @@
 #include "systems/Collectable.h"
 #include <stdio.h>
 
+
 MyGame* MyGame::_activeGame = nullptr;
 
 MyGame* MyGame::getActiveGame()
 {
 	return _activeGame;
+}
+
+void MyGame::setBackgroundMusicPath(const std::string& path)
+{
+	backgroundMusicPath = "assets/sounds/audio-WIP.mp3";
 }
 
 void MyGame::onCollectableCollected()
@@ -52,9 +58,11 @@ void MyGame::onCollectableCollected(int type)
 void MyGame::init(engine::AssetManager& assets, 
 				  engine::Renderer& renderer, 
 				  engine::Scene& scene,
+				  engine::AudioEngine& audio,
 				  const engine::AppConfig& config)
 {
 	_activeGame = this;
+	_audio = &audio;
 
 	// Initialize resources
 	std::cout << "Loading shaders...\n";
@@ -136,7 +144,10 @@ void MyGame::init(engine::AssetManager& assets,
 	});
 	scene.setIrradianceMap(irradianceCubemap);
 
-
+	if (_audio)
+	{
+		_audio->playMusic(backgroundMusicPath, true);
+	}
 	Handle<engine::Texture> defaultGrayTex = assets.createSolidTexture("defaultGrayTex", { 128, 128, 128, 255 });
 	Handle<engine::Texture> gemDiffuseTex = assets.loadTexture("gemDiffuseTex", "textures/cyan_gem_texture.png", true);
 	Handle<engine::Texture> charBaseTex = assets.loadTexture("charBaseTex", "textures/char_Base_color.png", true);
