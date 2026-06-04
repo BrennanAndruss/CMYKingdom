@@ -76,11 +76,11 @@ private:
 	engine::AudioEngine* _audio = nullptr;
 	// Set these to the audio files you want to use.
 	// Background music loops until the game closes.
-	std::string backgroundMusicPath = "assets/sounds/background.mp3";
+	std::string backgroundMusicPath = PROJECT_ROOT"assets/sounds/background.mp3";
 	// These are used by the player controller for locomotion and jump SFX.
-	std::string runningSoundPath = "assets/sounds/walkaudio.mp3";
-	std::string runningFastSoundPath = "assets/sounds/runaudio.mp3";
-	std::string jumpingSoundPath = "assets/sounds/jumpaudio.mp3";
+	std::string runningSoundPath = PROJECT_ROOT "assets/sounds/walkaudio.mp3";
+	std::string runningFastSoundPath = PROJECT_ROOT "assets/sounds/runaudio.mp3";
+	std::string jumpingSoundPath = PROJECT_ROOT "assets/sounds/jumpaudio.mp3";
 	float _collectedCyan = 0.0f, _collectedMagenta = 0.0f, _collectedYellow = 0.0f;
 	int _cyanGemCount = 0, _magentaGemCount = 0, _yellowGemCount = 0;
 	float _teleportCooldown = 0.0f;
