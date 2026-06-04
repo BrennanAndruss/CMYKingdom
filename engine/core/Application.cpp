@@ -4,6 +4,8 @@
 #include "core/Input.h"
 #include "core/Time.h"
 
+#include <iostream>
+
 namespace engine 
 {
     Application::Application(const AppConfig& config) : 
@@ -23,6 +25,11 @@ namespace engine
         _scene.setPhysicsSystem(&_physics);
         _renderer.init(_assets);
 
+        if (!_audio.init())
+        {
+            std::cerr << "Application: audio initialization failed; continuing without background music." << std::endl;
+        }
+
         int framebufferWidth = 0, framebufferHeight = 0;
         glfwGetFramebufferSize(_window.getHandle(), &framebufferWidth, &framebufferHeight);
         if (framebufferWidth > 0 && framebufferHeight > 0)
@@ -38,13 +45,14 @@ namespace engine
 
     Application::~Application()
     {
+		_audio.shutdown();
         _editor.shutdown();
     }
 
     void Application::run(std::unique_ptr<Game> game)
     {
 		_game = game.get();
-        game->init(_assets, _renderer, _scene, _config);
+        game->init(_assets, _renderer, _scene, _audio, _config);
 		_game->setEditorMode(_editorActive, _scene);
         _scene.start();
 

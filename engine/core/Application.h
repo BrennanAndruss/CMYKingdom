@@ -9,6 +9,7 @@
 #include "renderer/Renderer.h"
 #include "resources/AssetManager.h"
 #include "scene/Scene.h"
+#include "scene/components/Audio.h"
 
 // Forward declarations
 namespace engine
@@ -42,6 +43,7 @@ namespace engine
 		Renderer _renderer;
 		AssetManager _assets;
 		Scene _scene;
+		AudioEngine _audio;
 		Game* _game = nullptr;
 
 		bool _editorActive = false;
