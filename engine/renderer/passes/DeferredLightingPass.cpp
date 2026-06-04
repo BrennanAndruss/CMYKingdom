@@ -31,21 +31,42 @@ namespace engine
 		RenderContext& ctx)
 	{
 		// Debug views for G-buffer textures and shadow cascades
-		static int debugView = -1;
-		if (Input::isKeyDown(GLFW_KEY_F4))
-		{
-			if (Input::isKeyPressed(GLFW_KEY_1)) debugView = 0;
-			else if (Input::isKeyPressed(GLFW_KEY_2)) debugView = 1;
-			else if (Input::isKeyPressed(GLFW_KEY_3)) debugView = 2;
-		}
-		else
-			debugView = -1;
+		static bool debugMode = false;
+		static int selectedDebugView = -1;         // 0/1/2 = views selected while debugMode is enabled
+		static bool showCascadesToggle = false;
 
-		int showCascades = 0;
-		if (Input::isKeyDown(GLFW_KEY_F2))
+		// Toggle debug mode
+		if (Input::isKeyPressed(GLFW_KEY_F4))
 		{
-			showCascades = 1;
+			debugMode = !debugMode;
 		}
+
+		// When debugMode is active, pressing 1/2/3 will toggle the corresponding view selection
+		if (debugMode)
+		{
+			if (Input::isKeyPressed(GLFW_KEY_1))
+			{
+				selectedDebugView = (selectedDebugView == 0) ? -1 : 0;
+			}
+			else if (Input::isKeyPressed(GLFW_KEY_2))
+			{
+				selectedDebugView = (selectedDebugView == 1) ? -1 : 1;
+			}
+			else if (Input::isKeyPressed(GLFW_KEY_3))
+			{
+				selectedDebugView = (selectedDebugView == 2) ? -1 : 2;
+			}
+		}
+
+		// Toggle cascade visualization
+		if (Input::isKeyPressed(GLFW_KEY_F2))
+		{
+			showCascadesToggle = !showCascadesToggle;
+		}
+
+		// Only show the selected view when debugMode is enabled
+		int debugView = debugMode ? selectedDebugView : -1;
+		int showCascades = showCascadesToggle ? 1 : 0;
 
 		// Blit stencil from gBuffer to lighting framebuffer
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.sceneFramebuffer->getFboId());

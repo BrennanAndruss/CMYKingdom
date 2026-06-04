@@ -127,11 +127,7 @@ namespace engine
 
         if (key == GLFW_KEY_F4 && action == GLFW_PRESS)
         {
-            _renderer.enablePostProcessing(false);
-        }
-        if (key == GLFW_KEY_F4 && action == GLFW_RELEASE)
-        {
-            _renderer.enablePostProcessing(true);
+            _renderer.enablePostProcessing(!_renderer.isPostProcessingEnabled());
         }
     }
 

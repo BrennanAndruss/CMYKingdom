@@ -36,6 +36,7 @@ namespace engine
 		Handle<Shader> getTerrainShader() const { return _terrainShader; }
 
 		void enablePostProcessing(bool enable) { _postProcessEnabled = enable; }
+		bool isPostProcessingEnabled() const { return _postProcessEnabled; }
 
 	private:
 		std::unique_ptr<ShadowPass> _shadowPass;

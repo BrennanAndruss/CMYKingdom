@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <cassert>
 #include <iostream>
+#include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/passes/ShadowPass.h"
 #include "renderer/passes/ForwardRenderPass.h"
@@ -15,6 +16,9 @@
 
 namespace engine
 {
+	// Debug profiling
+	static int frameCount = 0;
+
 	Renderer::Renderer(int width, int height, RenderingPath renderingPath) : 
 		_width(width), 
 		_height(height),
@@ -114,26 +118,44 @@ namespace engine
 		}
 
 		// Run shadow pass and upload shadow UBO
+		double startTime = glfwGetTime();
 		_shadowPass->execute(scene, assets, _ctx);
+		// glFinish();
+		double endTime = glfwGetTime();
+		if (frameCount == 0)
+			std::cout << "Shadow pass: " << (endTime - startTime) * 1000.0 << "ms\n";
+
 		ShadowUBO shadowData = _shadowPass->getShadowUBO();
 		_shadowUBO.update(&shadowData, sizeof(ShadowUBO));
 
 		// Run render pipeline
 		for (const auto& pass : _renderPasses)
 		{
+			startTime = glfwGetTime();
 			pass->execute(scene, assets, _ctx);
+			// glFinish();
+			endTime = glfwGetTime();
+			if (frameCount == 0)
+				std::cout << "Render pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 		}
 
 		if (_postProcessEnabled)
 		{
 			for (const auto& pass : _postProcessPasses)
 			{
+				startTime = glfwGetTime();
 				pass->execute(scene, assets, _ctx);
+				// glFinish();
+				endTime = glfwGetTime();
+				if (frameCount == 0)
+					std::cout << "Post pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 			}
 		}
 
 		// Blit processed frame to screen
 		_blitPass->execute(scene, assets, _ctx);
+
+		frameCount = (frameCount + 1) % 1000;
 	}
 
 	void Renderer::addRenderPass(std::unique_ptr<RenderPass> pass)
