@@ -230,13 +230,13 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Texture> grassBladeTex = terrainGrass; 
 
 	Handle<engine::Texture> terrainSand =
-		assets.loadTexture("terrainSand", "textures/terrain/sand.png", true);
+		assets.loadTexture("terrainSand", "textures/terrain/sand01.jpg", true);
 
 	Handle<engine::Texture> terrainRock =
 		assets.loadTexture("terrainRock", "textures/terrain/stylized_stone.png", true);
 
 	Handle<engine::Texture> terrainSnow =
-		assets.loadTexture("terrainSnow", "textures/terrain/snow.png", true); 
+		assets.loadTexture("terrainSnow", "textures/terrain/snow01.png", true); 
 	
 	Handle<engine::Cubemap> skyboxCubemap = assets.loadCubemap("daySkybox", {
 		"textures/skybox/px.png",
