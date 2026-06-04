@@ -23,6 +23,10 @@ namespace engine
         void stopMusic();
         void setMusicVolume(float volume);
 
+        bool playLoopingEffect(const std::string& filePath, bool loop = true);
+        void stopLoopingEffect();
+        void setLoopingEffectVolume(float volume);
+
         bool playOneShot(const std::string& filePath);
         void updateListener(const glm::vec3& camPos, const glm::vec3& camFront, const glm::vec3& camUp);
 
