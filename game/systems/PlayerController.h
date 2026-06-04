@@ -9,6 +9,11 @@
 #include "resources/SkeletalAnimation.h"
 #include "scene/components/Animator.h"
 
+namespace engine
+{
+	class AudioEngine;
+}
+
 class PlayerController : public engine::Component
 {
 public:
@@ -46,17 +51,23 @@ public:
 	void postPhysicsUpdate(float deltaTime) override;
 	void activateSpeedBoost();
 	void activateJumpBoost();
+	void setAudioEngine(engine::AudioEngine* audioEngine);
 	engine::Animator* animator = nullptr;
 	Handle<engine::AnimationClip> idleClip;
 	Handle<engine::AnimationClip> sprintClip;
 	Handle<engine::AnimationClip> jumpClip;
+	std::string runSoundPath;
+	std::string runFastSoundPath;
+	std::string jumpSoundPath;
 
 private:
 	engine::CharacterController* _characterController = nullptr;
+	engine::AudioEngine* _audio = nullptr;
 	engine::Object* _groundCarrier = nullptr;
 	glm::vec3 _lastGroundCarrierWorldPosition = glm::vec3(0.0f);
 	glm::vec3 _pendingCarrierDelta = glm::vec3(0.0f);
 	std::string _pendingCarrierName;
+	std::string _activeLoopingSoundPath;
 	float _jumpBufferTimer = 0.0f;
 	float _groundedGraceTimer = 0.0f;
 

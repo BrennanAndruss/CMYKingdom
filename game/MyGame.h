@@ -74,8 +74,13 @@ private:
 
 	ColorRestorationPass* _colorRestorePass = nullptr;
 	engine::AudioEngine* _audio = nullptr;
-	// Set this to the file you want to loop until the game closes.
-	std::string backgroundMusicPath = "assets/sounds/audio-WIP.mp3";
+	// Set these to the audio files you want to use.
+	// Background music loops until the game closes.
+	std::string backgroundMusicPath = "assets/sounds/background.mp3";
+	// These are used by the player controller for locomotion and jump SFX.
+	std::string runningSoundPath = "assets/sounds/walkaudio.mp3";
+	std::string runningFastSoundPath = "assets/sounds/runaudio.mp3";
+	std::string jumpingSoundPath = "assets/sounds/jumpaudio.mp3";
 	float _collectedCyan = 0.0f, _collectedMagenta = 0.0f, _collectedYellow = 0.0f;
 	int _cyanGemCount = 0, _magentaGemCount = 0, _yellowGemCount = 0;
 	float _teleportCooldown = 0.0f;
