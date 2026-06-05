@@ -82,7 +82,7 @@ namespace engine
 		void updateStreaming(const glm::vec3& playerPos);
 
 		void start() override;
-		void draw(const AssetManager& assets, const Frustum& frustum, float time) const;
+		void draw(const AssetManager& assets, const Frustum& frustum) const;
 		void setSplatTextureCpu(const Texture* texture);
 
 

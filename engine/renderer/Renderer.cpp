@@ -118,12 +118,12 @@ namespace engine
 		}
 
 		// Run shadow pass and upload shadow UBO
-		double startTime = glfwGetTime();
+		// double startTime = glfwGetTime();
 		_shadowPass->execute(scene, assets, _ctx);
 		// glFinish();
-		double endTime = glfwGetTime();
-		if (frameCount == 0)
-			std::cout << "Shadow pass: " << (endTime - startTime) * 1000.0 << "ms\n";
+		// double endTime = glfwGetTime();
+		/*if (frameCount == 0)
+			std::cout << "Shadow pass: " << (endTime - startTime) * 1000.0 << "ms\n";*/
 
 		ShadowUBO shadowData = _shadowPass->getShadowUBO();
 		_shadowUBO.update(&shadowData, sizeof(ShadowUBO));
@@ -131,24 +131,24 @@ namespace engine
 		// Run render pipeline
 		for (const auto& pass : _renderPasses)
 		{
-			startTime = glfwGetTime();
+			// startTime = glfwGetTime();
 			pass->execute(scene, assets, _ctx);
 			// glFinish();
-			endTime = glfwGetTime();
-			if (frameCount == 0)
-				std::cout << "Render pass: " << (endTime - startTime) * 1000.0 << "ms\n";
+			// endTime = glfwGetTime();
+			//if (frameCount == 0)
+			//	std::cout << "Render pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 		}
 
 		if (_postProcessEnabled)
 		{
 			for (const auto& pass : _postProcessPasses)
 			{
-				startTime = glfwGetTime();
+				// startTime = glfwGetTime();
 				pass->execute(scene, assets, _ctx);
 				// glFinish();
-				endTime = glfwGetTime();
-				if (frameCount == 0)
-					std::cout << "Post pass: " << (endTime - startTime) * 1000.0 << "ms\n";
+				// endTime = glfwGetTime();
+				//if (frameCount == 0)
+				//	std::cout << "Post pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 			}
 		}
 

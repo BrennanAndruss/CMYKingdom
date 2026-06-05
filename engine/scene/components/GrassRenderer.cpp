@@ -2,7 +2,7 @@
 
 #include <random>
 #include <glm/gtc/constants.hpp>
-
+#include <core/Time.h>
 #include "resources/AssetManager.h"
 #include "resources/Heightmap.h"
 #include "renderer/resources/Shader.h"
@@ -423,7 +423,7 @@ namespace engine
 				<< " attempts\n";
 	}
 
-	void GrassRenderer::draw(const AssetManager& assets, const Frustum& frustum, float time) const
+	void GrassRenderer::draw(const AssetManager& assets, const Frustum& frustum) const
 	{
 		if (_vao == 0 || _indexCount <= 0)
 			return;
@@ -435,7 +435,7 @@ namespace engine
 		shaderPtr->bind();
 
 		// Shader Variables 
-		shaderPtr->setFloat("uTime", time);
+		shaderPtr->setFloat("uTime", Time::time());
 		shaderPtr->setVec2("uWindDirection", glm::vec2(1.0f, 0.25f));
 		shaderPtr->setFloat("uWindStrength", 0.35f);
 		shaderPtr->setFloat("uWindSpeed", 2.0f);

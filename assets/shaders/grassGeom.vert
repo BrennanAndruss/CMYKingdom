@@ -1,0 +1,84 @@
+#version 410 core
+
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTexCoord;
+
+layout (location = 2) in vec4 iPosScale;
+layout (location = 3) in vec4 iRotBendSeed;
+
+layout(std140) uniform CameraData
+{
+    mat4 view;
+    mat4 projection;
+    vec4 cameraPos;
+};
+
+uniform float uTime;
+
+uniform vec2 uWindDirection;
+uniform float uWindStrength;
+uniform float uWindSpeed;
+
+out vec3 WorldPos;
+out vec3 WorldNor;
+out vec2 TexCoord;
+
+void main()
+{
+    vec3 pos = aPos;
+
+    float bladeHeight = iPosScale.w;
+    float rotation = iRotBendSeed.x;
+    float bendAmount = iRotBendSeed.y;
+    float widthScale = iRotBendSeed.z;
+    float seed = iRotBendSeed.w;
+
+    float t = aTexCoord.y;
+
+    pos.x *= widthScale;
+    pos.y *= bladeHeight;
+
+    // Permanent blade curve
+    pos.z += bendAmount * t * t;
+
+    vec2 windDir = normalize(uWindDirection);
+
+    float travelingWave =
+        sin(
+            uTime * uWindSpeed +
+            dot(iPosScale.xz, windDir) * 0.15 +
+            seed
+        );
+
+    float gustWave =
+        sin(
+            uTime * (uWindSpeed * 0.37) +
+            dot(iPosScale.xz, windDir) * 0.04 +
+            seed * 0.5
+        );
+
+    float windAmount =
+        ((travelingWave * 0.7) + (gustWave * 0.3))
+        * uWindStrength;
+
+    float bendFactor = t * t;
+
+    pos.xz += windDir * windAmount * bendFactor;
+
+    float c = cos(rotation);
+    float s = sin(rotation);
+    mat2 rot = mat2(c, -s, s, c);
+    pos.xz = rot * pos.xz;
+
+    // Base normal points out of the blade face
+    // Rotate by same yaw rotation as the blade geometry
+    // Tilt slightly upward so top of blade catches more light
+    vec3 localNormal = normalize(vec3(0.0, 0.3, 1.0));
+    vec2 rotNormal = rot * localNormal.xz;
+    WorldNor = normalize(vec3(rotNormal.x, localNormal.y, rotNormal.y));
+
+    WorldPos = pos + iPosScale.xyz;
+    gl_Position = projection * view * vec4(WorldPos, 1.0);
+
+    TexCoord = aTexCoord;
+}

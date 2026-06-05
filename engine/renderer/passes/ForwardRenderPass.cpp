@@ -126,7 +126,7 @@ namespace engine
 		}
 		if (auto* grass = object->getComponent<GrassRenderer>())
 		{
-			grass->draw(assets, frustum, Time::time());
+			grass->draw(assets, frustum);
 		}
 
 		// Recurse into children

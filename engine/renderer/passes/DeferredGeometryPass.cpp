@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Mesh.h"
@@ -13,6 +14,7 @@
 #include "scene/Scene.h"
 #include "scene/components/Animator.h"
 #include "scene/components/MeshRenderer.h"
+#include "scene/components/GrassRenderer.h"
 
 namespace engine
 {
@@ -44,15 +46,26 @@ namespace engine
 		if (!camera) return;
 		Frustum frustum = Frustum::fromCamera(camera->getCameraData());
 
-		// Cull and draw
+		// Cull and draw regular objects
 		for (const auto& object : scene.getRootObjects())
 		{
 			drawObjectCulled(object, scene, assets, frustum);
 		}
 
-		// Clean up state for next pass
-		glDisable(GL_STENCIL_TEST);
 		glStencilMask(0x00);
+
+		// Draw instanced grass
+		glDisable(GL_CULL_FACE);
+		for (const auto& object : scene.getObjects())
+		{
+			if (auto* grass = object->getComponent<GrassRenderer>())
+			{
+				grass->draw(assets, frustum);
+			}
+		}
+
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_STENCIL_TEST);
 		_gBuffer.unbind();
 
 		ctx.setBuffer(BufferNames::GPosition, _gBuffer.getColorAttachment(0));

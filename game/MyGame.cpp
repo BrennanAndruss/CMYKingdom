@@ -184,7 +184,8 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Shader> waterShader = assets.loadShader(
 		"waterShader", "shaders/water.vert", "shaders/water.frag");
 	Handle<engine::Shader> grassShader = assets.loadShader(
-		"grassShader", "shaders/grass.vert", "shaders/grass.frag");
+		// "grassShader", "shaders/grass.vert", "shaders/grass.frag");
+		"grassShader", "shaders/grassGeom.vert", "shaders/grassGeom.frag");
 
 
 	//loading textures
