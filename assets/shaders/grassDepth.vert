@@ -6,20 +6,12 @@ layout (location = 1) in vec2 aTexCoord;
 layout (location = 2) in vec4 iPosScale;
 layout (location = 3) in vec4 iRotBendSeed;
 
-layout (std140) uniform CameraData
-{
-    mat4 view;
-    mat4 projection;
-    vec4 cameraPos;
-};
-
+uniform mat4 lightSpace;
 uniform float uTime;
 uniform vec2 uWindDirection;
 uniform float uWindStrength;
 uniform float uWindSpeed;
 
-out vec3 WorldPos;
-out vec3 WorldNor;
 out vec2 TexCoord;
 
 void main()
@@ -69,15 +61,8 @@ void main()
     mat2 rot = mat2(c, -s, s, c);
     pos.xz = rot * pos.xz;
 
-    // Base normal points out of the blade face
-    // Rotate by same yaw rotation as the blade geometry
-    // Tilt slightly upward so top of blade catches more light
-    vec3 localNormal = normalize(vec3(0.0, 0.3, 1.0));
-    vec2 rotNormal = rot * localNormal.xz;
-    WorldNor = normalize(vec3(rotNormal.x, localNormal.y, rotNormal.y));
-
-    WorldPos = pos + iPosScale.xyz;
-    gl_Position = projection * view * vec4(WorldPos, 1.0);
+    vec3 worldPos = pos + iPosScale.xyz;
+    gl_Position = lightSpace * vec4(worldPos, 1.0);
 
     TexCoord = aTexCoord;
 }

@@ -11,6 +11,7 @@
 #include "scene/Scene.h"
 #include "scene/components/MeshRenderer.h"
 #include "scene/components/Animator.h"
+#include "scene/components/GrassRenderer.h"
 #include "scene/components/Light.h"
 
 namespace engine
@@ -237,44 +238,104 @@ namespace engine
 	void ShadowPass::renderCascade(int index, const Scene& scene,
 		const AssetManager& assets)
 	{
-		// todo: implement shadow frustum culling
+		// Build frustum from cascade's light space matrix
+		Frustum lightFrustum = Frustum::fromMatrix(
+			_shadowUBO.cascadeLightSpaces[index]);
+
+		// Cull and draw regular objects
+		for (const auto& object : scene.getRootObjects())
+		{
+			drawObjectCulled(index, object, scene, assets, lightFrustum);
+		}
+
+		// Draw instanced grass
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_CULL_FACE);
 		for (const auto& object : scene.getObjects())
 		{
-			auto* meshRenderer = object->getComponent<MeshRenderer>();
-			if (!meshRenderer) continue;
-
-			auto* mesh = assets.getMesh(meshRenderer->mesh);
-			auto* mat = assets.getMaterial(meshRenderer->material);
-			if (!mesh || !mat || mat->renderMode == RenderMode::Transparent
-				|| mat->renderMode == RenderMode::Water) continue;
-
-			auto* animator = object->getComponent<Animator>();
-			bool skinned = mesh->isSkinned() && animator;
-
-			Shader* shader = assets.getShader(
-				skinned ? _skinnedDepthShader : _depthShader);
-			assert(shader && "Shader not found.");
-
-			shader->bind();
-			shader->setMat4("lightSpace", _shadowUBO.cascadeLightSpaces[index]);
-			shader->setMat4("model", object->transform.getWorldMatrix());
-
-			if (skinned)
+			if (auto* grass = object->getComponent<GrassRenderer>())
 			{
-				const auto& boneMatrices = animator->getBoneMatrices();
-				const int numBones = static_cast<int>(
-					std::min(boneMatrices.size(), MAX_SHADER_BONES));
-				shader->setInt("isSkinned", 1);
-				shader->setInt("numBones", numBones);
-				for (int i = 0; i < numBones; ++i)
-				{
-					shader->setMat4("bones[" + std::to_string(i) + "]",
-						boneMatrices[i]);
-				}
+				grass->drawShadow(assets, lightFrustum,
+					_shadowUBO.cascadeLightSpaces[index]);
+			}
+		}
+
+		glEnable(GL_CULL_FACE);
+	}
+
+	void ShadowPass::drawObjectCulled(int index, Object* object, const Scene& scene,
+		const AssetManager& assets, const Frustum& lightFrustum)
+	{
+		// Test object's hierarchy bbox
+		if (!object->transform.getChildren().empty())
+		{
+			// Test combined bbox to cull the subtree
+			BBox hierarchyBBox = object->getHierarchyBBox(assets);
+			if (!hierarchyBBox.intersectsFrustum(lightFrustum))
+			{
+				return;
+			}
+		}
+
+		// Test object's own bbox
+		if (auto* mr = object->getComponent<MeshRenderer>())
+		{
+			const BBox& worldBBox = object->getWorldBBox(assets);
+			if (!worldBBox.intersectsFrustum(lightFrustum))
+			{
+				return;
 			}
 
-			mesh->draw();
-			shader->unbind();
+			drawObject(index, object, scene, assets);
 		}
+
+		// Recurse into children
+		for (auto* childTransform : object->transform.getChildren())
+		{
+			if (Object* child = childTransform->owner)
+			{
+				drawObjectCulled(index, child, scene, assets, lightFrustum);
+			}
+		}
+	}
+
+	void ShadowPass::drawObject(int index, Object* object, const Scene& scene, 
+		const AssetManager& assets)
+	{
+		auto* meshRenderer = object->getComponent<MeshRenderer>();
+		if (!meshRenderer) return;
+
+		auto* mesh = assets.getMesh(meshRenderer->mesh);
+		auto* mat = assets.getMaterial(meshRenderer->material);
+		if (!mesh || !mat || mat->renderMode == RenderMode::Transparent
+			|| mat->renderMode == RenderMode::Water) return;
+
+		auto* animator = object->getComponent<Animator>();
+		bool skinned = mesh->isSkinned() && animator;
+
+		Shader* shader = assets.getShader(
+			skinned ? _skinnedDepthShader : _depthShader);
+		assert(shader && "Shader not found.");
+
+		shader->bind();
+		shader->setMat4("lightSpace", _shadowUBO.cascadeLightSpaces[index]);
+		shader->setMat4("model", object->transform.getWorldMatrix());
+
+		if (skinned)
+		{
+			const auto& boneMatrices = animator->getBoneMatrices();
+			const int numBones = static_cast<int>(
+				std::min(boneMatrices.size(), MAX_SHADER_BONES));
+			shader->setInt("isSkinned", 1);
+			shader->setInt("numBones", numBones);
+			for (int i = 0; i < numBones; ++i)
+			{
+				shader->setMat4("bones[" + std::to_string(i) + "]",
+					boneMatrices[i]);
+			}
+		}
+
+		mesh->draw();
+		shader->unbind();
 	}
 }

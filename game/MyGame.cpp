@@ -186,7 +186,8 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Shader> grassShader = assets.loadShader(
 		// "grassShader", "shaders/grass.vert", "shaders/grass.frag");
 		"grassShader", "shaders/grassGeom.vert", "shaders/grassGeom.frag");
-
+	Handle<engine::Shader> grassShadowShader = assets.loadShader(
+		"grassShadowShader", "shaders/grassDepth.vert", "shaders/grassDepth.frag");
 
 	//loading textures
 	std::cout << "Loading textures...\n";
@@ -798,6 +799,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 		grassRenderer = &grassObj.addComponent<engine::GrassRenderer>();
 		grassRenderer->shader = grassShader;
+		grassRenderer->shadowShader = grassShadowShader;
 		grassRenderer->texture = grassBladeTex;
 		grassRenderer->heightmap = heightmap;
 		grassRenderer->terrainPlaneLen = planeLen;

@@ -34,6 +34,7 @@ namespace engine
 	{
 	public:
 		Handle<Shader> shader;
+		Handle<Shader> shadowShader;
 		Handle<Texture> texture;
 		Handle<Texture> splatmap;
 		const Texture* _splatTextureCpu = nullptr;
@@ -83,6 +84,8 @@ namespace engine
 
 		void start() override;
 		void draw(const AssetManager& assets, const Frustum& frustum) const;
+		void drawShadow(const AssetManager& assets, const Frustum& lightFrustum, 
+			const glm::mat4& lightSpace) const;
 		void setSplatTextureCpu(const Texture* texture);
 
 

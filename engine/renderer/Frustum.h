@@ -5,7 +5,6 @@
 namespace engine
 {
 	class BoundingVolume;
-	struct CameraData;
 }
 
 namespace engine
@@ -14,7 +13,7 @@ namespace engine
 	{
 		glm::vec4 planes[6];
 
-		static Frustum fromCamera(const CameraData& camData);
+		static Frustum fromMatrix(const glm::mat4& matrix);
 		bool intersects(const BoundingVolume& volume) const;
 	};
 }

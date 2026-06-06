@@ -10,10 +10,12 @@
 namespace engine
 {
 	class Scene;
+	class Object;
 	class AssetManager;
 	class RenderContext;
 	class Shader;
 	class Camera;
+	struct Frustum;
 	struct BBox;
 }
 
@@ -62,8 +64,9 @@ namespace engine
 			BBox sceneBBox, glm::vec3 lightDir);
 		void renderCascade(int index, const Scene& scene,
 			const AssetManager& assets);
-
-		void drawObject(int index, const Scene& scene,
+		void drawObjectCulled(int index, Object* object, const Scene& scene,
+			const AssetManager& assets, const Frustum& lightFrustum);
+		void drawObject(int index, Object* object, const Scene& scene,
 			const AssetManager& assets);
 	};
 }

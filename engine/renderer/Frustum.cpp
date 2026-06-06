@@ -6,16 +6,15 @@
 
 namespace engine
 {
-	Frustum Frustum::fromCamera(const CameraData& camData)
+	Frustum Frustum::fromMatrix(const glm::mat4& matrix)
 	{
 		Frustum f;
 
-		// Extract planes from view-projection matrix
-		glm::mat4 vp = camData.projection * camData.view;
-		glm::vec4 r0 = glm::row(vp, 0);
-		glm::vec4 r1 = glm::row(vp, 1);
-		glm::vec4 r2 = glm::row(vp, 2);
-		glm::vec4 r3 = glm::row(vp, 3);
+		// Extract planes from matrix
+		glm::vec4 r0 = glm::row(matrix, 0);
+		glm::vec4 r1 = glm::row(matrix, 1);
+		glm::vec4 r2 = glm::row(matrix, 2);
+		glm::vec4 r3 = glm::row(matrix, 3);
 
 		f.planes[0] = r3 + r0; // Left
 		f.planes[1] = r3 - r0; // Right

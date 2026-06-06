@@ -44,7 +44,9 @@ namespace engine
 
 		Camera* camera = scene.getMainCamera();
 		if (!camera) return;
-		Frustum frustum = Frustum::fromCamera(camera->getCameraData());
+		
+		const CameraData& camData = camera->getCameraData();
+		Frustum frustum = Frustum::fromMatrix(camData.projection * camData.view);
 
 		// Cull and draw regular objects
 		for (const auto& object : scene.getRootObjects())

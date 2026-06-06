@@ -425,49 +425,39 @@ namespace engine
 
 	void GrassRenderer::draw(const AssetManager& assets, const Frustum& frustum) const
 	{
-		if (_vao == 0 || _indexCount <= 0)
-			return;
+		if (_vao == 0 || _indexCount <= 0) return;
 
 		auto* shaderPtr = assets.getShader(shader);
-		if (!shaderPtr)
-			return;
+		if (!shaderPtr) return;
 
 		shaderPtr->bind();
 
 		// Shader Variables 
 		shaderPtr->setFloat("uTime", Time::time());
-		shaderPtr->setVec2("uWindDirection", glm::vec2(1.0f, 0.25f));
-		shaderPtr->setFloat("uWindStrength", 0.35f);
-		shaderPtr->setFloat("uWindSpeed", 2.0f);
-		
-
+		shaderPtr->setVec2("uWindDirection", windDirection);
+		shaderPtr->setFloat("uWindStrength", windStrength);
+		shaderPtr->setFloat("uWindSpeed", windSpeed);
 
 		if (auto* tex = assets.getTexture(texture))
 		{
 			tex->bindToUnit(shaderPtr->getUniform("uGrassTex"), 0);
 		}
 
-		glDisable(GL_CULL_FACE);
 		glBindVertexArray(_vao);
 
 		if (usePatchStreaming)
 		{
-			int totalPatches = 0;
-			int drawnPatches = 0;
-			int drawnInstances = 0;
+			//int totalPatches = 0;
+			//int drawnPatches = 0;
+			//int drawnInstances = 0;
 
 			for (const GrassPatch& patch : _patches)
 			{
-				totalPatches++;
+				//totalPatches++;
 
-				if (patch.instances.empty())
-					continue;
-
-				if (!patch.bounds.intersectsFrustum(frustum))
-					continue;
-
-				if (patch.instanceVbo == 0)
-					continue;
+				if (patch.instances.empty()) continue;
+				if (!patch.bounds.intersectsFrustum(frustum)) continue;
+				if (patch.instanceVbo == 0) continue;
 
 				glBindBuffer(GL_ARRAY_BUFFER, patch.instanceVbo);
 
@@ -497,45 +487,120 @@ namespace engine
 					static_cast<GLsizei>(patch.instances.size())
 				);
 
-				drawnPatches++;
-				drawnInstances += static_cast<int>(patch.instances.size());
+				//drawnPatches++;
+				//drawnInstances += static_cast<int>(patch.instances.size());
 			}
 
-			static int frameCounter = 0;
-			frameCounter++;
+			//static int frameCounter = 0;
+			//frameCounter++;
 
-			if (frameCounter % 120 == 0)
+			//if (frameCounter % 120 == 0)
+			//{
+			//	std::cout << "Grass VFC: drawn "
+			//			<< drawnPatches
+			//			<< " / "
+			//			<< totalPatches
+			//			<< " patches, instances: "
+			//			<< drawnInstances
+			//			<< "\n";
+			//}
+		}
+		else
+		{
+			if (!_instances.empty() && worldBounds.intersectsFrustum(frustum))
 			{
-				//std::cout << "Grass VFC: drawn "
-				//		<< drawnPatches
-				//		<< " / "
-				//		<< totalPatches
-				//		<< " patches, instances: "
-				//		<< drawnInstances
-				//		<< "\n";
+				glDrawElementsInstanced(
+					GL_TRIANGLES,
+					_indexCount,
+					GL_UNSIGNED_INT,
+					(void*)0,
+					static_cast<GLsizei>(_instances.size())
+				);
 			}
+		}		
 
-			glBindVertexArray(0);
-			glEnable(GL_CULL_FACE);
-			shaderPtr->unbind();
-			return;
+		glBindVertexArray(0);
+		shaderPtr->unbind();
+	}
+
+	void GrassRenderer::drawShadow(const AssetManager& assets,
+		const Frustum& lightFrustum, const glm::mat4& lightSpace) const
+	{
+		if (_vao == 0 || _indexCount <= 0) return;
+
+		auto* shaderPtr = assets.getShader(shadowShader);
+		if (!shaderPtr) return;
+
+		shaderPtr->bind();
+
+		shaderPtr->setMat4("lightSpace", lightSpace);
+		shaderPtr->setFloat("uTime", Time::time());
+		shaderPtr->setVec2("uWindDirection", windDirection);
+		shaderPtr->setFloat("uWindStrength", windStrength);
+		shaderPtr->setFloat("uWindSpeed", windSpeed);
+
+		if (auto* tex = assets.getTexture(texture))
+		{
+			tex->bindToUnit(shaderPtr->getUniform("uGrassTex"), 0);
 		}
 
-		if (!_instances.empty() && worldBounds.intersectsFrustum(frustum))
+		glBindVertexArray(_vao);
+
+		if (usePatchStreaming)
 		{
-			glDrawElementsInstanced(
-				GL_TRIANGLES,
-				_indexCount,
-				GL_UNSIGNED_INT,
-				(void*)0,
-				static_cast<GLsizei>(_instances.size())
-			);
+			for (const GrassPatch& patch : _patches)
+			{
+				if (patch.instances.empty()) continue;
+				if (!patch.bounds.intersectsFrustum(lightFrustum)) continue;
+				if (patch.instanceVbo == 0) continue;
+
+				glBindBuffer(GL_ARRAY_BUFFER, patch.instanceVbo);
+
+				glVertexAttribPointer(
+					2,
+					4,
+					GL_FLOAT,
+					GL_FALSE,
+					sizeof(GrassInstance),
+					(void*)offsetof(GrassInstance, posScale)
+				);
+
+				glVertexAttribPointer(
+					3,
+					4,
+					GL_FLOAT,
+					GL_FALSE,
+					sizeof(GrassInstance),
+					(void*)offsetof(GrassInstance, rotBendSeed)
+				);
+
+				glDrawElementsInstanced(
+					GL_TRIANGLES,
+					_indexCount,
+					GL_UNSIGNED_INT,
+					(void*)0,
+					static_cast<GLsizei>(patch.instances.size())
+				);
+			}
+		}
+		else
+		{
+			if (!_instances.empty() && worldBounds.intersectsFrustum(lightFrustum))
+			{
+				glDrawElementsInstanced(
+					GL_TRIANGLES,
+					_indexCount,
+					GL_UNSIGNED_INT,
+					(void*)0,
+					static_cast<GLsizei>(_instances.size())
+				);
+			}
 		}
 
 		glBindVertexArray(0);
-		glEnable(GL_CULL_FACE);
 		shaderPtr->unbind();
-}
+	}
+
 	void GrassRenderer::regenerate(const glm::vec3& newCenter)
 	{
 		centerPosition = newCenter;
