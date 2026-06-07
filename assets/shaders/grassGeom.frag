@@ -14,8 +14,8 @@ void main()
 {
 	vec4 albedo = texture(uGrassTex, TexCoord);
 	albedo.rgb *= 0.70;
-	if (albedo.a < 0.35)
-		discard;
+	//if (albedo.a < 0.35)
+	//	discard;
 
 	// Flip normal for back faces
 	vec3 normal = gl_FrontFacing ? WorldNor : -WorldNor;

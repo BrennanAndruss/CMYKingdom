@@ -14,6 +14,8 @@ namespace engine
 		case AttachmentFormat::RGBA8: return GL_RGBA8;
 		case AttachmentFormat::RGBA16F: return GL_RGBA16F;
 		case AttachmentFormat::RGB16F: return GL_RGB16F;
+		case AttachmentFormat::RGBA32F: return GL_RGBA32F;
+		case AttachmentFormat::RGB32F: return GL_RGB32F;
 		case AttachmentFormat::Depth24: return GL_DEPTH_COMPONENT24;
 		case AttachmentFormat::Depth24Stencil8: return GL_DEPTH24_STENCIL8;
 		case AttachmentFormat::Depth32F:
@@ -30,8 +32,10 @@ namespace engine
 		switch (format)
 		{
 		case AttachmentFormat::RGBA8:
-		case AttachmentFormat::RGBA16F: return GL_RGBA;
-		case AttachmentFormat::RGB16F: return GL_RGB;
+		case AttachmentFormat::RGBA16F:
+		case AttachmentFormat::RGBA32F: return GL_RGBA;
+		case AttachmentFormat::RGB16F: 
+		case AttachmentFormat::RGB32F: return GL_RGB;
 		case AttachmentFormat::Depth24: 
 		case AttachmentFormat::Depth32F:
 		case AttachmentFormat::Depth32FShadow: 
@@ -50,6 +54,8 @@ namespace engine
 		case AttachmentFormat::RGBA8: return GL_UNSIGNED_BYTE;
 		case AttachmentFormat::RGBA16F:
 		case AttachmentFormat::RGB16F:
+		case AttachmentFormat::RGBA32F:
+		case AttachmentFormat::RGB32F:
 		case AttachmentFormat::Depth32F:
 		case AttachmentFormat::Depth32FShadow: 
 		case AttachmentFormat::Depth32FShadowArray: return GL_FLOAT;
@@ -192,12 +198,8 @@ namespace engine
 					dataFormat, dataType, nullptr
 				);
 
-				// Set filter to linear for PCF shadows
-				GLint filter = (attachment.format == AttachmentFormat::Depth32FShadowArray)
-					? GL_LINEAR : GL_NEAREST;
-
-				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, filter);
-				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, filter);
+				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, attachment.filterMode);
+				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, attachment.filterMode);
 				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, attachment.wrapMode);
 				glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, attachment.wrapMode);
 
@@ -230,14 +232,14 @@ namespace engine
 					dataType, nullptr
 				);
 
-				// Set filter to linear for PCF shadows
-				GLint filter = (attachment.format == AttachmentFormat::Depth32FShadow)
-					? GL_LINEAR : GL_NEAREST;
+				GLint filter = attachment.filterMode;
 
 				// Set filter to linear for smooth color textures
 				if (attachment.format == AttachmentFormat::RGBA8 ||
 					attachment.format == AttachmentFormat::RGBA16F ||
-					attachment.format == AttachmentFormat::RGB16F)
+					attachment.format == AttachmentFormat::RGB16F ||
+					attachment.format == AttachmentFormat::RGBA32F ||
+					attachment.format == AttachmentFormat::RGB32F)
 				{
 					filter = GL_LINEAR;
 				}

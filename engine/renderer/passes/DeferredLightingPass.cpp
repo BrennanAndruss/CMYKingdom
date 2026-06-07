@@ -108,6 +108,9 @@ namespace engine
 
 		shader->setInt("numLights", static_cast<int>(scene.getLights().size()));
 		
+		shader->setInt("shadowSampleCount", shadowSampleCount);
+		shader->setFloat("shadowPenumbraSize", shadowPenumbraSize);
+
 		shader->setInt("debugView", debugView);
 		shader->setInt("showCascades", showCascades);
 

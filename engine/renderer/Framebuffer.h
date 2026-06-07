@@ -16,6 +16,8 @@ namespace engine
 		RGBA8,
 		RGBA16F,
 		RGB16F,
+		RGBA32F,
+		RGB32F,
 
 		// Depth formats
 		Depth24,
@@ -23,7 +25,7 @@ namespace engine
 		Depth32F,
 
 		// Shadow formats
-		// Enable hardware PCF sampling
+		// Enables shadow compare mode
 		Depth32FShadow,
 		Depth32FShadowArray
 	};
@@ -31,6 +33,7 @@ namespace engine
 	struct FramebufferAttachment
 	{
 		AttachmentFormat format;
+		GLint filterMode = GL_NEAREST;
 		GLint wrapMode = GL_CLAMP_TO_EDGE;
 		bool borderWhite = false;
 		int layerCount = 1;

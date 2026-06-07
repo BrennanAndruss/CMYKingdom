@@ -24,7 +24,8 @@ namespace engine
 		_depthShader(depthShader),
 		_skinnedDepthShader(skinnedDepthShader),
 		_shadowFramebuffer(shadowResolution, shadowResolution, {
-			{ AttachmentFormat::Depth32FShadowArray, GL_CLAMP_TO_BORDER, true, NUM_CASCADES }
+			{ AttachmentFormat::Depth32FShadowArray, GL_LINEAR, 
+			GL_CLAMP_TO_BORDER, true, NUM_CASCADES }
 		}) {}
 	
 	ShadowPass::~ShadowPass() = default;
@@ -41,7 +42,8 @@ namespace engine
 			//std::cout << "lambda: " << lambda << "\n";
 			//for (int i = 0; i < NUM_CASCADES; i++)
 			//{
-			//	std::cout << "cascade " << i << " split depth: " << _shadowUBO.cascadeSplits[i] << "\n";
+			//	std::cout << "cascade " << i << " split depth: " 
+			// << _shadowUBO.cascadeSplits[i] << "\n";
 			//}
 		}
 		if (Input::isKeyPressed(GLFW_KEY_RIGHT_BRACKET))
@@ -52,7 +54,8 @@ namespace engine
 			//std::cout << "lambda: " << lambda << "\n";
 			//for (int i = 0; i < NUM_CASCADES; i++)
 			//{
-			//	std::cout << "cascade " << i << " split depth: " << _shadowUBO.cascadeSplits[i] << "\n";
+			//	std::cout << "cascade " << i << " split depth: " 
+			// << _shadowUBO.cascadeSplits[i] << "\n";
 			//}
 		}
 
@@ -75,9 +78,11 @@ namespace engine
 		glm::vec3 lightDir = -dirLight->getDirection();
 		computeLightSpaceMatrices(*camera, sceneBBox, lightDir);
 
-		// _shadowUBO.shadowBias = shadowBias;
-		_shadowUBO.numCascades = NUM_CASCADES;
-
+		for (int i = 0; i < NUM_CASCADES; i++)
+		{
+			// Reduce bias for lower cascades to resolve peter panning
+			_shadowUBO.cascadeBiases[i] = shadowBias * biasScales[i];
+		}
 		
 		// Shift depth values to reduce shadow acne
 		_shadowFramebuffer.bind();
@@ -174,7 +179,7 @@ namespace engine
 					radius = d;
 			}
 
-			// Construct stable view frame so all shadow casters are in front of light
+			//// Construct stable view frame so all shadow casters are in front of light
 			float sceneZExtent = glm::length(sceneBBox.max - sceneBBox.min);
 			glm::vec3 lightPos = center + lightDir * (radius + sceneZExtent);
 			glm::mat4 lightView = glm::lookAt(lightPos, center, up);

@@ -22,7 +22,7 @@ namespace engine
 
 	DeferredGeometryPass::DeferredGeometryPass(int width, int height) :
 		_gBuffer(width, height, {
-			{ AttachmentFormat::RGB16F },	// 0: Position
+			{ AttachmentFormat::RGB32F },	// 0: Position
 			{ AttachmentFormat::RGBA16F },	// 1: Normal + Shininess
 			{ AttachmentFormat::RGBA8 },	// 2: Albedo + Specular
 			{ AttachmentFormat::Depth24Stencil8 }

@@ -24,6 +24,10 @@ namespace engine
 		void execute(const Scene& scene, const AssetManager& assets,
 			RenderContext& ctx) override;
 
+		// Shadow parameters
+		int shadowSampleCount = 16;
+		float shadowPenumbraSize = 1.5f;
+
 	private:
 		Handle<Shader> _shader;
 		Framebuffer _framebuffer;

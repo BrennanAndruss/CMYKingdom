@@ -35,6 +35,11 @@ namespace engine
 		glm::vec3 min = glm::vec3(std::numeric_limits<float>::max());
 		glm::vec3 max = glm::vec3(-std::numeric_limits<float>::max());
 
+		glm::vec3 center() const
+		{
+			return max - min;
+		}
+
 		// Expand to include a point
 		void expand(glm::vec3 point)
 		{

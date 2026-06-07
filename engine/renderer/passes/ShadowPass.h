@@ -21,17 +21,16 @@ namespace engine
 
 namespace engine
 {
-	constexpr int NUM_CASCADES = 3;
+	constexpr int NUM_CASCADES = 3; // Supports up to 4 cascades
 	constexpr int SHADOW_RESOLUTION = 2048;
 
 	struct ShadowUBO
 	{
 		glm::mat4 cascadeLightSpaces[NUM_CASCADES];
-		glm::vec4 cascadeRadii;
-		glm::vec4 cascadeSplits;
-		int numCascades = NUM_CASCADES;
-		float shadowBias = 0.0005f;
-		float _pad[2];
+		// Properties indexed per cascade
+		glm::vec4 cascadeRadii = glm::vec4(0.0f);
+		glm::vec4 cascadeSplits = glm::vec4(0.0f);
+		glm::vec4 cascadeBiases = glm::vec4(0.0f);
 	};
 
 	class ShadowPass : public RenderPass
@@ -47,9 +46,10 @@ namespace engine
 		const ShadowUBO& getShadowUBO() const { return _shadowUBO; }
 
 		// Cascade parameters
+		float maxShadowDistance = 500.0f;
 		float lambda = 0.15f;
 		float shadowBias = 0.0015f;
-		float maxShadowDistance = 500.0f;
+		glm::vec4 biasScales = glm::vec4(1.0, 2.0, 9.0, 0.0);
 
 	private:
 		Handle<Shader> _depthShader, _skinnedDepthShader;
