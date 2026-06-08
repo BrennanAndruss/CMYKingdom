@@ -12,11 +12,11 @@ namespace engine
 
 namespace engine
 {
-	class TransparentPass : public RenderPass
+	class WaterPass : public RenderPass
 	{
 	public:
-		TransparentPass(int width, int height);
-		~TransparentPass();
+		WaterPass(int width, int height);
+		~WaterPass();
 
 		void resize(int width, int height) override;
 		void execute(const Scene& scene, const AssetManager& assets,

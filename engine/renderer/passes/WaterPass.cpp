@@ -1,4 +1,4 @@
-#include "renderer/passes/TransparentPass.h"
+#include "renderer/passes/WaterPass.h"
 
 #include <iostream>
 #include "core/Time.h"
@@ -14,38 +14,34 @@
 
 namespace engine
 {
-	TransparentPass::TransparentPass(int width, int height) :
+	WaterPass::WaterPass(int width, int height) :
 		_framebuffer(width, height, {
 			{ AttachmentFormat::RGBA8 }
 		}) {}
 
-	TransparentPass::~TransparentPass() = default;
+	WaterPass::~WaterPass() = default;
 
-	void TransparentPass::resize(int width, int height)
+	void WaterPass::resize(int width, int height)
 	{
 		_framebuffer.resize(width, height);
 	}
 
-	void TransparentPass::execute(const Scene& scene, const AssetManager& assets,
+	void WaterPass::execute(const Scene& scene, const AssetManager& assets,
 		RenderContext& ctx)
 	{
-		// Collect transparent objects
-		std::vector<Object*> transparents;
+		// Collect water objects
+		std::vector<Object*> waterObjects;
 		for (const auto& object : scene.getObjects())
 		{
 			auto* mr = object->getComponent<MeshRenderer>();
 			if (!mr) continue;
 
 			auto* mat = assets.getMaterial(mr->material);
-			if (mat && (mat->renderMode == RenderMode::Transparent ||
-				mat->renderMode == RenderMode::Water))
+			if (mat && mat->renderMode == RenderMode::Water)
 			{
-				transparents.push_back(object.get());
+				waterObjects.push_back(object.get());
 			}
 		}
-
-		// todo (when we have multiple transparent objects)
-		// sort transparent objects back-to-front
 
 		// Copy opaque scene from lighting pass into scratch buffer
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.sceneFramebuffer->getFboId());
@@ -61,16 +57,11 @@ namespace engine
 		Framebuffer* framebuffer = ctx.sceneFramebuffer;
 		framebuffer->bind();
 
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS); // Pass if less or exactly equal
+		glDepthFunc(GL_LESS);
 		glDepthMask(GL_FALSE);
 
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(-.1f, -.1f); // Bias the depth calculations slightly forward
-
-		for (const auto& object : transparents)
+		for (const auto& object : waterObjects)
 		{
 			auto* mr = object->getComponent<MeshRenderer>();
 			auto* mesh = assets.getMesh(mr->mesh);
@@ -123,9 +114,7 @@ namespace engine
 			shader->unbind();
 		}
 
-		glDisable(GL_POLYGON_OFFSET_FILL); // Clean up state
 		glDepthMask(GL_TRUE);
-		// glDisable(GL_BLEND);
 
 		framebuffer->unbind();
 	}
