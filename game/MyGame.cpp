@@ -48,27 +48,24 @@ bool MyGame::allGemsCollected() const
            _yellowGemCount >= _gameUI.maxGems;
 }
 
-void MyGame::onCollectableCollected(int type)
+void MyGame::onCollectableCollected(Collectable::Type type, glm::vec3 worldPos)
 {
-	// Only increment the color corresponding to the collectable type
-	if (type == 0)
-	{
-    	_collectedCyan = std::min(_collectedCyan + 0.2f, 1.0f);
-    	_cyanGemCount++;
-	}
-	else if (type == 1)
-	{
-    	_collectedMagenta = std::min(_collectedMagenta + 0.2f, 1.0f);
-    	_magentaGemCount++;
-	}
-	else if (type == 2)
-	{
-    	_collectedYellow = std::min(_collectedYellow + 0.2f, 1.0f);
-    	_yellowGemCount++;
-	}
+	// Increment the gem count of the corresponding collectable type
+	if (type == Collectable::Type::Cyan)
+		_cyanGemCount++;
+	else if (type == Collectable::Type::Magenta)
+		_magentaGemCount++;
+	else if (type == Collectable::Type::Yellow)
+		_yellowGemCount++;
+
+	// Set values for color pulse
+	_pulseCenter = worldPos;
+	_pulseRadius = 0.0f;
+	_activePulseType = type;
+	_pulseActive = true;
 }
 
-	void MyGame::startGame()
+void MyGame::startGame()
 {
     _gameUIState = GameUIState::Playing;
     editorModeActive = false;
@@ -897,8 +894,6 @@ void MyGame::init(engine::AssetManager& assets,
 		editorController->enabled = false;
 	}
 
-	
-
 	// Add post-processing render passes
 	_colorRestorePass = static_cast<ColorRestorationPass*>(
 		&renderer.addPostProcessPass(std::make_unique<ColorRestorationPass>(
@@ -911,12 +906,18 @@ void MyGame::init(engine::AssetManager& assets,
 	
 	
 
+	// Compute color restoration increments
+	_colorIncrement = 1.0f / static_cast<float>(_gameUI.maxGems);
+	_colorRestorePass->pulseColorBoost = _colorIncrement;
+	_colorRestorePass->pulseThickness = 5.0f;
+	_colorRestorePass->pulseSoftness = 2.0f;
+
 	std::cout << "Game initialized!\n";
 }
 
 void MyGame::update(float deltaTime)
 {
-	    if (_startRequested)
+	if (_startRequested)
     {
         _startRequested = false;
         startGame();
@@ -968,6 +969,7 @@ void MyGame::update(float deltaTime)
 		grassRenderer->updateStreaming(playerPos);
 	}
 
+	// manual color restore debugs
 	if (engine::Input::isKeyDown(GLFW_KEY_C)) _collectedCyan += 0.002f;
 	if (engine::Input::isKeyDown(GLFW_KEY_M)) _collectedMagenta += 0.002f;
 	if (engine::Input::isKeyDown(GLFW_KEY_Y)) _collectedYellow += 0.002f;
@@ -976,11 +978,39 @@ void MyGame::update(float deltaTime)
 		_collectedCyan = _collectedMagenta = _collectedYellow = 0.0f;
 	}
 
+	// Expand active pulses
+	static float PULSE_MAX_RADIUS = 1000.0f;
+	static float PULSE_SPEED = 250.0f;
+	if (_pulseActive)
+	{
+		_pulseRadius += PULSE_SPEED * deltaTime;
+		if (_pulseRadius > PULSE_MAX_RADIUS)
+		{
+			// Commit color restoration progress to the baseline background
+			if (_activePulseType == Collectable::Type::Cyan)
+				_collectedCyan = std::min(_collectedCyan + _colorIncrement, 1.0f);
+			else if (_activePulseType == Collectable::Type::Magenta)
+				_collectedMagenta = std::min(_collectedMagenta + _colorIncrement, 1.0f);
+			else if (_activePulseType == Collectable::Type::Yellow)
+				_collectedYellow = std::min(_collectedYellow + _colorIncrement, 1.0f);
+
+			_pulseActive = false;
+		}
+	}
+
 	if (_colorRestorePass)
 	{
+		// Persistent base values for restored color
 		_colorRestorePass->cyan = std::min(_collectedCyan, 1.0f);
 		_colorRestorePass->magenta = std::min(_collectedMagenta, 1.0f);
 		_colorRestorePass->yellow = std::min(_collectedYellow, 1.0f);
+
+		// Pulse values
+		_colorRestorePass->pulseActive = _pulseActive;
+		_colorRestorePass->pulseCenter = _pulseCenter;
+		_colorRestorePass->pulseRadius = _pulseRadius;
+		_colorRestorePass->activePulseType = _activePulseType;
+
 		//const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
 		//_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
 	}
