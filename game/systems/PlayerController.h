@@ -31,7 +31,7 @@ public:
 	float sensitivity = 0.1f;
 	float jumpForce = 32.0f;
 	float baseJumpForce = 32.0f;
-	float jumpBoostMultiplier = 2.0f;
+	float jumpBoostMultiplier = 4.0f;
 	float jumpBoostDuration = 15.0f;
 	float jumpBoostTimer = 0.0f;
 	float jumpBufferDuration = 0.20f;

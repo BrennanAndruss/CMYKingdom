@@ -27,10 +27,10 @@ namespace engine
 		_currentSyncedWorldPosition = controllerPosition;
 		_previousSyncedWorldPosition = _currentSyncedWorldPosition;
 		_groundAnchorY = controllerPosition.y;
-		_hasGroundAnchor = true;
 		
-		const glm::vec3 halfExtents(radius, height * 0.5f, radius);
-		_shape = std::make_unique<btBoxShape>(PhysicsSystem::toBullet(halfExtents));
+		float cylinderHeight = glm::max(0.01f, height - 2.0f * radius);
+		_shape = std::make_unique<btCapsuleShape>(radius,cylinderHeight);
+		std::cout << "shape_type: " << _shape->getShapeType() << std::endl;
 
 		_ghostObject = new btPairCachingGhostObject();
 		_ghostObject->setCollisionShape(_shape.get());
@@ -47,11 +47,11 @@ namespace engine
 		_ghostObject->setActivationState(DISABLE_DEACTIVATION);
 
 		// Configure controller logic
-		const float stepHeight = glm::max(0.05f, radius * 0.25f);
+		const float stepHeight = glm::max(0.2f, height * 0.15f);
 		_controller = new btKinematicCharacterController(_ghostObject, _shape.get(), stepHeight);
 		_controller->setUp(btVector3(0, 1, 0));
 		_controller->setGravity(btVector3(0, -gravity, 0));
-		_controller->setMaxPenetrationDepth(0.01f);
+		_controller->setMaxPenetrationDepth(0.3f);
 
 		// Add to world with filters
 		int group = btBroadphaseProxy::CharacterFilter;
@@ -112,25 +112,8 @@ namespace engine
 		btTransform t = _ghostObject->getWorldTransform();
 		_previousSyncedWorldPosition = _currentSyncedWorldPosition;
 		glm::vec3 syncedPosition = PhysicsSystem::toGlm(t.getOrigin());
-		const float verticalDelta = std::abs(syncedPosition.y - _currentSyncedWorldPosition.y);
-		if (verticalDelta < 0.02f)
-		{
-			syncedPosition.y = _currentSyncedWorldPosition.y;
-		}
-		const bool grounded = _controller->onGround();
-		if (grounded)
-		{
-			if (!_hasGroundAnchor)
-			{
-				_groundAnchorY = syncedPosition.y;
-				_hasGroundAnchor = true;
-			}
-			syncedPosition.y = _groundAnchorY;
-		}
-		else
-		{
-			_hasGroundAnchor = false;
-		}
+		
+		
 		owner->transform.setPosition(syncedPosition);
 		_currentSyncedWorldPosition = syncedPosition;
 		_postPhysicsSyncedWorldPosition = _currentSyncedWorldPosition;
@@ -157,7 +140,7 @@ namespace engine
 		_previousSyncedWorldPosition = newPosition;
 		_currentSyncedWorldPosition = newPosition;
 		_groundAnchorY = newPosition.y;
-		_hasGroundAnchor = false;
+		
 	}
 
 	void CharacterController::move(glm::vec3 direction)
@@ -216,7 +199,7 @@ void CharacterController::teleport(const glm::vec3& position)
 	_walkDirection = glm::vec3(0.0f);
 	owner->transform.setPosition(adjustedPos);
 	_groundAnchorY = adjustedPos.y;
-	_hasGroundAnchor = false;
+	
 
 	// Flag to skip physics sync for one frame to let it settle
 	_justTeleported = true;

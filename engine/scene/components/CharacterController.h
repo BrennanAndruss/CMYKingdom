@@ -44,7 +44,7 @@ namespace engine
 	private:
 		btPairCachingGhostObject* _ghostObject = nullptr;
 		btKinematicCharacterController* _controller = nullptr;
-		std::unique_ptr<btBoxShape> _shape;
+		std::unique_ptr<btConvexShape> _shape;
 
 		glm::vec3 _walkDirection = glm::vec3(0.0f);
 		bool _justTeleported = false;

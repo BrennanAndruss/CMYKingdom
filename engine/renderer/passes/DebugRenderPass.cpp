@@ -304,7 +304,15 @@ bool DebugRenderPass::s_showColliders = false;
 			{
 				const glm::vec3 origin = worldPos;
 				const glm::vec3 halfExtents(characterController->radius, characterController->height * 0.5f, characterController->radius);
-				appendBoxWireframe(lineVerts, origin, rotation, halfExtents);
+				appendCapsuleWireframe(
+					lineVerts,
+					origin,
+					rotation,
+					engine::Axis::Y,
+					characterController->radius,
+					characterController->height
+				);
+
 				if (!lineVerts.empty())
 				{
 					_lineShader->bind();
