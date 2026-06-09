@@ -58,11 +58,9 @@ void MyGame::onCollectableCollected(Collectable::Type type, glm::vec3 worldPos)
 	else if (type == Collectable::Type::Yellow)
 		_yellowGemCount++;
 
-	// Set values for color pulse
-	_pulseCenter = worldPos;
-	_pulseRadius = 0.0f;
-	_activePulseType = type;
-	_pulseActive = true;
+	// Add color pulse event
+	if (_activePulses.size() >= ColorRestorationPass::MAX_PULSES) return;
+	_activePulses.emplace_back(PulseData{ worldPos, 0.0f, type });
 }
 
 void MyGame::startGame()
@@ -716,7 +714,7 @@ void MyGame::init(engine::AssetManager& assets,
 		obj.transform.lookAt(glm::vec3(-0.8f, -0.5f, 0.0f));
 		// obj.transform.lookAt(glm::vec3(0.0f, 0.0f, -1.0f));
 		dirLight.setColor(glm::vec3(1.0f));
-		dirLight.setIntensity(0.3f);
+		dirLight.setIntensity(0.6f);
 	}
 
 	{
@@ -978,23 +976,28 @@ void MyGame::update(float deltaTime)
 		_collectedCyan = _collectedMagenta = _collectedYellow = 0.0f;
 	}
 
-	// Expand active pulses
+	// Update active pulses
 	static float PULSE_MAX_RADIUS = 1000.0f;
-	static float PULSE_SPEED = 250.0f;
-	if (_pulseActive)
+	static float PULSE_SPEED = 100.0f;
+
+	for (auto it = _activePulses.begin(); it != _activePulses.end(); )
 	{
-		_pulseRadius += PULSE_SPEED * deltaTime;
-		if (_pulseRadius > PULSE_MAX_RADIUS)
+		it->radius += PULSE_SPEED * deltaTime;
+		if (it->radius > PULSE_MAX_RADIUS)
 		{
 			// Commit color restoration progress to the baseline background
-			if (_activePulseType == Collectable::Type::Cyan)
+			if (it->type == Collectable::Type::Cyan)
 				_collectedCyan = std::min(_collectedCyan + _colorIncrement, 1.0f);
-			else if (_activePulseType == Collectable::Type::Magenta)
+			else if (it->type == Collectable::Type::Magenta)
 				_collectedMagenta = std::min(_collectedMagenta + _colorIncrement, 1.0f);
-			else if (_activePulseType == Collectable::Type::Yellow)
+			else if (it->type == Collectable::Type::Yellow)
 				_collectedYellow = std::min(_collectedYellow + _colorIncrement, 1.0f);
 
-			_pulseActive = false;
+			it = _activePulses.erase(it);
+		}
+		else
+		{
+			it++;
 		}
 	}
 
@@ -1004,15 +1007,7 @@ void MyGame::update(float deltaTime)
 		_colorRestorePass->cyan = std::min(_collectedCyan, 1.0f);
 		_colorRestorePass->magenta = std::min(_collectedMagenta, 1.0f);
 		_colorRestorePass->yellow = std::min(_collectedYellow, 1.0f);
-
-		// Pulse values
-		_colorRestorePass->pulseActive = _pulseActive;
-		_colorRestorePass->pulseCenter = _pulseCenter;
-		_colorRestorePass->pulseRadius = _pulseRadius;
-		_colorRestorePass->activePulseType = _activePulseType;
-
-		//const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
-		//_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
+		_colorRestorePass->setActivePulses(_activePulses);
 	}
 
 	if (engine::Input::isKeyPressed(GLFW_KEY_L))

@@ -1,5 +1,7 @@
 #version 410 core
 
+#define MAX_PULSES 4
+
 in vec2 fragTexCoord;
 
 out vec4 color;
@@ -9,13 +11,19 @@ uniform sampler2D depthTex;
 
 uniform mat4 invPV;
 
-uniform bool pulseActive;
-uniform vec3 pulseCenter;
-uniform float pulseRadius;
+struct PulseData
+{
+	vec3 center;
+	float radius;
+	int type;		// 0 = Cyan, 1 = Magenta, 2 = Yellow
+};
+
+uniform int activePulseCount;
+uniform PulseData pulses[MAX_PULSES];
+
 uniform float pulseThickness;
 uniform float pulseSoftness;
 uniform float pulseBoost;
-uniform int activePulseType; // 0 = Cyan, 1 = Magenta, 2 = Yellow
 
 uniform float cyan;
 uniform float magenta;
@@ -28,9 +36,9 @@ float hash3(vec3 p) {
 }
 
 // Sphere SDF
-float pulseSignedDist(vec3 pos)
+float sphereSignedDist(vec3 pos, vec3 center, float radius)
 {
-	vec4 sphere = vec4(pulseCenter, pulseRadius);
+	vec4 sphere = vec4(center, radius);
 	return distance(pos, sphere.xyz) - sphere.w;
 }
 
@@ -49,32 +57,37 @@ void main()
 	float currentMagenta = magenta;
 	float currentYellow = yellow;
 
-	float rimMask = 0.0;
+	vec3 rimColor = vec3(0.0);
 
-	// Process dynamic color surge if a pulse is active
-	if (pulseActive)
+	// Process active color pulses
+	for (int i = 0; i < activePulseCount; i++)
 	{
 		// Compute signed distance of world space pos from pulse
 		// Negative values indicate the position is inside the pulse
-		float pulseSD = pulseSignedDist(worldPos);
+		float pulseSD = sphereSignedDist(worldPos, pulses[i].center, pulses[i].radius);
 
-		// Apply distortion to the sphere shell
-		pulseSD += hash3(floor(worldPos * 0.4)) * 1.8;
+		// Apply distortion to sphere border
+		// pulseSD += hash3(floor(worldPos * 0.4)) * 2;
 
 		if (pulseSD < 0.0)
 		{
 			// Restore color within the pulse
-			if (activePulseType == 0) 
+			if (pulses[i].type == 0)
 				currentCyan = min(cyan + pulseBoost, 1.0);
-			else if (activePulseType == 1) 
+			else if (pulses[i].type == 1)
 				currentMagenta = min(magenta + pulseBoost, 1.0);
-			else if (activePulseType == 2) 
+			else if (pulses[i].type == 2)
 				currentYellow = min(yellow + pulseBoost, 1.0);
 		}
 		else if (pulseSD < pulseThickness)
 		{
-			// Set rim mask for highlights at the edge of the pulse shockwave
-			rimMask = 1.0 - smoothstep(pulseThickness * 0.5 - pulseSoftness, pulseThickness * 0.5, abs(pulseSD));
+			// Apply pure color rim to pulse border
+			if (pulses[i].type == 0)
+				rimColor += vec3(0.0, 1.0, 1.0);
+			else if (pulses[i].type == 1) 
+				rimColor += vec3(1.0, 0.0, 1.0);
+			else if (pulses[i].type == 2)
+				rimColor += vec3(1.0, 1.0, 0.0);
 		}
 	}
 
@@ -97,20 +110,8 @@ void main()
 	float maxChannelValue = max(currentCyan, max(currentMagenta, currentYellow));
 	vec3 finalComposite = mix(grayscale, restored, maxChannelValue);
 
-	// Apply pure color rim highlight to pulse border
-	if (rimMask > 0.0)
-	{
-		vec3 pureRimColor = vec3(0.0);
-		if (activePulseType == 0) 
-			pureRimColor = vec3(0.0, 1.0, 1.0);
-		else if (activePulseType == 1) 
-			pureRimColor = vec3(1.0, 0.0, 1.0);
-		else if (activePulseType == 2)
-			pureRimColor = vec3(1.0, 1.0, 0.0);
-
-		// Blend the glowing border smoothly into the scene color
-		finalComposite = mix(finalComposite, pureRimColor, rimMask * 0.85);
-	}
+	// Overlay accumulated rim glow
+	finalComposite += rimColor;
 
 	color = vec4(finalComposite, 1.0);
 }

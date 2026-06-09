@@ -75,11 +75,8 @@ private:
 	std::vector<engine::Object*> objects;
 
 	// Color restoration and pulse tracking
+	std::vector<PulseData> _activePulses;
 	ColorRestorationPass* _colorRestorePass = nullptr;
-	bool _pulseActive = false;
-	float _pulseRadius = 0.0f;
-	glm::vec3 _pulseCenter;
-	Collectable::Type _activePulseType;
 
 	float _collectedCyan = 0.0f, _collectedMagenta = 0.0f, _collectedYellow = 0.0f;
 	int _cyanGemCount = 0, _magentaGemCount = 0, _yellowGemCount = 0;

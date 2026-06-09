@@ -52,14 +52,21 @@ void ColorRestorationPass::execute(const engine::Scene& scene,
 	glm::mat4 invPV = glm::inverse(camData.projection * camData.view);
 	shader->setMat4("invPV", invPV);
 
-	// Pulse-tracking variables
-	shader->setInt("pulseActive", pulseActive);
-	shader->setVec3("pulseCenter", pulseCenter);
-	shader->setFloat("pulseRadius", pulseRadius);
+	// Pulse variables
 	shader->setFloat("pulseThickness", pulseThickness);
 	shader->setFloat("pulseSoftness", pulseSoftness);
 	shader->setFloat("pulseBoost", pulseColorBoost);
-	shader->setInt("activePulseType", static_cast<int>(activePulseType));
+
+	int count = std::min(static_cast<int>(_activePulses.size()), MAX_PULSES);
+	shader->setInt("activePulseCount", count);
+
+	for (int i = 0; i < count; i++)
+	{
+		std::string prefix = "pulses[" + std::to_string(i) + "].";
+		shader->setVec3(prefix + "center", _activePulses[i].center);
+		shader->setFloat(prefix + "radius", _activePulses[i].radius);
+		shader->setInt(prefix + "type", static_cast<int>(_activePulses[i].type));
+	}
 
 	// Color restoration variables
 	shader->setFloat("cyan", cyan);
