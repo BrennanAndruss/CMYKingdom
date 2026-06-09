@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <regex>
 #include <string>
 
 #include <glm/glm.hpp>
@@ -296,14 +297,43 @@ namespace
         return false;
     }
 
-    std::string makeUniqueName(const engine::Scene& scene, const std::string& baseName, const std::string& suffix)
+    std::string stripTrailingIndex(const std::string& name)
     {
-        int index = 0;
-        while (isNameInUse(scene, baseName + suffix + std::to_string(index)))
+        // removes patterns like:
+        // "Box_0", "Box_12", "Box (3)", "Box_copy_4"
+        static const std::regex pattern(R"((.*?)([\s_\(]*copy)?[\s_\(]*\d+\)?$)");
+
+        std::smatch match;
+        if (std::regex_match(name, match, pattern))
         {
+            return match[1];
+        }
+        return name;
+    }
+
+    std::string makeUniqueName(const engine::Scene& scene,
+                           const std::string& baseName,
+                           const std::string& suffix = "")
+    {
+        // Normalize base name first
+        std::string cleanBase = stripTrailingIndex(baseName);
+
+        // include suffix if provided
+        std::string fullBase = cleanBase + suffix;
+
+        int index = 0;
+        std::string candidate;
+
+        do {
+            candidate = (index == 0)
+                ? fullBase
+                : fullBase + "_" + std::to_string(index);
+
             ++index;
         }
-        return baseName + suffix + std::to_string(index);
+        while (isNameInUse(scene, candidate));
+
+        return candidate;
     }
 
     void deleteObject(engine::Scene& scene, engine::Object* objectToDelete)
@@ -439,8 +469,10 @@ namespace engine
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
                 collider.size = 0.5f * (bounds.max - bounds.min);
-                collider.size.x *= 0.5f; 
-                collider.size.z *= 0.5f; 
+                collider.size.x *= 0.1f; 
+                collider.size.y *= 0.1f;
+                collider.center.y = 0.0f;
+                //collider.size.z *= 0.1f; 
             }
             else
             {
@@ -480,8 +512,9 @@ namespace engine
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
                 collider.size = 0.5f * (bounds.max - bounds.min);
-                collider.size.x *= 0.5f; 
-                collider.size.z *= 0.5f; 
+                collider.size.x *= 0.2f; 
+                collider.size.z *= 0.2f; 
+                collider.center.z = -0.9f;
             }
             else
             {
@@ -526,8 +559,8 @@ namespace engine
                 const auto bounds = mesh->getBBox();
                 collider.center = 0.5f * (bounds.max + bounds.min);
                 collider.size = 0.5f * (bounds.max - bounds.min);
-                collider.size.x *= 0.5f; 
-                collider.size.z *= 0.5f; 
+                collider.size.x *= 0.2f; 
+                collider.size.z *= 0.2f; 
             }
             else
             {
@@ -856,6 +889,15 @@ namespace engine
                     auto& newMeshRenderer = newObject.addComponent<MeshRenderer>();
                     newMeshRenderer.mesh = meshRenderer->mesh;
                     newMeshRenderer.material = meshRenderer->material;
+                }
+
+                if (auto * rigidBody = selectedObject->getComponent<RigidBody>())
+                {
+                    auto& newRigidBody = newObject.addComponent<RigidBody>();
+                    newRigidBody.setBodyType(rigidBody->getBodyType());
+                    newRigidBody.mass = rigidBody->mass;
+                    newRigidBody.friction = rigidBody->friction;
+                    //newRigidBody.restitution = rigidBody->restitution;
                 }
 
                 if (auto* boxCollider = selectedObject->getComponent<BoxCollider>())

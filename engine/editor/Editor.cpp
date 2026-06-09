@@ -230,7 +230,37 @@ namespace engine
         ImGui::Begin("Transform");
         ImGui::SeparatorText("Transform");
         if (_selectedObject) {
+
+          
+
             ImGui::Text("Selected: %s", _selectedObject->name.c_str());
+            ImGui::Separator();
+
+            static bool renaming = false;
+            static char nameBuffer[128];
+
+            // Start renaming
+            if (!renaming) {
+                if (ImGui::Button("Rename")) {
+                    renaming = true;
+                    strncpy(nameBuffer, _selectedObject->name.c_str(), sizeof(nameBuffer));
+                    nameBuffer[sizeof(nameBuffer) - 1] = '\0';
+                }
+            } else {
+                ImGui::InputText("New Name", nameBuffer, sizeof(nameBuffer));
+
+                if (ImGui::Button("Apply")) {
+                    _selectedObject->name = nameBuffer;
+                    renaming = false;
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Cancel")) {
+                    renaming = false;
+                }
+            }
+
             ImGui::Separator();
 
             if (auto* editorCamera = scene.getMainCamera())
@@ -274,7 +304,8 @@ namespace engine
             const bool hasRigidBody = _selectedObject->getComponent<RigidBody>() != nullptr;
             const bool hasCollectable = _selectedObject->getComponent<Collectable>() != nullptr;
             const bool hasAnimatedVelocity = _selectedObject->getComponent<AnimatedVelocity>() != nullptr;
-
+            
+            //std::cout << "hasCollider: " << hasCollider << ", hasRigidBody: " << hasRigidBody << ", hasCollectable: " << hasCollectable << ", hasAnimatedVelocity: " << hasAnimatedVelocity << std::endl;
             if (!hasCollider || !hasRigidBody) {
             
                 ImGui::BeginDisabled(hasCollectable);
@@ -327,6 +358,33 @@ namespace engine
                     if (rigidBody->getBodyType() == RigidBody::BodyType::Dynamic)
                     {
                         ImGui::DragFloat("Mass", &rigidBody->mass, 0.1f, 0.0f, 1000.0f);
+                    }
+                }
+
+                if (auto* collider = _selectedObject->getComponent<BoxCollider>())
+                {
+                    ImGui::SeparatorText("Box Collider");
+
+                    // Center editing
+                    glm::vec3 center = collider->center;
+                    if (ImGui::DragFloat3("Center", &center.x, 0.05f))
+                    {
+                        collider->center = center;
+                        collider->rebuild();
+                    }
+
+                    // Size editing (THIS is what you asked for)
+                    glm::vec3 size = collider->size;
+                    if (ImGui::DragFloat3("Size", &size.x, 0.05f, 0.01f, 100.0f))
+                    {
+                        collider->size = size;
+                        collider->rebuild();
+                    }
+
+                    // Optional: trigger toggle
+                    if (ImGui::Checkbox("Is Trigger", &collider->isTrigger))
+                    {
+                        collider->rebuild();
                     }
                 }
   
@@ -665,7 +723,7 @@ namespace engine
                     return;
                 }
 
-                std::cout << "Flushing object: " << data.name << std::endl;
+                //std::cout << "Flushing object: " << data.name << std::endl;
                 if (!data.hasMesh && !data.hasMaterial && !data.hasBoxCollider && !data.isCollectable)
                 {
                     std::cout << "Skipping object: " << data.name << std::endl;
@@ -864,6 +922,8 @@ namespace engine
                 }
                 else if (line.rfind("  BoxCollider: ", 0) == 0)
                 {
+                    currentObject->hasBoxCollider = true;
+
                     const std::string value = line.substr(15);
                     const std::size_t centerPrefix = value.find("center=");
                     const std::size_t sizePrefix = value.find("size=");
