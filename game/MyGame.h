@@ -55,7 +55,7 @@ public:
 
 private:
 	engine::Object* gem = nullptr;
-	engine::Object* cube = nullptr;
+	engine::Object* player = nullptr;
 	engine::Object* gameplayCameraObject = nullptr;
 	engine::Object* editorCameraObject = nullptr;
 	engine::Object* pointLightCenter = nullptr;

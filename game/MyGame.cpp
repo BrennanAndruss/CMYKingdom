@@ -718,12 +718,12 @@ void MyGame::init(engine::AssetManager& assets,
 	}
 
 	{
-		cube = &scene.createObject("Player");
-		cube->transform.setPosition(glm::vec3(-200.0f, 15.0f, -8.0f));
-		cube->transform.setScale(glm::vec3(0.5f));
+		player = &scene.createObject("Player");
+		player->transform.setPosition(glm::vec3(-200.0f, 15.0f, -8.0f));
+		player->transform.setScale(glm::vec3(0.5f));
 
 		auto& visual = scene.createObject("PlayerVisual");
-		visual.transform.setParent(&cube->transform);
+		visual.transform.setParent(&player->transform);
 
 		auto& meshRenderer = visual.addComponent<engine::MeshRenderer>();
 		meshRenderer.mesh = sprintMesh;
@@ -736,7 +736,7 @@ void MyGame::init(engine::AssetManager& assets,
 		animator.debugClipLogging = true;
 		animator.debugClipFilter = "jump";
 
-		auto& characterController = cube->addComponent<engine::CharacterController>();
+		auto& characterController = player->addComponent<engine::CharacterController>();
 		characterController.gravity = 9.81f;
 		characterController.mass = 8.0f;
 		characterController.targetHeight = 1.0f;
@@ -749,7 +749,7 @@ void MyGame::init(engine::AssetManager& assets,
 			characterController.fitToMesh(*mesh);
 		}
 
-		auto& playerController = cube->addComponent<PlayerController>();
+		auto& playerController = player->addComponent<PlayerController>();
 		playerController.eyeHeight = 0.3f;
 		playerController.cameraDistance = 4.0f;
 		playerController.jumpForce = 48.0f;
@@ -800,7 +800,7 @@ void MyGame::init(engine::AssetManager& assets,
 		grassRenderer->heightmap = heightmap;
 		grassRenderer->terrainPlaneLen = planeLen;
 		// Keeping track of player position --> Chunking State Variables 
-		grassRenderer->centerPosition = cube->transform.getPosition();
+		grassRenderer->centerPosition = player->transform.getPosition();
 		grassRenderer->spawnRadius = 400.0f;
 		grassRenderer->usePatchStreaming = true;
 		// Grass Patches
@@ -871,7 +871,7 @@ void MyGame::init(engine::AssetManager& assets,
 		auto& camera = camObj.addComponent<engine::Camera>(45.0f, aspect, 0.1f, 1000.0f);
 		scene.setMainCamera(&camera);
 		
-		gameplayController = cube->getComponent<PlayerController>();
+		gameplayController = player->getComponent<PlayerController>();
 		gameplayController->cameraTransform = &camObj.transform;
 		gameplayController->enabled = false;
 		engine::Input::setMouseTrapped(false);
@@ -880,7 +880,7 @@ void MyGame::init(engine::AssetManager& assets,
 	{
 		auto& camObj = scene.createObject("EditorCamera");
 		editorCameraObject = &camObj;
-		const glm::vec3 playerPos = cube->transform.getPosition();
+		const glm::vec3 playerPos = player->transform.getPosition();
 		camObj.transform.setPosition(playerPos + glm::vec3(0.0f, 3.0f, 8.0f));
 		camObj.transform.lookAt(playerPos + glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -944,16 +944,16 @@ void MyGame::update(float deltaTime)
 	// Update teleport cooldown
 	_teleportCooldown -= deltaTime;
 
-	if (cube)
+	if (player)
 	{
-		glm::vec3 playerPos = cube->transform.getPosition();
+		glm::vec3 playerPos = player->transform.getPosition();
 		// std::cout << "Player Y Position: " << playerPos.y << "\n";
 
 		if (playerPos.y < 9.0f && _teleportCooldown <= 0.0f)
 		{
 			glm::vec3 respawnPos(-200.0f, 17.0f, -8.0f);
 			// Teleport back to spawn
-			if (auto* controller = cube->getComponent<engine::CharacterController>())
+			if (auto* controller = player->getComponent<engine::CharacterController>())
 			{
 				controller->teleport(respawnPos);
 				_teleportCooldown = 0.5f; // 0.5 second cooldown before next teleport
@@ -961,9 +961,9 @@ void MyGame::update(float deltaTime)
 			
 		}
 	}
-	if (cube && grassRenderer)
+	if (player && grassRenderer)
 	{
-		const glm::vec3 playerPos = cube->transform.getPosition();
+		const glm::vec3 playerPos = player->transform.getPosition();
 		grassRenderer->updateStreaming(playerPos);
 	}
 
