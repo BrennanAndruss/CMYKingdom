@@ -3,7 +3,9 @@
 #include <iostream>
 #include "resources/AssetManager.h"
 #include "renderer/BoundingVolume.h"
-#include "scene/components/Components.h"
+#include "renderer/resources/Material.h"
+#include "scene/components/Collider.h"
+#include "scene/components/MeshRenderer.h"
 
 namespace engine
 {
@@ -178,10 +180,14 @@ namespace engine
 		BBox sceneBBox;
 		for (const auto& object : _objects)
 		{
-			if (auto* mr = object->getComponent<MeshRenderer>())
-			{
-				sceneBBox.expand(object->getWorldBBox(assets));
-			}
+			auto* mr = object->getComponent<MeshRenderer>();
+			if (!mr) continue;
+
+			// Ignore objects that don't cast shadows
+			auto* mat = assets.getMaterial(mr->material);
+			if (mat->renderMode == RenderMode::Water) continue;
+
+			sceneBBox.expand(object->getWorldBBox(assets));
 		}
 
 		return sceneBBox;
