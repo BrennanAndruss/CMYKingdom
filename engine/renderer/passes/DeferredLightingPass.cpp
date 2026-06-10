@@ -16,7 +16,7 @@ namespace engine
 	DeferredLightingPass::DeferredLightingPass(int width, int height, Handle<Shader> shader) :
 		_shader(shader),
 		_framebuffer(width, height, {
-			{ AttachmentFormat::RGBA8 },
+			{ AttachmentFormat::RGBA16F },
 			{ AttachmentFormat::Depth24Stencil8 }
 		}) {}
 

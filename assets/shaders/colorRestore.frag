@@ -92,7 +92,7 @@ void main()
 	}
 
 	// Convert scene to grayscale based on luminance
-	float gray = dot(scene, vec3(0.299, 0.587, 0.114));
+	float gray = dot(scene, vec3(0.2126, 0.7152, 0.0722));
 	vec3 grayscale = vec3(gray);
 
 	// Convert scene RGB to CMY

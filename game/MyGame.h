@@ -14,6 +14,7 @@
 #include "ui/GameUI.h"
 #include <glad/glad.h>
 
+#include "renderer/passes/PostProcessPass.h"
 #include "passes/ColorRestorationPass.h"
 #include "systems/Collectable.h"
 #include "systems/FreeCameraController.h"
@@ -73,6 +74,8 @@ private:
 	bool editorModeActive = false;
 	bool editorCameraLocked = false;
 	std::vector<engine::Object*> objects;
+
+	engine::PostProcessVolume* _volume;
 
 	// Color restoration and pulse tracking
 	std::vector<PulseData> _activePulses;
