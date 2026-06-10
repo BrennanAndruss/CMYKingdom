@@ -11,7 +11,9 @@
 #include "renderer/passes/DeferredLightingPass.h"
 #include "renderer/passes/WaterPass.h"
 #include "renderer/passes/SkyboxRenderPass.h"
+#include "renderer/passes/PostProcessPass.h"
 #include "renderer/passes/DebugRenderPass.h"
+#include "renderer/passes/BlitPass.h"
 #include "resources/AssetManager.h"
 
 namespace engine
@@ -27,6 +29,8 @@ namespace engine
 		_lightsUBO(MAX_LIGHTS * sizeof(LightData), static_cast<GLuint>(UBOBindings::Light)),
 		_shadowUBO(sizeof(ShadowUBO), static_cast<GLuint>(UBOBindings::Shadow))
 	{}
+
+	Renderer::~Renderer() = default;
 
 	void Renderer::init(AssetManager& assets)
 	{
@@ -75,6 +79,13 @@ namespace engine
 			addRenderPass(std::make_unique<WaterPass>(_width, _height));
 		}
 
+		Handle<Shader> postProcessShader = assets.loadEngineShader(
+			"EnginePostProcess", "shaders/passthrough.vert", "shaders/postProcess.frag");
+
+		auto postProcessPass = std::make_unique<PostProcessPass>(_width, _height, postProcessShader);
+		volume = &postProcessPass->volume;
+
+		addRenderPass(std::move(postProcessPass));
 		addRenderPass(std::make_unique<DebugRenderPass>());
 		_blitPass = std::make_unique<BlitPass>();
 	}

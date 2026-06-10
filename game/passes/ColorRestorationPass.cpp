@@ -78,15 +78,18 @@ void ColorRestorationPass::execute(const engine::Scene& scene,
 	GLuint inputTex = ctx.getBuffer(engine::BufferNames::SceneColor);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, inputTex);
+	shader->setInt("sceneTex", 0);
 
 	// Bind scene depth
 	GLuint depthTex = ctx.getBuffer(engine::BufferNames::SceneDepth);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthTex);
+	shader->setInt("depthTex", 1);
 
 	engine::FullscreenQuad::getInstance().draw();
 
 	shader->unbind();
+	glDisable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	_framebuffer.unbind();
 

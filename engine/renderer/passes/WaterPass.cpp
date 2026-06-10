@@ -16,7 +16,7 @@ namespace engine
 {
 	WaterPass::WaterPass(int width, int height) :
 		_framebuffer(width, height, {
-			{ AttachmentFormat::RGBA8 }
+			{ AttachmentFormat::RGBA16F }
 		}) {}
 
 	WaterPass::~WaterPass() = default;
@@ -43,7 +43,11 @@ namespace engine
 			}
 		}
 
-		// Copy opaque scene from lighting pass into scratch buffer
+		// Get scene color and shared depth/stencil textures
+		GLuint hdrSceneTex = ctx.getBuffer(BufferNames::SceneColor);
+		GLuint depthStencilTex = ctx.getBuffer(BufferNames::SceneDepth);
+
+		// Copy opaque scene from lighting pass into local buffer
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, ctx.sceneFramebuffer->getFboId());
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _framebuffer.getFboId());
 		glBlitFramebuffer(
@@ -53,9 +57,11 @@ namespace engine
 			GL_NEAREST
 		);
 
-		// Bind framebuffer from deferred lighting pass
-		Framebuffer* framebuffer = ctx.sceneFramebuffer;
-		framebuffer->bind();
+		_framebuffer.bind();
+
+		// Link depth/stencil slot to the shared buffer
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT,
+			GL_TEXTURE_2D, depthStencilTex, 0);
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -84,15 +90,14 @@ namespace engine
 				shader->setFloat("u_waveHeight", 0.25f);
 				shader->setFloat("u_refractionStrength", 0.01f);
 				shader->setFloat("u_depthScale", 0.50f);
-				shader->setVec3("u_shallowColor", glm::vec3(0.3f, 0.66f, 0.9f));
-				shader->setVec3("u_deepColor", glm::vec3(0.24f, 0.48f, 0.81f));
+				shader->setVec3("u_shallowColor", glm::vec3(0.1f, 0.75f, 0.85f));
+				shader->setVec3("u_deepColor", glm::vec3(0.05f, 0.15f, 0.45f));
 				shader->setFloat("u_terrainPlaneLen", mat->terrainPlaneLen);
 				shader->setFloat("u_terrainHeightScale", mat->terrainHeightScale);
 
-				// Sample the lit scene from deferred rendering for refraction effects
-				GLuint sceneColor = _framebuffer.getColorAttachment(0);
+				// Sample the opaque scene texture from lighting pass for refraction effects
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, sceneColor);
+				glBindTexture(GL_TEXTURE_2D, hdrSceneTex);
 				glUniform1i(shader->getUniform("u_sceneColorTex"), 0);
 
 				if (auto* noiseTex = assets.getTexture("waterNoiseTex"))
@@ -116,6 +121,11 @@ namespace engine
 
 		glDepthMask(GL_TRUE);
 
-		framebuffer->unbind();
+		_framebuffer.unbind();
+
+		// Pass updated buffer through the pipeline
+		// Leave scene depth pointed to the shared buffer
+		ctx.setBuffer(BufferNames::SceneColor, _framebuffer.getColorAttachment(0));
+		ctx.sceneFramebuffer = &_framebuffer;
 	}
 }

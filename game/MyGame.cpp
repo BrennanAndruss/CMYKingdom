@@ -714,7 +714,7 @@ void MyGame::init(engine::AssetManager& assets,
 		obj.transform.lookAt(glm::vec3(-0.8f, -0.5f, 0.0f));
 		// obj.transform.lookAt(glm::vec3(0.0f, 0.0f, -1.0f));
 		dirLight.setColor(glm::vec3(1.0f));
-		dirLight.setIntensity(0.6f);
+		dirLight.setIntensity(1.0f);
 	}
 
 	{
@@ -892,23 +892,26 @@ void MyGame::init(engine::AssetManager& assets,
 		editorController->enabled = false;
 	}
 
-	// Add post-processing render passes
+	// Get post processing volume
+	_volume = renderer.getPostProcessVolume();
+	_volume->colorGrading.contrast = 1.0f;
+	_volume->colorGrading.exposure = -0.5f;
+	_volume->colorGrading.lift = glm::vec3(-0.05f);
+	_volume->colorGrading.gamma = glm::vec3(1.0f, 1.0f, 1.05f);
+
+	// Add custom post-processing render passes
 	_colorRestorePass = static_cast<ColorRestorationPass*>(
 		&renderer.addPostProcessPass(std::make_unique<ColorRestorationPass>(
 			config.width, config.height, colorRestoreShader)));
-
-	engine::Input::setMouseTrapped(false);
-
-	engine::Editor::setCurrentSceneName(config.defaultScene);
-
-	
-	
 
 	// Compute color restoration increments
 	_colorIncrement = 1.0f / static_cast<float>(_gameUI.maxGems);
 	_colorRestorePass->pulseColorBoost = _colorIncrement;
 	_colorRestorePass->pulseThickness = 5.0f;
 	_colorRestorePass->pulseSoftness = 2.0f;
+
+	engine::Input::setMouseTrapped(false);
+	engine::Editor::setCurrentSceneName(config.defaultScene);
 
 	std::cout << "Game initialized!\n";
 }
@@ -977,7 +980,7 @@ void MyGame::update(float deltaTime)
 	}
 
 	// Update active pulses
-	static float PULSE_MAX_RADIUS = 1000.0f;
+	static float PULSE_MAX_RADIUS = 500.0f;
 	static float PULSE_SPEED = 100.0f;
 
 	for (auto it = _activePulses.begin(); it != _activePulses.end(); )

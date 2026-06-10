@@ -3,8 +3,6 @@
 #include <vector>
 #include <memory>
 #include "renderer/passes/RenderPass.h"
-#include "renderer/passes/ShadowPass.h"
-#include "renderer/passes/BlitPass.h"
 #include "renderer/RenderingPath.h"
 #include "renderer/RenderContext.h"
 #include "renderer/UniformBuffer.h"
@@ -14,6 +12,9 @@
 namespace engine
 {
 	class AssetManager;
+	class ShadowPass;
+	class BlitPass;
+	struct PostProcessVolume;
 }
 
 namespace engine
@@ -22,7 +23,7 @@ namespace engine
 	{
 	public:
 		Renderer(int width, int height, RenderingPath renderingPath);
-		~Renderer() = default;
+		~Renderer();
 
 		void init(AssetManager& assets);
 		void resize(int width, int height);
@@ -34,6 +35,7 @@ namespace engine
 		Handle<Shader> getBaseShader() const { return _baseShader; }
 		Handle<Shader> getSkinnedShader() const { return _skinnedShader; }
 		Handle<Shader> getTerrainShader() const { return _terrainShader; }
+		PostProcessVolume* getPostProcessVolume() const { return volume; }
 
 		void enablePostProcessing(bool enable) { _postProcessEnabled = enable; }
 		bool isPostProcessingEnabled() const { return _postProcessEnabled; }
@@ -46,6 +48,7 @@ namespace engine
 
 		RenderingPath _renderingPath;
 		Handle<Shader> _baseShader, _skinnedShader, _terrainShader;
+		PostProcessVolume* volume;
 		
 		int _width, _height;
 		RenderContext _ctx;
