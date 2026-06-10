@@ -29,8 +29,10 @@ GameUIAction GameUI::draw(
     GameUIState state,
     int cyanGemCount,
     int magentaGemCount,
-    int yellowGemCount
+    int yellowGemCount,
+    const PowerUpPopup& powerUpPopup
 )
+
 {
     switch (state)
     {
@@ -38,8 +40,9 @@ GameUIAction GameUI::draw(
         return drawStartScreen();
 
     case GameUIState::Playing:
-        drawHUD(cyanGemCount, magentaGemCount, yellowGemCount);
-        return GameUIAction::None;
+    drawPowerUpPopup(powerUpPopup);
+    drawHUD(cyanGemCount, magentaGemCount, yellowGemCount);
+    return GameUIAction::None;
 
     case GameUIState::End:
         return drawEndScreen();
@@ -466,4 +469,59 @@ GameUIAction GameUI::drawEndScreen()
     ImGui::End();
 
     return action;
+}
+
+void GameUI::drawPowerUpPopup(const PowerUpPopup& popup)
+{
+    if (!popup.active || popup.remainingTime <= 0.0f)
+    {
+        return;
+    }
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    const float width = 420.0f;
+    const float height = 70.0f;
+
+    ImGui::SetNextWindowPos(
+        ImVec2((io.DisplaySize.x - width) * 0.5f, 30.0f)
+    );
+    ImGui::SetNextWindowSize(ImVec2(width, height));
+
+    ImGuiWindowFlags flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoSavedSettings |
+        ImGuiWindowFlags_NoCollapse;
+
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.02f, 0.02f, 0.02f, 0.80f));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 16.0f);
+
+    ImGui::Begin("PowerUpPopup", nullptr, flags);
+
+    ImGui::SetWindowFontScale(1.4f);
+
+    char text[128];
+    snprintf(
+        text,
+        sizeof(text),
+        "%s collected! Time: %.1f",
+        popup.label,
+        popup.remainingTime
+    );
+
+    ImVec2 textSize = ImGui::CalcTextSize(text);
+    ImGui::SetCursorPosX((width - textSize.x) * 0.5f);
+    ImGui::SetCursorPosY((height - textSize.y) * 0.5f);
+
+    ImGui::Text("%s", text);
+
+    ImGui::SetWindowFontScale(1.0f);
+
+    ImGui::End();
+
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor();
 }

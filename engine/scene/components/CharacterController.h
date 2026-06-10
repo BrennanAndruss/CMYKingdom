@@ -40,6 +40,8 @@ namespace engine
 		bool canJump() const;
 		void jump(glm::vec3 direction = glm::vec3(0.0f, 1.0f, 0.0f));
 		void teleport(const glm::vec3& position);
+		void setGravity(float newGravity);
+		float getGravity() const;
 
 	private:
 		btPairCachingGhostObject* _ghostObject = nullptr;

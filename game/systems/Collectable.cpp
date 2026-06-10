@@ -61,14 +61,28 @@ void Collectable::tryRegisterCallback()
 
 			if (auto* playerController = otherOwner->getComponent<PlayerController>())
 			{
-				if (type == Type::speedBoost)
+    			if (type == Type::speedBoost)
 				{
-					playerController->activateSpeedBoost();
+    				playerController->activateSpeedBoost();
+
+    				if (auto* game = MyGame::getActiveGame())
+    				{
+        				game->onPowerUpCollected(type, playerController->speedBoostDuration);
+    				}
 				}
 				else if (type == Type::JumpBoost)
 				{
-					playerController->activateJumpBoost();
+    				playerController->activateJumpBoost();
+
+    				if (auto* game = MyGame::getActiveGame())
+    				{
+        				game->onPowerUpCollected(type, playerController->jumpBoostDuration);
+    				}
 				}
+    			else if (type == Type::Cyan || type == Type::Magenta || type == Type::Yellow)
+    			{
+        			playerController->triggerGemCelebrate();
+    			}
 			}
 
 			onCollected();

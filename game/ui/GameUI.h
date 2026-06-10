@@ -23,21 +23,31 @@ enum class GameUIAction
     Restart
 };
 
+struct PowerUpPopup
+{
+    bool active = false;
+    const char* label = "";
+    float remainingTime = 0.0f;
+};
+
 class GameUI
 {
 public:
     void loadAssets(engine::AssetManager& assets);
 
     GameUIAction draw(
-        GameUIState state,
-        int cyanGemCount,
-        int magentaGemCount,
-        int yellowGemCount
+    GameUIState state,
+    int cyanGemCount,
+    int magentaGemCount,
+    int yellowGemCount,
+    const PowerUpPopup& powerUpPopup
     );
+
     const int maxGems = 5;
 
 private:
     void drawHUD(int cyanGemCount, int magentaGemCount, int yellowGemCount);
+    void drawPowerUpPopup(const PowerUpPopup& popup);
     GameUIAction drawStartScreen();
     GameUIAction drawEndScreen();
 

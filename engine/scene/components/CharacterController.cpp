@@ -205,5 +205,20 @@ void CharacterController::teleport(const glm::vec3& position)
 	_justTeleported = true;
 }
 
+void CharacterController::setGravity(float newGravity)
+{
+    gravity = newGravity;
+
+    if (_controller)
+    {
+        _controller->setGravity(btVector3(0.0f, -gravity, 0.0f));
+    }
+}
+
+float CharacterController::getGravity() const
+{
+    return gravity;
+}
+
 		
 }

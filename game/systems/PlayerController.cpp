@@ -113,6 +113,33 @@ void PlayerController::update(float deltaTime)
 		return;
 	}
 
+	if (_celebratingGem)
+{
+    	_celebrateTimer -= deltaTime;
+
+    	if (_characterController)
+    	{
+        	_characterController->move(glm::vec3(0.0f));
+    	}
+
+    	if (_celebrateTimer <= 0.0f)
+    	{
+        	_celebratingGem = false;
+
+        	if (_characterController)
+        	{
+            	_characterController->setGravity(_savedGravity);
+        	}
+
+        	hasJumped = true;
+        	_groundedGraceTimer = 0.0f;
+        	_jumpBufferTimer = 0.0f;
+        	_groundCarrier = nullptr;
+    	}
+
+    	return;
+	}
+
 	if (speedBoostTimer > 0.0f)
 	{
 					speedBoostTimer -= deltaTime;
@@ -392,4 +419,52 @@ void PlayerController::activateJumpBoost()
 {
     jumpBoostTimer = jumpBoostDuration;
     jumpForce = baseJumpForce * jumpBoostMultiplier;
+}
+
+void PlayerController::triggerGemCelebrate()
+{
+    if (_celebratingGem)
+    {
+        return;
+    }
+
+    if (!animator || !celebrateClip.valid() || !_characterController)
+    {
+        return;
+    }
+
+    _celebratingGem = true;
+    _celebrateTimer = _celebrateDuration;
+
+    _savedGravity = _characterController->getGravity();
+    _characterController->setGravity(0.0f);
+
+    hasJumped = true;
+    _groundedGraceTimer = 0.0f;
+    _jumpBufferTimer = 0.0f;
+    _groundCarrier = nullptr;
+
+    _characterController->move(glm::vec3(0.0f));
+    _characterController->moveWorldOffset(glm::vec3(0.0f, 0.35f, 0.0f));
+
+    animator->playbackSpeed = 1.0f;
+    animator->play(celebrateClip, false, 0.0f, 0.10f);
+}
+
+void PlayerController::resetGameplayState()
+{
+    speedBoostTimer = 0.0f;
+    jumpBoostTimer = 0.0f;
+    moveSpeed = baseMoveSpeed;
+    jumpForce = baseJumpForce;
+    hasJumped = false;
+
+    _jumpBufferTimer = 0.0f;
+    _groundedGraceTimer = 0.0f;
+    _groundCarrier = nullptr;
+    _pendingCarrierDelta = glm::vec3(0.0f);
+    _pendingCarrierName.clear();
+
+    _yaw = 0.0f;
+    _pitch = 0.0f;
 }

@@ -34,6 +34,21 @@ void MyGame::setBackgroundMusicPath(const std::string& path)
 	backgroundMusicPath = path;
 }
 
+void MyGame::onPowerUpCollected(Collectable::Type type, float duration)
+{
+    _powerUpPopup.active = true;
+    _powerUpPopup.remainingTime = duration;
+
+    if (type == Collectable::Type::speedBoost)
+    {
+        _powerUpPopup.label = "Speed boost";
+    }
+    else if (type == Collectable::Type::JumpBoost)
+    {
+        _powerUpPopup.label = "Jump boost";
+    }
+}
+
 void MyGame::onCollectableCollected()
 {
 	_collectedCyan = std::min(_collectedCyan + 0.2f, 1.0f);
@@ -113,9 +128,9 @@ void MyGame::continueGame()
 void MyGame::restartGame()
 {
     resetGameProgress();
+    resetPlayerToStart();
 
     _endScreenShown = false;
-
     _gameUIState = GameUIState::Playing;
 
     if (gameplayController)
@@ -129,10 +144,46 @@ void MyGame::restartGame()
     }
 
     engine::Input::setMouseTrapped(true);
+    engine::Input::flushMouseDelta();
+}
+
+void MyGame::resetPlayerToStart()
+{
+    if (!player)
+    {
+        return;
+    }
+
+    if (auto* controller = player->getComponent<engine::CharacterController>())
+    {
+        controller->teleport(_playerStartPosition);
+    }
+    else
+    {
+        player->transform.setPosition(_playerStartPosition);
+    }
+
+    if (gameplayController)
+    {
+        gameplayController->resetGameplayState();
+    }
+
+    if (gameplayCameraObject)
+    {
+        const glm::vec3 focus = player->transform.getPosition() + glm::vec3(0.0f, gameplayController ? gameplayController->eyeHeight : 0.3f, 0.0f);
+        gameplayCameraObject->transform.setPosition(focus + glm::vec3(0.0f, 0.0f, -4.0f));
+        gameplayCameraObject->transform.lookAt(focus);
+    }
+
+    _teleportCooldown = 0.0f;
 }
 
 void MyGame::resetGameProgress()
 {
+	_powerUpPopup.active = false;
+	_powerUpPopup.remainingTime = 0.0f;
+	_powerUpPopup.label = "";
+	
     _cyanGemCount = 0;
     _magentaGemCount = 0;
     _yellowGemCount = 0;
@@ -141,22 +192,27 @@ void MyGame::resetGameProgress()
     _collectedMagenta = 0.0f;
     _collectedYellow = 0.0f;
 
+    _activePulses.clear();
+
     if (_colorRestorePass)
     {
         _colorRestorePass->cyan = 0.0f;
         _colorRestorePass->magenta = 0.0f;
         _colorRestorePass->yellow = 0.0f;
+        _colorRestorePass->setActivePulses(_activePulses);
     }
 }
+
 
 void MyGame::drawUI()
 {
     GameUIAction action = _gameUI.draw(
-        _gameUIState,
-        _cyanGemCount,
-        _magentaGemCount,
-        _yellowGemCount
-    );
+    _gameUIState,
+    _cyanGemCount,
+    _magentaGemCount,
+    _yellowGemCount,
+    _powerUpPopup
+	);
 
     if (_gameUIState == GameUIState::Start && action == GameUIAction::Start)
     {
@@ -611,8 +667,8 @@ void MyGame::init(engine::AssetManager& assets,
 	Handle<engine::Skeleton> sprintSkeleton;
 	Handle<engine::AnimationClip> idleClip;
 	Handle<engine::AnimationClip> sprintClip;
-	// still trying to find a good jumping animation
 	Handle<engine::AnimationClip> jumpClip;
+	Handle<engine::AnimationClip> celebrateClip;
 
 	try
 	{
@@ -621,6 +677,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 		idleClip = assets.loadAnimationClipAssimp("playerIdleAnimation", "models/Idle.fbx");
 		sprintClip = assets.loadAnimationClipAssimp("playerSprintAnimation", "models/walking.fbx");
+		celebrateClip = assets.loadAnimationClipAssimp("playerCelebrateAnimation","models/Spinning.fbx");
 		// load jump animation if available in assets/models/jump.fbx
 		try {
 			jumpClip = assets.loadAnimationClipAssimp("playerJumpAnimation", "models/jump.fbx");
@@ -764,7 +821,7 @@ void MyGame::init(engine::AssetManager& assets,
 
 	{
 		player = &scene.createObject("Player");
-		player->transform.setPosition(glm::vec3(-200.0f, 15.0f, -8.0f));
+		player->transform.setPosition(_playerStartPosition);
 		player->transform.setScale(glm::vec3(0.5f));
 
 		auto& visual = scene.createObject("PlayerVisual");
@@ -806,6 +863,7 @@ void MyGame::init(engine::AssetManager& assets,
 		playerController.idleClip = idleClip;
 		playerController.sprintClip = sprintClip;
 		playerController.jumpClip = jumpClip;
+		playerController.celebrateClip = celebrateClip;
 		playerController.setAudioEngine(_audio); // set the audio engine pointer in the player controller
 		playerController.runSoundPath = runningSoundPath;
 		playerController.runFastSoundPath = runningFastSoundPath;
@@ -968,6 +1026,17 @@ void MyGame::update(float deltaTime)
         _startRequested = false;
         startGame();
     }
+
+	if (_powerUpPopup.active)
+	{
+    	_powerUpPopup.remainingTime -= deltaTime;
+
+    	if (_powerUpPopup.remainingTime <= 0.0f)
+    	{
+        	_powerUpPopup.remainingTime = 0.0f;
+        	_powerUpPopup.active = false;
+    	}
+	}
 
     if (_gameUIState == GameUIState::Start)
     {

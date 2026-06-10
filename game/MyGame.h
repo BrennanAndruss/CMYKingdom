@@ -52,6 +52,7 @@ public:
 	void continueGame();
 	void restartGame();
 	void resetGameProgress();
+	void onPowerUpCollected(Collectable::Type type, float duration);
 	
 
 private:
@@ -74,6 +75,7 @@ private:
 	FreeCameraController* editorController = nullptr;
 	GameUI _gameUI;
 	GameUIState _gameUIState = GameUIState::Start;
+	PowerUpPopup _powerUpPopup;
 
 	bool editorModeActive = false;
 	bool editorCameraLocked = false;
@@ -100,7 +102,9 @@ private:
 	
 	float _teleportCooldown = 0.0f;
 	static MyGame* _activeGame;
+	const glm::vec3 _playerStartPosition = glm::vec3(-200.0f, 15.0f, -8.0f);
 
 	void refreshEditorCameraState(engine::Scene& scene);
 	void startGame();
+	void resetPlayerToStart();
 };

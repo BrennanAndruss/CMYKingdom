@@ -52,10 +52,13 @@ public:
 	void activateSpeedBoost();
 	void activateJumpBoost();
 	void setAudioEngine(engine::AudioEngine* audioEngine);
+	void triggerGemCelebrate();
+	void resetGameplayState();
 	engine::Animator* animator = nullptr;
 	Handle<engine::AnimationClip> idleClip;
 	Handle<engine::AnimationClip> sprintClip;
 	Handle<engine::AnimationClip> jumpClip;
+	Handle<engine::AnimationClip> celebrateClip;
 	std::string runSoundPath;
 	std::string runFastSoundPath;
 	std::string jumpSoundPath;
@@ -70,6 +73,10 @@ private:
 	std::string _activeLoopingSoundPath;
 	float _jumpBufferTimer = 0.0f;
 	float _groundedGraceTimer = 0.0f;
+	bool _celebratingGem = false;
+	float _celebrateTimer = 0.0f;
+	float _celebrateDuration = 1.0f;
+	float _savedGravity = 9.81f;
 
 	float _yaw = 0.0f;
 	float _pitch = 0.0f;
