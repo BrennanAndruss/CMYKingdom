@@ -48,27 +48,22 @@ bool MyGame::allGemsCollected() const
            _yellowGemCount >= _gameUI.maxGems;
 }
 
-void MyGame::onCollectableCollected(int type)
+void MyGame::onCollectableCollected(Collectable::Type type, glm::vec3 worldPos)
 {
-	// Only increment the color corresponding to the collectable type
-	if (type == 0)
-	{
-    	_collectedCyan = std::min(_collectedCyan + 0.2f, 1.0f);
-    	_cyanGemCount++;
-	}
-	else if (type == 1)
-	{
-    	_collectedMagenta = std::min(_collectedMagenta + 0.2f, 1.0f);
-    	_magentaGemCount++;
-	}
-	else if (type == 2)
-	{
-    	_collectedYellow = std::min(_collectedYellow + 0.2f, 1.0f);
-    	_yellowGemCount++;
-	}
+	// Increment the gem count of the corresponding collectable type
+	if (type == Collectable::Type::Cyan)
+		_cyanGemCount++;
+	else if (type == Collectable::Type::Magenta)
+		_magentaGemCount++;
+	else if (type == Collectable::Type::Yellow)
+		_yellowGemCount++;
+
+	// Add color pulse event
+	if (_activePulses.size() >= ColorRestorationPass::MAX_PULSES) return;
+	_activePulses.emplace_back(PulseData{ worldPos, 0.0f, type });
 }
 
-	void MyGame::startGame()
+void MyGame::startGame()
 {
     _gameUIState = GameUIState::Playing;
     editorModeActive = false;
@@ -719,7 +714,7 @@ void MyGame::init(engine::AssetManager& assets,
 		obj.transform.lookAt(glm::vec3(-0.8f, -0.5f, 0.0f));
 		// obj.transform.lookAt(glm::vec3(0.0f, 0.0f, -1.0f));
 		dirLight.setColor(glm::vec3(1.0f));
-		dirLight.setIntensity(0.3f);
+		dirLight.setIntensity(0.6f);
 	}
 
 	{
@@ -897,8 +892,6 @@ void MyGame::init(engine::AssetManager& assets,
 		editorController->enabled = false;
 	}
 
-	
-
 	// Add post-processing render passes
 	_colorRestorePass = static_cast<ColorRestorationPass*>(
 		&renderer.addPostProcessPass(std::make_unique<ColorRestorationPass>(
@@ -911,12 +904,18 @@ void MyGame::init(engine::AssetManager& assets,
 	
 	
 
+	// Compute color restoration increments
+	_colorIncrement = 1.0f / static_cast<float>(_gameUI.maxGems);
+	_colorRestorePass->pulseColorBoost = _colorIncrement;
+	_colorRestorePass->pulseThickness = 5.0f;
+	_colorRestorePass->pulseSoftness = 2.0f;
+
 	std::cout << "Game initialized!\n";
 }
 
 void MyGame::update(float deltaTime)
 {
-	    if (_startRequested)
+	if (_startRequested)
     {
         _startRequested = false;
         startGame();
@@ -968,6 +967,7 @@ void MyGame::update(float deltaTime)
 		grassRenderer->updateStreaming(playerPos);
 	}
 
+	// manual color restore debugs
 	if (engine::Input::isKeyDown(GLFW_KEY_C)) _collectedCyan += 0.002f;
 	if (engine::Input::isKeyDown(GLFW_KEY_M)) _collectedMagenta += 0.002f;
 	if (engine::Input::isKeyDown(GLFW_KEY_Y)) _collectedYellow += 0.002f;
@@ -976,13 +976,38 @@ void MyGame::update(float deltaTime)
 		_collectedCyan = _collectedMagenta = _collectedYellow = 0.0f;
 	}
 
+	// Update active pulses
+	static float PULSE_MAX_RADIUS = 1000.0f;
+	static float PULSE_SPEED = 100.0f;
+
+	for (auto it = _activePulses.begin(); it != _activePulses.end(); )
+	{
+		it->radius += PULSE_SPEED * deltaTime;
+		if (it->radius > PULSE_MAX_RADIUS)
+		{
+			// Commit color restoration progress to the baseline background
+			if (it->type == Collectable::Type::Cyan)
+				_collectedCyan = std::min(_collectedCyan + _colorIncrement, 1.0f);
+			else if (it->type == Collectable::Type::Magenta)
+				_collectedMagenta = std::min(_collectedMagenta + _colorIncrement, 1.0f);
+			else if (it->type == Collectable::Type::Yellow)
+				_collectedYellow = std::min(_collectedYellow + _colorIncrement, 1.0f);
+
+			it = _activePulses.erase(it);
+		}
+		else
+		{
+			it++;
+		}
+	}
+
 	if (_colorRestorePass)
 	{
+		// Persistent base values for restored color
 		_colorRestorePass->cyan = std::min(_collectedCyan, 1.0f);
 		_colorRestorePass->magenta = std::min(_collectedMagenta, 1.0f);
 		_colorRestorePass->yellow = std::min(_collectedYellow, 1.0f);
-		//const float restoredAmount = (_collectedCyan + _collectedMagenta + _collectedYellow) / 3.0f;
-		//_colorRestorePass->key = std::max(0.0f, std::min(1.0f, 1.0f - restoredAmount));
+		_colorRestorePass->setActivePulses(_activePulses);
 	}
 
 	if (engine::Input::isKeyPressed(GLFW_KEY_L))

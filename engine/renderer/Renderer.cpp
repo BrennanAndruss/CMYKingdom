@@ -39,6 +39,9 @@ namespace engine
 		_shadowPass = std::make_unique<ShadowPass>(
 			SHADOW_RESOLUTION, depthShader, skinnedDepthShader);
 
+		Handle<Shader> skyboxShader = assets.loadEngineShader(
+			"EngineSkybox", "shaders/skybox.vert", "shaders/skybox.frag");
+
 		if (_renderingPath == RenderingPath::Forward)
 		{
 			_baseShader = assets.loadEngineShader(
@@ -50,6 +53,7 @@ namespace engine
 
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<ForwardRenderPass>(_width, _height));
+			addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		}
 		else if (_renderingPath == RenderingPath::Deferred)
 		{
@@ -67,14 +71,11 @@ namespace engine
 			assets.setDefaultShader(_baseShader);
 			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height));
 			addRenderPass(std::make_unique<DeferredLightingPass>(_width, _height, lightingShader));
+			addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 			addRenderPass(std::make_unique<WaterPass>(_width, _height));
 		}
 
-		Handle<Shader> skyboxShader = assets.loadEngineShader(
-			"EngineSkybox", "shaders/skybox.vert", "shaders/skybox.frag");
-
 		addRenderPass(std::make_unique<DebugRenderPass>());
-		addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 		_blitPass = std::make_unique<BlitPass>();
 	}
 
