@@ -879,7 +879,7 @@ void MyGame::init(engine::AssetManager& assets,
 	mat->splatMaps[1] = terrainSplat1;
 	mat->splatMaps[2] = terrainSplat2;
 
-	mat->splatMapCount = 4;
+	mat->splatMapCount = 3;
 
 	// Terrain textures.
 	// Splatmap 0 RGBA controls textures 0-3.
