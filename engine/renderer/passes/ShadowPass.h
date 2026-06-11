@@ -49,7 +49,7 @@ namespace engine
 		float maxShadowDistance = 500.0f;
 		float lambda = 0.15f;
 		float shadowBias = 0.0015f;
-		glm::vec4 biasScales = glm::vec4(1.0, 2.0, 9.0, 0.0);
+		glm::vec4 biasScales = glm::vec4(1.0, 2.0, 20.0, 0.0);
 
 	private:
 		Handle<Shader> _depthShader, _skinnedDepthShader;
