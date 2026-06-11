@@ -22,6 +22,11 @@ namespace engine
         }
 
         _window.setEventCallbacks(this);
+        if (config.fullscreen)
+        {
+            _window.setFullscreen();
+        }
+
         _scene.setPhysicsSystem(&_physics);
         _renderer.init(_assets);
 

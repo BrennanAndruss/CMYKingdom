@@ -25,6 +25,8 @@ namespace engine
 		void swapBuffers();
 		void pollEvents();
 
+		void setFullscreen();
+
 	private:
 		GLFWwindow* _handle;
 		EventCallbacks* _callbacks;

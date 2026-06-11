@@ -92,6 +92,14 @@ namespace engine
 		glfwPollEvents();
 	}
 
+	void Window::setFullscreen()
+	{
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		glfwSetWindowMonitor(_handle, monitor, 0, 0, 
+			mode->width, mode->height, mode->refreshRate);
+	}
+
 	static Window* getWindow(GLFWwindow* w)
 	{
 		auto* win = static_cast<Window*>(glfwGetWindowUserPointer(w));

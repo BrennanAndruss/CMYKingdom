@@ -22,7 +22,7 @@ namespace engine
 namespace engine
 {
 	constexpr int NUM_CASCADES = 3; // Supports up to 4 cascades
-	constexpr int SHADOW_RESOLUTION = 1024;
+	constexpr int SHADOW_RESOLUTION = 2048;
 
 	struct ShadowUBO
 	{
