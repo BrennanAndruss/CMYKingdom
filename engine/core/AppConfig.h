@@ -13,6 +13,7 @@ namespace engine
 		RenderingPath renderingPath = RenderingPath::Forward;
 		bool depthTest = true;
 		bool cullFace = true;
+		bool fullscreen = false;
 		std::string defaultScene = "scene_objects";
 
 		// Project root directory for asset loading

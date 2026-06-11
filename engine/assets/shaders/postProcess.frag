@@ -13,6 +13,8 @@ uniform vec3 lift;
 uniform vec3 gamma;
 uniform vec3 gain;
 
+uniform int tonemapMode; // 0 = Linear, 1 = Reinhard, 2 = ACES
+
 vec3 tonemapReinhard(vec3 color)
 {
 	return color / (vec3(1.0) + color);
@@ -32,8 +34,11 @@ vec3 tonemapACES(vec3 x)
 
 vec3 applyTonemap(vec3 color)
 {
-	// return tonemapReinhard(color);
-	return tonemapACES(color);
+	if (tonemapMode == 1) return tonemapReinhard(color);
+	if (tonemapMode == 2) return tonemapACES(color);
+
+	// Linear tonemap
+	return clamp(color, 0.0, 1.0);
 }
 
 vec3 applyColorGrading(vec3 color)

@@ -14,6 +14,7 @@ namespace engine
 #include <string>
 #include <vector>
 #include <cstddef>
+#include "../game/MyGame.h"
 
 namespace engine
 {
@@ -46,5 +47,6 @@ namespace engine
 		Object* _selectedObject = nullptr;
         static std::string currentSceneName;
         bool _sceneNameUnlocked = false;
+        MyGame* _currentGame;
     };
 }

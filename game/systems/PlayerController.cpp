@@ -7,6 +7,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "core/Input.h"
+#include "resources/AssetManager.h"
+#include "resources/AudioClip.h"
 #include "scene/Object.h"
 #include "scene/Scene.h"
 #include "scene/components/Audio.h"
@@ -101,9 +103,10 @@ void PlayerController::start()
 	cameraTransform->lookAt(focus);
 }
 
-void PlayerController::setAudioEngine(engine::AudioEngine* audioEngine)
+void PlayerController::setAudioEngine(engine::AudioEngine* audioEngine, engine::AssetManager* assets)
 {
 	_audio = audioEngine;
+	_assets = assets;
 }
 
 void PlayerController::update(float deltaTime)
@@ -248,11 +251,7 @@ void PlayerController::update(float deltaTime)
 		}
 	}
 
-	if (groundedNow)
-	{
-		hasJumped = false;
-	}
-	else if (_groundedGraceTimer <= 0.0f)
+	if (!groundedNow && _groundedGraceTimer <= 0.0f)
 	{
 		_groundCarrier = nullptr;
 		_lastGroundCarrierWorldPosition = glm::vec3(0.0f);
@@ -271,13 +270,16 @@ void PlayerController::update(float deltaTime)
 		if (_audio)
 		{
 			_audio->stopLoopingEffect();
-			_activeLoopingSoundPath.clear();
+			_activeLoopingSoundClip = {};
 		}
 		const float effectiveMass = glm::max(_characterController->mass, 0.001f);
 		_characterController->jump(glm::vec3(0.0f, jumpForce / effectiveMass, 0.0f));
-		if (_audio && !jumpSoundPath.empty())
+		if (_audio && _assets)
 		{
-			_audio->playOneShot(jumpSoundPath);
+			if (auto* clip = _assets->getAudioClip(jumpSoundClip))
+			{
+				_audio->playOneShot(*clip);
+			}
 		}
 
 		if (animator && jumpClip.valid())
@@ -293,26 +295,29 @@ void PlayerController::update(float deltaTime)
 	if (_audio)
 	{
 		const bool wantsLoop = isMoving && !hasJumped;
-		std::string desiredLoopPath;
+		Handle<engine::AudioClip> desiredLoopClip;
 		if (wantsLoop)
 		{
-			desiredLoopPath = isFastMovement && !runFastSoundPath.empty() ? runFastSoundPath : runSoundPath;
+			desiredLoopClip = isFastMovement && runFastSoundClip.valid() ? runFastSoundClip : runSoundClip;
 		}
 
-		if (desiredLoopPath != _activeLoopingSoundPath)
+		if (desiredLoopClip.index != _activeLoopingSoundClip.index)
 		{
-			if (desiredLoopPath.empty())
+			if (!desiredLoopClip.valid() || !_assets)
 			{
 				_audio->stopLoopingEffect();
-				_activeLoopingSoundPath.clear();
+				_activeLoopingSoundClip = {};
 			}
-			else if (_audio->playLoopingEffect(desiredLoopPath, true))
+			else if (auto* clip = _assets->getAudioClip(desiredLoopClip))
 			{
-				_activeLoopingSoundPath = desiredLoopPath;
+				if (_audio->playLoopingEffect(*clip, true))
+				{
+					_activeLoopingSoundClip = desiredLoopClip;
+				}
 			}
 		}
 	}
-	
+
 	// Normalize input and transform to camera space
 	glm::vec3 walkDir = glm::vec3(0.0f);
 	if (input != glm::vec3(0.0f))
@@ -398,6 +403,21 @@ void PlayerController::postPhysicsUpdate(float deltaTime)
 	const glm::vec3 finalPlayerWorldPosition = _characterController->getCurrentSyncedWorldPosition();
 	const glm::vec3 playerDelta = finalPlayerWorldPosition - previousPlayerWorldPosition;
 
+	const bool groundedNow = _characterController->isOnGround();
+	const bool landedThisFrame = groundedNow && !_wasGroundedLastFrame && hasJumped;
+	if (landedThisFrame && _audio && _assets)
+	{
+		if (auto* clip = _assets->getAudioClip(landingSoundClip))
+		{
+			_audio->playPreloadedOneShot(*clip);
+		}
+	}
+
+	_wasGroundedLastFrame = groundedNow;
+	if (groundedNow)
+	{
+		hasJumped = false;
+	}
 
 
 	// Orbit the camera after the player transform has been finalized for this frame.
@@ -464,6 +484,7 @@ void PlayerController::resetGameplayState()
     _groundCarrier = nullptr;
     _pendingCarrierDelta = glm::vec3(0.0f);
     _pendingCarrierName.clear();
+	_wasGroundedLastFrame = false;
 
     _yaw = 0.0f;
     _pitch = 0.0f;

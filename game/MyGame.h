@@ -32,7 +32,6 @@ public:
 	~MyGame() = default;
 
 	static MyGame* getActiveGame();
-	void setBackgroundMusicPath(const std::string& path);
 
 	void init(engine::AssetManager& assets, 
 			  engine::Renderer& renderer, 
@@ -53,7 +52,8 @@ public:
 	void restartGame();
 	void resetGameProgress();
 	void onPowerUpCollected(Collectable::Type type, float duration);
-	
+
+	engine::PostProcessVolume* volume;
 
 private:
 	engine::Scene* _scene = nullptr;
@@ -81,8 +81,6 @@ private:
 	bool editorCameraLocked = false;
 	std::vector<engine::Object*> objects;
 
-	engine::PostProcessVolume* _volume;
-
 	// Color restoration and pulse tracking
 	std::vector<PulseData> _activePulses;
 	ColorRestorationPass* _colorRestorePass = nullptr;
@@ -92,13 +90,13 @@ private:
 	float _colorIncrement;
 
 	engine::AudioEngine* _audio = nullptr;
-	// Set these to the audio files you want to use.
-	// Background music loops until the game closes.
-	std::string backgroundMusicPath = PROJECT_ROOT"assets/sounds/background.mp3";
-	// These are used by the player controller for locomotion and jump SFX.
-	std::string runningSoundPath = PROJECT_ROOT "assets/sounds/walkaudio.mp3";
-	std::string runningFastSoundPath = PROJECT_ROOT "assets/sounds/runaudio.mp3";
-	std::string jumpingSoundPath = PROJECT_ROOT "assets/sounds/jumpaudio.mp3";
+	Handle<engine::AudioClip> backgroundMusicClip;
+	Handle<engine::AudioClip> runSoundClip;
+	Handle<engine::AudioClip> runFastSoundClip;
+	Handle<engine::AudioClip> jumpSoundClip;
+	Handle<engine::AudioClip> landingSoundClip;
+	Handle<engine::AudioClip> gemCollectSoundClip;
+	Handle<engine::AudioClip> allGemsCollectedSoundClip;
 	
 	float _teleportCooldown = 0.0f;
 	static MyGame* _activeGame;

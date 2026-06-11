@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <array>
+#include <vector>
 #include "renderer/passes/RenderPass.h"
 #include "renderer/Framebuffer.h"
 #include "renderer/UniformBuffer.h"
@@ -49,7 +49,7 @@ namespace engine
 		float maxShadowDistance = 500.0f;
 		float lambda = 0.15f;
 		float shadowBias = 0.0015f;
-		glm::vec4 biasScales = glm::vec4(1.0, 2.0, 9.0, 0.0);
+		glm::vec4 biasScales = glm::vec4(1.0, 2.0, 20.0, 0.0);
 
 	private:
 		Handle<Shader> _depthShader, _skinnedDepthShader;
@@ -59,14 +59,15 @@ namespace engine
 
 		ShadowUBO _shadowUBO;
 
+		std::vector<Object*> staticQueue;
+		std::vector<Object*> skinnedQueue;
+
 		void computeCascadeSplits(const Camera& camera);
 		void computeLightSpaceMatrices(const Camera& camera, 
 			BBox sceneBBox, glm::vec3 lightDir);
 		void renderCascade(int index, const Scene& scene,
 			const AssetManager& assets);
-		void drawObjectCulled(int index, Object* object, const Scene& scene,
+		void collectVisibleObjects(int index, Object* object, const Scene& scene,
 			const AssetManager& assets, const Frustum& lightFrustum);
-		void drawObject(int index, Object* object, const Scene& scene,
-			const AssetManager& assets);
 	};
 }

@@ -26,6 +26,8 @@ namespace engine
 		void setMat2(const std::string& name, const glm::mat2& value) const;
 		void setMat3(const std::string& name, const glm::mat3& value) const;
 		void setMat4(const std::string& name, const glm::mat4& value) const;
+		void setMat4Array(const std::string& name, const glm::mat4* values, 
+			GLsizei count) const;
 
 	private:
 		GLuint _pid = 0;

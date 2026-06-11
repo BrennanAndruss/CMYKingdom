@@ -17,6 +17,7 @@ namespace engine
 	class Mesh;
 	struct Skeleton;
 	struct AnimationClip;
+	struct AudioClip;
 	struct Material;
 	class Heightmap;
 }
@@ -66,6 +67,7 @@ namespace engine
 			unsigned int meshIndex = 0);
 		Handle<AnimationClip> loadAnimationClipAssimp(const std::string& name, const std::string& path,
 			unsigned int animationIndex = 0);
+		Handle<AudioClip> loadAudioClip(const std::string& name, const std::string& path);
 		Handle<Material> loadMaterial(const std::string& name);
 
 		Handle<Heightmap> loadHeightmap(const std::string& name,
@@ -109,6 +111,10 @@ namespace engine
 		AnimationClip* getAnimationClip(const std::string& name) const;
 		Handle<AnimationClip> getAnimationClipHandle(const std::string& name) const;
 
+		AudioClip* getAudioClip(Handle<AudioClip> handle) const;
+		AudioClip* getAudioClip(const std::string& name) const;
+		Handle<AudioClip> getAudioClipHandle(const std::string& name) const;
+
 		Material* getMaterial(Handle<Material> handle) const;
 		Material* getMaterial(const std::string& name) const;
 		Handle<Material> getMaterialHandle(const std::string& name) const;
@@ -134,6 +140,7 @@ namespace engine
 		AssetPool<Mesh> _meshes;
 		AssetPool<Skeleton> _skeletons;
 		AssetPool<AnimationClip> _animationClips;
+		AssetPool<AudioClip> _audioClips;
 		AssetPool<Material> _materials;
 		AssetPool<Heightmap> _heightmaps;
 
