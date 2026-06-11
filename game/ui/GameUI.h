@@ -43,7 +43,7 @@ public:
     const PowerUpPopup& powerUpPopup
     );
 
-    const int maxGems = 1;
+    const int maxGems = 2;
 
 private:
     void drawHUD(int cyanGemCount, int magentaGemCount, int yellowGemCount);
