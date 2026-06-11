@@ -71,7 +71,7 @@ Object: Platform1_Copy0
 
 Object: Platform1_Copy0_Copy0
   Position: -128.76, 14, -0.277
-  Rotation: 180, 62.7817, 180
+  Rotation: 1.27771e-05, -74.0943, -1.37152e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -250,7 +250,7 @@ Object: Platform16
 
 Object: Platform16_Copy0
   Position: 13.004, 24.735, 36.634
-  Rotation: 1.42466e-06, 5, -11
+  Rotation: 1.58535e-06, 5, -11
   Scale: 5, 2, 8
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -282,7 +282,7 @@ Object: Platform16_Copy0_Copy0_Copy0
 
 Object: Platform16_Copy0_Copy0_Copy0_Copy0
   Position: -4.296, 36.535, 53.734
-  Rotation: -159.947, -1.981, -180
+  Rotation: -159.947, -1.981, 180
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -389,7 +389,7 @@ Object: Tree0_Copy0_Copy0_Copy0_Copy0_Copy1
 
 Object: Pine Tree1_Copy0_Copy0_Copy0
   Position: 66.085, 27.979, 35.477
-  Rotation: -9.41901, 89.9657, -12.0076
+  Rotation: -9.4182, 89.9604, -12.0067
   Scale: 9.2, 8.7, 8
   Mesh: tree3_0
   Material: tree3Mat0
@@ -460,7 +460,7 @@ Object: Winding Tree1
 
 Object: Winding Tree1_Copy0
   Position: -227.158, 36.909, -15.089
-  Rotation: -180, 28.02, -180
+  Rotation: 180, 28.02, 180
   Scale: 1, 1, 1
   Mesh: tree2
   Material: tree2Mat
@@ -625,7 +625,7 @@ Object: Pine Tree2_Copy0
 
 Object: Pine Tree2_Copy0_Copy0
   Position: 142.67, 37.164, -11.726
-  Rotation: 180, 89.02, -180
+  Rotation: -180, 89.02, 180
   Scale: 8, 6, 8
   Mesh: tree3_0
   Material: tree3Mat0
@@ -965,7 +965,7 @@ Object: Cactus2_Copy0
 
 Object: Desert House0
   Position: -30.182, 24.091, 178.842
-  Rotation: -180, 36.02, -180
+  Rotation: 180, 36.02, 180
   Scale: 0.04, 0.04, 0.04
   Mesh: desert_house
   Material: desertHouseMat
@@ -1063,7 +1063,7 @@ Object: Desert House_Copy
 
 Object: Desert House_Copy_Copy
   Position: 44.761, 57.17, 169.397
-  Rotation: 9.00102, 84.9976, 10.007
+  Rotation: 9.00102, 84.9977, 10.007
   Scale: 0.04, 0.04, 0.04
   Mesh: desert_house
   Material: desertHouseMat
@@ -1085,7 +1085,7 @@ Object: Desert Rock
 
 Object: Desert Rock_Copy
   Position: 41.322, 59.644, 182.276
-  Rotation: -175.989, 17, -180
+  Rotation: -175.989, 17, 180
   Scale: 6.2, 9.11, 6
   Mesh: desert_rock
   Material: desertRockMat
@@ -1118,7 +1118,7 @@ Object: Palm Tree_Copy
 
 Object: Cactus
   Position: -1.5765, 50.266, 182.94
-  Rotation: -180, 2, -180
+  Rotation: 180, 2, 180
   Scale: 0.5, 0.5, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1129,7 +1129,7 @@ Object: Cactus
 
 Object: Cactus_Copy
   Position: 57.4763, 56.672, 172.257
-  Rotation: -180, 2, -177
+  Rotation: 180, 2, -177
   Scale: 0.5, 0.5, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1140,7 +1140,7 @@ Object: Cactus_Copy
 
 Object: Cactus_Copy_Copy
   Position: 20.5139, 50.304, 186.129
-  Rotation: -180, 2, -177
+  Rotation: 180, 2, -177
   Scale: 0.5, 0.5, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1151,7 +1151,7 @@ Object: Cactus_Copy_Copy
 
 Object: Cactus_Copy_Copy_Copy
   Position: -18.7339, 51.678, 204.011
-  Rotation: -180, 2, -177
+  Rotation: 180, 2, -177
   Scale: 1, 1, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1162,7 +1162,7 @@ Object: Cactus_Copy_Copy_Copy
 
 Object: Cactus_Copy_Copy_Copy_Copy
   Position: 26.18, 49.98, 164.103
-  Rotation: 0.0073297, 89.028, 8.01087
+  Rotation: 0.00734268, 89.028, 8.01085
   Scale: 1, 1, 1
   Mesh: cactus
   Material: cactusMat
@@ -1173,7 +1173,7 @@ Object: Cactus_Copy_Copy_Copy_Copy
 
 Object: Desert Rock_Copy_Copy
   Position: 64.4626, 36.732, 143.632
-  Rotation: -175.989, 82, -180
+  Rotation: -175.989, 82, 180
   Scale: 6.2, 7, 6
   Mesh: desert_rock
   Material: desertRockMat
@@ -1184,7 +1184,7 @@ Object: Desert Rock_Copy_Copy
 
 Object: Desert Rock_Copy_Copy_Copy
   Position: 10.2952, 32.833, 147.317
-  Rotation: -175.996, 8.001, 180
+  Rotation: -175.996, 8.001, -180
   Scale: 6.2, 7, 6
   Mesh: desert_rock
   Material: desertRockMat
@@ -1206,7 +1206,7 @@ Object: Desert Rock_Copy_Copy_Copy_Copy
 
 Object: Cactus_Copy_1
   Position: -35.2274, 20.329, 197.627
-  Rotation: -180, 48, -180
+  Rotation: 180, 48, 180
   Scale: 0.5, 0.5, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1217,7 +1217,7 @@ Object: Cactus_Copy_1
 
 Object: Palm Tree_1
   Position: 22.122, 28.119, 146.918
-  Rotation: -90, -71, 3.21797e-05
+  Rotation: -90, -71, 2.4359e-05
   Scale: 6, 6, 6
   Mesh: palmTree
   Material: palmTreeMat
@@ -1228,7 +1228,7 @@ Object: Palm Tree_1
 
 Object: Palm Tree_Copy_1
   Position: 60.6731, 32.579, 148.964
-  Rotation: -90, -71, 3.21797e-05
+  Rotation: -90, -71, 2.4359e-05
   Scale: 6, 6, 6
   Mesh: palmTree
   Material: palmTreeMat
@@ -1261,7 +1261,7 @@ Object: Desert Rock_1
 
 Object: Desert Rock_Copy_1
   Position: -5.313, 21.573, 130.412
-  Rotation: 180, 83, 180
+  Rotation: -180, 83, -180
   Scale: 2, 2, 2
   Mesh: desert_rock
   Material: desertRockMat
@@ -1338,7 +1338,7 @@ Object: Palm Tree_3
 
 Object: Cactus_5
   Position: 34.612, 23.126, 113.59
-  Rotation: -11.0048, -89.9802, 0
+  Rotation: -11.0052, -90, -0.000597744
   Scale: 0.5, 0.5, 0.5
   Mesh: cactus
   Material: cactusMat
@@ -1393,7 +1393,7 @@ Object: Winding Tree_Copy
 
 Object: Winding Tree_Copy_Copy
   Position: 45.055, 71.075, -68.574
-  Rotation: -180, -89.0001, 180
+  Rotation: 180, -89.0001, -180
   Scale: 2, 2, 2
   Mesh: tree2
   Material: tree2Mat
@@ -1591,7 +1591,7 @@ Object: Pine Tree_Copy
 
 Object: Pine Tree_Copy_Copy
   Position: 181.182, 64.273, 42.344
-  Rotation: 180, 82.0182, -167
+  Rotation: -180, 82.0182, -167
   Scale: 6.6, 7.3, 5.9
   Mesh: tree3_0
   Material: tree3Mat0
@@ -1602,7 +1602,7 @@ Object: Pine Tree_Copy_Copy
 
 Object: Winding Tree_2
   Position: -188.002, 16.374, 6.09185
-  Rotation: -3.00108, -89.972, -2.71887e-05
+  Rotation: -3.00127, -90, -0.000220472
   Scale: 1.5, 1.7, 0.8
   Mesh: tree2
   Material: tree2Mat
@@ -1613,7 +1613,7 @@ Object: Winding Tree_2
 
 Object: Winding Tree_Copy_1
   Position: -205.07, 17.662, -35.853
-  Rotation: -3.00108, -89.972, -2.71887e-05
+  Rotation: -3.00127, -90, -0.000220472
   Scale: 1.5, 1.7, 0.8
   Mesh: tree2
   Material: tree2Mat
@@ -1712,7 +1712,7 @@ Object: Platform_Copy_Copy_Copy
 
 Object: Platform1_Copy0_Copy_Copy
   Position: -187.929, 14.048, 77.1486
-  Rotation: 180, 62.7817, 180
+  Rotation: 1.27771e-05, -74.0943, -1.37152e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -1954,7 +1954,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_1
 
 Object: Platform1_Copy0_Copy_Copy_Copy
   Position: -172.134, 11.29, -86.486
-  Rotation: 180, 62.7817, 180
+  Rotation: 1.27771e-05, -74.0943, -1.37152e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -1976,7 +1976,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_1
 
 Object: Platform1_Copy0_Copy_Copy_Copy_Copy
   Position: -146.143, 11.906, -77.8613
-  Rotation: 180, 62.7817, 180
+  Rotation: 1.27771e-05, -74.0943, -1.37152e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -1987,7 +1987,7 @@ Object: Platform1_Copy0_Copy_Copy_Copy_Copy
 
 Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
   Position: -128.945, 13.19, -77.2315
-  Rotation: 5.00933e-06, 89.9802, -5.00933e-06
+  Rotation: 5.00935e-06, 89.9802, -5.00935e-06
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -1998,7 +1998,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
 
 Object: Platform1_Copy0_Copy_Copy_Copy_Copy_Copy
   Position: -116.784, 13.963, -75.24
-  Rotation: 180, 62.7817, 180
+  Rotation: 1.27771e-05, -74.0943, -1.37152e-05
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -2009,7 +2009,7 @@ Object: Platform1_Copy0_Copy_Copy_Copy_Copy_Copy
 
 Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
   Position: -95.448, 14.919, -71.792
-  Rotation: 5.00933e-06, 89.9802, -5.00933e-06
+  Rotation: 5.00935e-06, 89.9802, -5.00935e-06
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -2020,7 +2020,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
 
 Object: Platform1_Copy0_Copy_Copy_Copy_Copy_Copy_Copy
   Position: -79.7189, 13.808, -80.365
-  Rotation: 180, 82.7814, 180
+  Rotation: 180, -85.9066, -180
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -2031,7 +2031,7 @@ Object: Platform1_Copy0_Copy_Copy_Copy_Copy_Copy_Copy
 
 Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
   Position: -68.0556, 14.643, -77.6821
-  Rotation: 5.00933e-06, 89.9802, -5.00933e-06
+  Rotation: 5.00935e-06, 89.9802, -5.00935e-06
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -2042,7 +2042,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_1
 
 Object: Platform_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy_Copy
   Position: -59.956, 13.643, -77.6821
-  Rotation: 5.00933e-06, 89.9802, -5.00933e-06
+  Rotation: 5.00935e-06, 89.9802, -5.00935e-06
   Scale: 5, 2, 5
   Mesh: square-platform
   Material: platformCMYKMaterial
@@ -2139,7 +2139,7 @@ Object: Platform_2
   SpecularTexture: TexWhite
   BoxCollider: center=0,0,0 size=0.5,0.5,0.5 isTrigger=0
   RigidBody: type=1 mass=1
-  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
+  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0.5 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
 
 Object: Platform_Copy_4
   Position: 122.894, 8.80297, -182.395
@@ -2151,7 +2151,7 @@ Object: Platform_Copy_4
   SpecularTexture: TexWhite
   BoxCollider: center=0,0,0 size=0.5,0.5,0.5 isTrigger=0
   RigidBody: type=1 mass=1
-  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
+  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0.2 timeScale=1 linearBase=0,0,0 linearAmplitude=0,-0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
 
 Object: Platform_Copy_Copy_5
   Position: 135.794, 8.51004, -185.295
@@ -2163,7 +2163,7 @@ Object: Platform_Copy_Copy_5
   SpecularTexture: TexWhite
   BoxCollider: center=0,0,0 size=0.5,0.5,0.5 isTrigger=0
   RigidBody: type=1 mass=1
-  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
+  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0.9 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
 
 Object: Platform_Copy_Copy_Copy_4
   Position: 149.894, 8.841, -193.995
@@ -2199,7 +2199,7 @@ Object: Platform_Copy_Copy_Copy_5
   SpecularTexture: TexWhite
   BoxCollider: center=0,0,0 size=0.5,0.5,0.5 isTrigger=0
   RigidBody: type=1 mass=1
-  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
+  AnimatedVelocity: enabled=1 useLocalSpace=0 waveMode=1 frequency=0.2 phase=0.23 timeScale=1 linearBase=0,0,0 linearAmplitude=0,0.5,0 angularBase=0,0,0 angularAmplitude=0,0,0
 
 Object: Platform_Copy_Copy_Copy_Copy_4
   Position: 155.094, 9.058, -174.595
@@ -2238,7 +2238,7 @@ Object: Platform_Copy_5
 Object: Platform_Copy_Copy_6
   Position: 115.988, 50.39, -113.914
   Rotation: 0, 26, 0
-  Scale: 4, 8, 4
+  Scale: 4, 6, 4
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -2248,8 +2248,8 @@ Object: Platform_Copy_Copy_6
 
 Object: Platform_Copy_Copy_Copy_6
   Position: 110.788, 50.89, -113.914
-  Rotation: -180, 89.02, -180
-  Scale: 4, 11.1, 4
+  Rotation: 180, 89.02, 180
+  Scale: 4, 8, 4
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -2259,8 +2259,8 @@ Object: Platform_Copy_Copy_Copy_6
 
 Object: Platform_Copy_Copy_Copy_Copy_5
   Position: 101.488, 50.99, -122.714
-  Rotation: -172, 89.0218, -180
-  Scale: 4, 11.1, 4
+  Rotation: -172, 89.0224, -180
+  Scale: 4, 8, 4
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -2271,7 +2271,7 @@ Object: Platform_Copy_Copy_Copy_Copy_5
 Object: Platform_Copy_Copy_Copy_Copy_Copy_2
   Position: 103.788, 51.19, -132.014
   Rotation: 174, 89.0204, 180
-  Scale: 4, 12.4, 4
+  Scale: 4, 9, 4
   Mesh: square-platform
   Material: platformCMYKMaterial
   DiffuseTexture: platformCMYKTex
@@ -2280,7 +2280,7 @@ Object: Platform_Copy_Copy_Copy_Copy_Copy_2
   RigidBody: type=1 mass=1
 
 Object: Star_2
-  Position: 103.438, 59.5271, -132.831
+  Position: 103.196, 58.114, -132.632
   Rotation: 0, -0, 0
   Scale: 0.5, 0.5, 0.5
   Mesh: gem
@@ -2327,7 +2327,7 @@ Object: speedBoost
 
 Object: speedBoost_Copy
   Position: 52.817, 21.548, -123.5
-  Rotation: -180, -89.9802, -180
+  Rotation: 180, -89.9802, 180
   Scale: 0.31, 0.21, 0.5
   Mesh: speedBoost
   Material: redMat
@@ -2427,4 +2427,15 @@ Object: Platform_Copy_Copy_Copy_7
   SpecularTexture: TexWhite
   BoxCollider: center=0,0,0 size=0.5,0.5,0.5 isTrigger=0
   RigidBody: type=1 mass=1
+
+Object: speedBoost_1
+  Position: 136.698, 10.449, -185.162
+  Rotation: -180, -89.9802, -180
+  Scale: 0.31, 0.21, 0.5
+  Mesh: speedBoost
+  Material: redMat
+  DiffuseTexture: defaultGrayTex
+  SpecularTexture: defaultGrayTex
+  BoxCollider: center=0,0,0 size=1,1,1 isTrigger=1
+  Collectable: type=3
 
