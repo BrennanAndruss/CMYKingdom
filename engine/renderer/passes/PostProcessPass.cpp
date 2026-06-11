@@ -58,6 +58,7 @@ namespace engine
 		shader->setVec3("lift", volume.colorGrading.lift);
 		shader->setVec3("gamma", volume.colorGrading.gamma);
 		shader->setVec3("gain", volume.colorGrading.gain);
+		shader->setInt("tonemapMode", static_cast<int>(volume.tonemap.mode));
 
 		FullscreenQuad::getInstance().draw();
 

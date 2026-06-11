@@ -996,11 +996,11 @@ void MyGame::init(engine::AssetManager& assets,
 	}
 
 	// Get post processing volume
-	_volume = renderer.getPostProcessVolume();
-	_volume->colorGrading.contrast = 1.0f;
-	_volume->colorGrading.exposure = -0.5f;
-	_volume->colorGrading.lift = glm::vec3(-0.05f);
-	_volume->colorGrading.gamma = glm::vec3(1.0f, 1.0f, 1.05f);
+	volume = renderer.getPostProcessVolume();
+	volume->colorGrading.contrast = 1.0f;
+	volume->colorGrading.exposure = -0.5f;
+	volume->colorGrading.lift = glm::vec3(-0.05f);
+	volume->colorGrading.gamma = glm::vec3(1.0f, 1.0f, 1.05f);
 
 	// Add custom post-processing render passes
 	_colorRestorePass = static_cast<ColorRestorationPass*>(

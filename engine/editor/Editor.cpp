@@ -140,8 +140,6 @@ namespace engine
 
         _initialized = true;
         _capturedInitialSceneState = false;
-
-        
     }
 
     void Editor::shutdown()
@@ -538,32 +536,28 @@ namespace engine
             engine::DebugRenderPass::setShowColliders(col);
         }
 
+        _currentGame = MyGame::getActiveGame();
         ImGui::SeparatorText("Post Processing");
 
-        /* post processing stuff goes here, need access to variables in PostProcessPass 
         ImGui::Text("Color Grading");
 
-        engine::
+        ImGui::SliderFloat("Exposure", &_currentGame->volume->colorGrading.exposure, -5.0f, 5.0f);
+        ImGui::SliderFloat("Contrast", &_currentGame->volume->colorGrading.contrast, 0.0f, 3.0f);
+        ImGui::SliderFloat("Saturation", &_currentGame->volume->colorGrading.saturation, 0.0f, 3.0f);
 
-        ImGui::SliderFloat("Exposure", &postProcessPass.volume.colorGrading.exposure, -5.0f, 5.0f);
-        ImGui::SliderFloat("Contrast", &postProcessPass.volume.colorGrading.contrast, 0.0f, 3.0f);
-        ImGui::SliderFloat("Saturation", &postProcessPass.volume.colorGrading.saturation, 0.0f, 3.0f);
-
-        ImGui::SliderFloat3("Lift", &postProcessPass.volume.colorGrading.lift.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3("Gamma", &postProcessPass.volume.colorGrading.gamma.x, 0.0f, 2.0f);
-        ImGui::SliderFloat3("Gain", &postProcessPass.volume.colorGrading.gain.x, 0.0f, 2.0f);
+        ImGui::SliderFloat3("Lift", &_currentGame->volume->colorGrading.lift.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3("Gamma", &_currentGame->volume->colorGrading.gamma.x, 0.0f, 2.0f);
+        ImGui::SliderFloat3("Gain", &_currentGame->volume->colorGrading.gain.x, 0.0f, 2.0f);
 
         ImGui::Text("Tonemapping");
 
         const char* tonemapModes[] = { "Linear", "Reinhard", "ACES" };
 
-        int mode = static_cast<int>(postProcessPass.volume.tonemap.mode);
+        int mode = static_cast<int>(_currentGame->volume->tonemap.mode);
         if (ImGui::Combo("Mode", &mode, tonemapModes, IM_ARRAYSIZE(tonemapModes)))
         {
-            postProcessPass.volume.tonemap.mode =
-                static_cast<engine::TonemapSettings::Mode>(mode);
+            _currentGame->volume->tonemap.mode = static_cast<TonemapSettings::Mode>(mode);
         }
-                */
 
         ImGui::End();
     }

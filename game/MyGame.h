@@ -53,7 +53,8 @@ public:
 	void restartGame();
 	void resetGameProgress();
 	void onPowerUpCollected(Collectable::Type type, float duration);
-	
+
+	engine::PostProcessVolume* volume;
 
 private:
 	engine::Scene* _scene = nullptr;
@@ -80,8 +81,6 @@ private:
 	bool editorModeActive = false;
 	bool editorCameraLocked = false;
 	std::vector<engine::Object*> objects;
-
-	engine::PostProcessVolume* _volume;
 
 	// Color restoration and pulse tracking
 	std::vector<PulseData> _activePulses;
