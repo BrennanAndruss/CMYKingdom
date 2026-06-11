@@ -19,6 +19,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/config.h>
 #include "resources/Heightmap.h"
+#include "resources/AudioClip.h"
 #include "resources/SkeletalAnimation.h"
 #include "renderer/resources/Shader.h"
 #include "renderer/resources/Texture.h"
@@ -782,6 +783,24 @@ namespace engine
 		_animationClips.nameToHandle[name] = handle;
 		return handle;
 	}
+
+	Handle<AudioClip> AssetManager::loadAudioClip(const std::string& name, const std::string& path)
+	{
+		const std::filesystem::path absPath = resolvePath(path);
+		if (!std::filesystem::exists(absPath))
+		{
+			throw std::runtime_error("Failed to load audio clip: " + absPath.string());
+		}
+
+		auto clip = std::make_unique<AudioClip>();
+		clip->filePath = absPath.string();
+
+		_audioClips.assets.push_back(std::move(clip));
+		Handle<AudioClip> handle = { _audioClips.assets.size() - 1 };
+		_audioClips.nameToHandle[name] = handle;
+		return handle;
+	}
+
 	Mesh* AssetManager::getMesh(Handle<Mesh> handle) const
 	{
 		if (!handle.valid() || handle.index >= _meshes.assets.size()) return nullptr;
@@ -1073,6 +1092,26 @@ namespace engine
 	{
 		auto it = _animationClips.nameToHandle.find(name);
 		if (it == _animationClips.nameToHandle.end()) return {};
+		return it->second;
+	}
+
+	AudioClip* AssetManager::getAudioClip(Handle<AudioClip> handle) const
+	{
+		if (!handle.valid() || handle.index >= _audioClips.assets.size()) return nullptr;
+		return _audioClips.assets[handle.index].get();
+	}
+
+	AudioClip* AssetManager::getAudioClip(const std::string& name) const
+	{
+		auto it = _audioClips.nameToHandle.find(name);
+		if (it == _audioClips.nameToHandle.end()) return nullptr;
+		return getAudioClip(it->second);
+	}
+
+	Handle<AudioClip> AssetManager::getAudioClipHandle(const std::string& name) const
+	{
+		auto it = _audioClips.nameToHandle.find(name);
+		if (it == _audioClips.nameToHandle.end()) return {};
 		return it->second;
 	}
 

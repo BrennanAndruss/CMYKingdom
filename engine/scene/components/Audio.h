@@ -5,8 +5,10 @@
 
 #include <glm/vec3.hpp>
 
-
-
+namespace engine
+{
+	struct AudioClip;
+}
 
 namespace engine
 {
@@ -20,14 +22,17 @@ namespace engine
         void shutdown();
 
         bool playMusic(const std::string& filePath, bool loop = true);
+        bool playMusic(const AudioClip& clip, bool loop = true);
         void stopMusic();
         void setMusicVolume(float volume);
 
         bool playLoopingEffect(const std::string& filePath, bool loop = true);
+        bool playLoopingEffect(const AudioClip& clip, bool loop = true);
         void stopLoopingEffect();
         void setLoopingEffectVolume(float volume);
 
         bool playOneShot(const std::string& filePath);
+        bool playOneShot(const AudioClip& clip);
         void updateListener(const glm::vec3& camPos, const glm::vec3& camFront, const glm::vec3& camUp);
 
         bool isInitialized() const { return _impl != nullptr; }
