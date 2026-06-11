@@ -29,11 +29,6 @@ MyGame* MyGame::getActiveGame()
 	return _activeGame;
 }
 
-void MyGame::setBackgroundMusicPath(const std::string& path)
-{
-	backgroundMusicPath = path;
-}
-
 void MyGame::onPowerUpCollected(Collectable::Type type, float duration)
 {
     _powerUpPopup.active = true;
@@ -403,9 +398,17 @@ void MyGame::init(engine::AssetManager& assets,
 	});
 	scene.setIrradianceMap(irradianceCubemap);
 
+	backgroundMusicClip = assets.loadAudioClip("backgroundMusic", "sounds/background.mp3");
+	runSoundClip = assets.loadAudioClip("playerWalkSound", "sounds/walkaudio.mp3");
+	runFastSoundClip = assets.loadAudioClip("playerRunSound", "sounds/runaudio.mp3");
+	jumpSoundClip = assets.loadAudioClip("playerJumpSound", "sounds/jumpaudio.mp3");
+
 	if (_audio)
 	{
-		_audio->playMusic(backgroundMusicPath, true);
+		if (auto* clip = assets.getAudioClip(backgroundMusicClip))
+		{
+			_audio->playMusic(*clip, true);
+		}
 	}	//load in game UI
 	_gameUI.loadAssets(assets);
 
@@ -970,10 +973,10 @@ void MyGame::init(engine::AssetManager& assets,
 		playerController.sprintClip = sprintClip;
 		playerController.jumpClip = jumpClip;
 		playerController.celebrateClip = celebrateClip;
-		playerController.setAudioEngine(_audio); // set the audio engine pointer in the player controller
-		playerController.runSoundPath = runningSoundPath;
-		playerController.runFastSoundPath = runningFastSoundPath;
-		playerController.jumpSoundPath = jumpingSoundPath;
+		playerController.setAudioEngine(_audio, &assets);
+		playerController.runSoundClip = runSoundClip;
+		playerController.runFastSoundClip = runFastSoundClip;
+		playerController.jumpSoundClip = jumpSoundClip;
 	}
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");

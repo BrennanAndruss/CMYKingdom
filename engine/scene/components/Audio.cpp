@@ -2,6 +2,7 @@
 #include <iostream>
 #include <utility>
 
+#include "resources/AudioClip.h"
 #include "../../../external/miniaudio/miniaudio.h"
 
 namespace engine
@@ -94,6 +95,11 @@ namespace engine
         return true;
     }
 
+    bool AudioEngine::playMusic(const AudioClip& clip, bool loop)
+    {
+        return playMusic(clip.filePath, loop);
+    }
+
     void AudioEngine::stopMusic()
     {
         if (!_impl || !_impl->musicLoaded)
@@ -147,6 +153,11 @@ namespace engine
         return true;
     }
 
+    bool AudioEngine::playLoopingEffect(const AudioClip& clip, bool loop)
+    {
+        return playLoopingEffect(clip.filePath, loop);
+    }
+
     void AudioEngine::stopLoopingEffect()
     {
         if (!_impl || !_impl->loopingEffectLoaded)
@@ -176,6 +187,11 @@ namespace engine
 
         const ma_result result = ma_engine_play_sound(&_impl->engine, filePath.c_str(), nullptr);
         return result == MA_SUCCESS;
+    }
+
+    bool AudioEngine::playOneShot(const AudioClip& clip)
+    {
+        return playOneShot(clip.filePath);
     }
 
     void AudioEngine::updateListener(const glm::vec3& camPos, const glm::vec3& camFront, const glm::vec3& camUp)
