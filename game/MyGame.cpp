@@ -432,6 +432,7 @@ void MyGame::init(engine::AssetManager& assets,
 	jumpSoundClip = assets.loadAudioClip("playerJumpSound", "sounds/jumpaudio.mp3");
 	landingSoundClip = assets.loadAudioClip("playerLandSound", "sounds/landaudio.mp3");
 	gemCollectSoundClip = loadOptionalAudioClip(assets, "gemCollectSound", "sounds/gemcollect.mp3");
+	allGemsCollectedSoundClip = loadOptionalAudioClip(assets, "allGemsCollectedSound", "sounds/allgemscollected.mp3");
 
 	if (_audio)
 	{
@@ -1197,6 +1198,14 @@ void MyGame::update(float deltaTime)
 	{
     	_endScreenShown = true;
     	_gameUIState = GameUIState::End;
+
+		if (_audio && _assets && allGemsCollectedSoundClip.valid())
+		{
+			if (auto* clip = _assets->getAudioClip(allGemsCollectedSoundClip))
+			{
+				_audio->playOneShot(*clip);
+			}
+		}
 
     	if (gameplayController)
     	{
