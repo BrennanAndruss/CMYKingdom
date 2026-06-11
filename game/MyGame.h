@@ -94,6 +94,7 @@ private:
 	Handle<engine::AudioClip> runSoundClip;
 	Handle<engine::AudioClip> runFastSoundClip;
 	Handle<engine::AudioClip> jumpSoundClip;
+	Handle<engine::AudioClip> landingSoundClip;
 	
 	float _teleportCooldown = 0.0f;
 	static MyGame* _activeGame;

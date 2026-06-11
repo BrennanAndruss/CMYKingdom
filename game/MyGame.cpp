@@ -402,6 +402,8 @@ void MyGame::init(engine::AssetManager& assets,
 	runSoundClip = assets.loadAudioClip("playerWalkSound", "sounds/walkaudio.mp3");
 	runFastSoundClip = assets.loadAudioClip("playerRunSound", "sounds/runaudio.mp3");
 	jumpSoundClip = assets.loadAudioClip("playerJumpSound", "sounds/jumpaudio.mp3");
+	// TODO: add a landing SFX file here, then uncomment the load below.
+	landingSoundClip = assets.loadAudioClip("playerLandSound", "sounds/landaudio.mp3");
 
 	if (_audio)
 	{
@@ -977,6 +979,7 @@ void MyGame::init(engine::AssetManager& assets,
 		playerController.runSoundClip = runSoundClip;
 		playerController.runFastSoundClip = runFastSoundClip;
 		playerController.jumpSoundClip = jumpSoundClip;
+		playerController.landingSoundClip = landingSoundClip;
 	}
 
 	// pointLightCenter = &scene.createObject("PointLightCenter");

@@ -251,6 +251,16 @@ void PlayerController::update(float deltaTime)
 		}
 	}
 
+	const bool landedThisFrame = groundedNow && !_wasGroundedLastFrame && hasJumped;
+
+	if (landedThisFrame && _audio && _assets)
+	{
+		if (auto* clip = _assets->getAudioClip(landingSoundClip))
+		{
+			_audio->playOneShot(*clip);
+		}
+	}
+
 	if (groundedNow)
 	{
 		hasJumped = false;
@@ -321,6 +331,8 @@ void PlayerController::update(float deltaTime)
 			}
 		}
 	}
+
+	_wasGroundedLastFrame = groundedNow;
 	
 	// Normalize input and transform to camera space
 	glm::vec3 walkDir = glm::vec3(0.0f);
@@ -473,6 +485,7 @@ void PlayerController::resetGameplayState()
     _groundCarrier = nullptr;
     _pendingCarrierDelta = glm::vec3(0.0f);
     _pendingCarrierName.clear();
+	_wasGroundedLastFrame = false;
 
     _yaw = 0.0f;
     _pitch = 0.0f;

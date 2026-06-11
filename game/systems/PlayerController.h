@@ -64,6 +64,7 @@ public:
 	Handle<engine::AudioClip> runSoundClip;
 	Handle<engine::AudioClip> runFastSoundClip;
 	Handle<engine::AudioClip> jumpSoundClip;
+	Handle<engine::AudioClip> landingSoundClip;
 
 private:
 	engine::CharacterController* _characterController = nullptr;
@@ -80,6 +81,7 @@ private:
 	float _celebrateTimer = 0.0f;
 	float _celebrateDuration = 1.0f;
 	float _savedGravity = 9.81f;
+	bool _wasGroundedLastFrame = false;
 
 	float _yaw = 0.0f;
 	float _pitch = 0.0f;
