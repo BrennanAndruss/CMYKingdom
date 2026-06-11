@@ -20,17 +20,16 @@ layout (std140) uniform CameraData
 };
 
 uniform mat4 model;
-uniform int isSkinned;
 uniform int numBones;
 uniform mat4 bones[MAX_SHADER_BONES];
 
 mat4 getSkinMatrix()
 {
-	if (isSkinned == 0)
-	{
-		return mat4(1.0);
-	}
-
+//	if (isSkinned == 0)
+//	{
+//		return mat4(1.0);
+//	}
+//
 	mat4 skin = mat4(0.0);
 	for (int i = 0; i < 4; ++i)
 	{

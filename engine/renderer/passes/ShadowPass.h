@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <array>
+#include <vector>
 #include "renderer/passes/RenderPass.h"
 #include "renderer/Framebuffer.h"
 #include "renderer/UniformBuffer.h"
@@ -59,14 +59,15 @@ namespace engine
 
 		ShadowUBO _shadowUBO;
 
+		std::vector<Object*> staticQueue;
+		std::vector<Object*> skinnedQueue;
+
 		void computeCascadeSplits(const Camera& camera);
 		void computeLightSpaceMatrices(const Camera& camera, 
 			BBox sceneBBox, glm::vec3 lightDir);
 		void renderCascade(int index, const Scene& scene,
 			const AssetManager& assets);
-		void drawObjectCulled(int index, Object* object, const Scene& scene,
+		void collectVisibleObjects(int index, Object* object, const Scene& scene,
 			const AssetManager& assets, const Frustum& lightFrustum);
-		void drawObject(int index, Object* object, const Scene& scene,
-			const AssetManager& assets);
 	};
 }

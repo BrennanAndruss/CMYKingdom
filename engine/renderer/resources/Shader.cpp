@@ -161,4 +161,12 @@ namespace engine
 		if (loc == -1) return;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
 	}
+
+	void Shader::setMat4Array(const std::string& name, const glm::mat4* values,
+		GLsizei count) const
+	{
+		GLint loc = getUniform(name);
+		if (loc == -1) return;
+		glUniformMatrix4fv(loc, count, GL_FALSE, &values[0][0][0]);
+	}
 }
