@@ -286,24 +286,103 @@ void MyGame::init(engine::AssetManager& assets,
 		}
 		terrainHeightTex = assets.loadTexture("terrainHeightTex", heightRgba.data(), hWidth, hLength);
 	}
-	// Splatmap Texture
+	// Splatmap Textures
 	Handle<engine::Texture> terrainSplat0 =
-    assets.loadTexture("terrainSplat0", "textures/splatmaps/splatmap0.png", true); 
+		assets.loadTexture("terrainSplat0", "textures/splatmaps/splatmaps0.png", true);
 
-	Handle<engine::Texture> terrainGrass =
-		assets.loadTexture("terrainGrass", "textures/terrain/stylized_grass.png", true);
+	Handle<engine::Texture> terrainSplat1 =
+		assets.loadTexture("terrainSplat1", "textures/splatmaps/splatmaps1.png", true);
 
-	// Using Terrain Grass Texture for Grass Instances <Can change later on> 
-	Handle<engine::Texture> grassBladeTex = terrainGrass; 
+	Handle<engine::Texture> terrainSplat2 =
+		assets.loadTexture("terrainSplat2", "textures/splatmaps/splatmaps2.png", true);
 
-	Handle<engine::Texture> terrainSand =
-		assets.loadTexture("terrainSand", "textures/terrain/sand01.jpg", true);
 
-	Handle<engine::Texture> terrainRock =
-		assets.loadTexture("terrainRock", "textures/terrain/stylized_stone.png", true);
 
-	Handle<engine::Texture> terrainSnow =
-		assets.loadTexture("terrainSnow", "textures/terrain/snow01.png", true); 
+
+	// Terrain Textures
+	/*
+		assets/textures/terrain/BeachGrass.png 
+		assets/textures/terrain/BeachSang.png 
+		assets/textures/terrain/BeachStone.png 
+		assets/textures/terrain/DesertGrass.png 
+		assets/textures/terrain/DesertSand.png 
+		assets/textures/terrain/DesertStone.png 
+		assets/textures/terrain/ForestFlowers.png 
+		assets/textures/terrain/ForestGrass.png 
+		assets/textures/terrain/ForestStone.png
+		assets/textures/terrain/StylizedSnow.png
+	*/
+	// =====================================================
+	// Terrain Textures
+	// =====================================================
+
+	// Beach
+	Handle<engine::Texture> beachGrass =
+		assets.loadTexture("beachGrass", "textures/terrain/BeachGrass.png", true);
+
+	Handle<engine::Texture> beachSand =
+		assets.loadTexture("beachSand", "textures/terrain/BeachSand.png", true);
+
+	Handle<engine::Texture> beachStone =
+		assets.loadTexture("beachStone", "textures/terrain/BeachStone.png", true);
+
+
+	// Desert
+	Handle<engine::Texture> desertGrass =
+		assets.loadTexture("desertGrass", "textures/terrain/DesertGrass.png", true);
+
+	Handle<engine::Texture> desertSand =
+		assets.loadTexture("desertSand", "textures/terrain/DesertSand.png", true);
+
+	Handle<engine::Texture> desertStone =
+		assets.loadTexture("desertStone", "textures/terrain/DesertStone.png", true);
+
+
+	// Forest
+	Handle<engine::Texture> forestFlowers =
+		assets.loadTexture("forestFlowers", "textures/terrain/ForestFlowers.png", true);
+
+	Handle<engine::Texture> forestGrass =
+		assets.loadTexture("forestGrass", "textures/terrain/ForestGrass.png", true);
+
+	Handle<engine::Texture> forestStone =
+		assets.loadTexture("forestStone", "textures/terrain/ForestStone.png", true);
+
+
+	// Snow
+	Handle<engine::Texture> stylizedSnow =
+		assets.loadTexture("stylizedSnow", "textures/terrain/StylizedSnow.png", true);
+
+	// Texture array slots used by terrain shader: 10 textures used right now 
+
+	Handle<engine::Texture> terrainTex0 = beachSand;
+	Handle<engine::Texture> terrainTex1 = beachGrass;
+	Handle<engine::Texture> terrainTex2 = beachStone;
+
+	Handle<engine::Texture> terrainTex3 = desertSand;
+	Handle<engine::Texture> terrainTex4 = desertGrass;
+	Handle<engine::Texture> terrainTex5 = desertStone;
+
+	Handle<engine::Texture> terrainTex6 = forestGrass;
+	Handle<engine::Texture> terrainTex7 = forestFlowers;
+	Handle<engine::Texture> terrainTex8 = forestStone;
+
+	Handle<engine::Texture> terrainTex9 = stylizedSnow;
+
+	Handle<engine::Texture> terrainTex10 = forestGrass;
+
+
+	// Remaining slots available for future use
+	// Handle<engine::Texture> terrainTex10 = beachSand;
+	// Handle<engine::Texture> terrainTex11 = beachGrass;
+	// Handle<engine::Texture> terrainTex12 = desertSand;
+	// Handle<engine::Texture> terrainTex13 = desertGrass;
+	// Handle<engine::Texture> terrainTex14 = forestGrass;
+	// Handle<engine::Texture> terrainTex15 = stylizedSnow;
+
+
+	// Using Terrain Grass Texture for Grass Instances
+	Handle<engine::Texture> grassBladeTex = forestGrass;
 	
 	Handle<engine::Cubemap> skyboxCubemap = assets.loadCubemap("daySkybox", {
 		"textures/skybox/px.png",
@@ -788,18 +867,45 @@ void MyGame::init(engine::AssetManager& assets,
 	mat->specTex = charBaseTex;
 
 	// Terrain Material
+	// Terrain Material
 	Handle<engine::Material> terrainMat = assets.loadMaterial("terrainMat");
 	mat = assets.getMaterial(terrainMat);
 
 	mat->shader = renderer.getTerrainShader();
 	mat->renderMode = engine::RenderMode::Terrain;
 
-	mat->splat0 = terrainSplat0;
+	// Splatmaps
+	mat->splatMaps[0] = terrainSplat0;
+	mat->splatMaps[1] = terrainSplat1;
+	mat->splatMaps[2] = terrainSplat2;
 
-	mat->terrainGrass = terrainGrass;
-	mat->terrainSand = terrainSand;
-	mat->terrainRock = terrainRock;
-	mat->terrainSnow = terrainSnow;
+	mat->splatMapCount = 4;
+
+	// Terrain textures.
+	// Splatmap 0 RGBA controls textures 0-3.
+	// Splatmap 1 RGBA controls textures 4-7.
+	// Splatmap 2 RGBA controls textures 8-11.
+
+
+	mat->terrainTextures[0] = desertSand;
+	mat->terrainTextures[1] = desertStone;
+	mat->terrainTextures[2] = desertGrass;
+
+	mat->terrainTextures[3] = beachSand;
+	mat->terrainTextures[4] = beachStone;
+	mat->terrainTextures[5] = beachGrass;
+
+	mat->terrainTextures[6] = forestGrass;
+	mat->terrainTextures[7] = forestFlowers;
+	mat->terrainTextures[8] = forestStone;
+
+	mat->terrainTextures[9] = stylizedSnow;
+	mat->terrainTextures[10] = terrainTex10;
+
+	mat->terrainTextureCount = 11;
+
+	mat->terrainHeightTex = terrainHeightTex;
+
 	mat->ambient = glm::vec3(0.25f);
 	mat->diffuse = glm::vec3(1.0f);
 	mat->specular = glm::vec3(0.05f);
@@ -925,11 +1031,13 @@ void MyGame::init(engine::AssetManager& assets,
 		grassRenderer->windSpeed = 1.2f;
 
 		// Splatmapping Filtering 
-		grassRenderer->splatmap = terrainSplat0;
+		grassRenderer->splatmap = terrainSplat1;
 		grassRenderer->useSplatmapPlacement = true;
-		grassRenderer->minGrassSplatWeight = 0.35f;
+		grassRenderer->minGrassSplatWeight = 0.15f;
 		grassRenderer->maxPlacementAttemptsMultiplier = 3;
-		grassRenderer->setSplatTextureCpu(assets.getTexture(terrainSplat0));
+
+		// changed because grass is now on terrainsplat1
+		grassRenderer->setSplatTextureCpu(assets.getTexture(terrainSplat1));
 
 		// Clumping Noise
 		grassRenderer->useDensityNoise = true;
