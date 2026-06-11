@@ -73,7 +73,8 @@ namespace engine
 				"EngineLighting", "shaders/passthrough.vert", "shaders/lighting.frag");
 
 			assets.setDefaultShader(_baseShader);
-			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height));
+			addRenderPass(std::make_unique<DeferredGeometryPass>(_width, _height, _baseShader,
+				_terrainShader, _skinnedShader));
 			addRenderPass(std::make_unique<DeferredLightingPass>(_width, _height, lightingShader));
 			addRenderPass(std::make_unique<SkyboxRenderPass>(skyboxShader));
 			addRenderPass(std::make_unique<WaterPass>(_width, _height));
@@ -165,7 +166,12 @@ namespace engine
 		}
 
 		// Blit processed frame to screen
+		//startTime = glfwGetTime();
 		_blitPass->execute(scene, assets, _ctx);
+		//glFinish();
+		//endTime = glfwGetTime();
+		//if (frameCount == 0)
+			//std::cout << "Blit pass: " << (endTime - startTime) * 1000.0 << "ms\n";
 
 		frameCount = (frameCount + 1) % 1000;
 	}
