@@ -123,39 +123,40 @@ namespace engine
 		);
 	}
 
+	// GrassRenderer.cpp
+
 	static float sampleGrassSplatWeight(const engine::Texture* splatTexture, float u, float v)
 	{
 		if (!splatTexture)
-		{
 			return 1.0f;
-		}
 
 		const auto& pixels = splatTexture->getPixels();
 		const int width = splatTexture->getWidth();
 		const int height = splatTexture->getHeight();
 		const int channels = splatTexture->getChannels();
 
-		if (pixels.empty() || width <= 0 || height <= 0 || channels <= 0)
-		{
+		if (pixels.empty() || width <= 0 || height <= 0 || channels < 3)
 			return 1.0f;
-		}
 
 		u = glm::clamp(u, 0.0f, 1.0f);
 		v = glm::clamp(v, 0.0f, 1.0f);
 
 		const int x = static_cast<int>(u * static_cast<float>(width - 1));
 		const int y = static_cast<int>(v * static_cast<float>(height - 1));
-
 		const int index = (y * width + x) * channels;
 
-		// terrain.frag says:
-		// red   = grass
-		// green = sand
-		// blue  = rock
-		// alpha = snow
-		const unsigned char red = pixels[index + 0];
+		float r = pixels[index + 0] / 255.0f;
+		float g = pixels[index + 1] / 255.0f;
+		float b = pixels[index + 2] / 255.0f;
+		float a = channels >= 4 ? pixels[index + 3] / 255.0f : 0.0f;
 
-		return static_cast<float>(red) / 255.0f;
+		// Current 4-layer system:
+		// r = grass
+		// g = sand
+		// b = stone
+		// a = snow
+
+		return b;
 	}
 
 	void GrassRenderer::updatePatchesAround(const glm::vec3& playerPos)

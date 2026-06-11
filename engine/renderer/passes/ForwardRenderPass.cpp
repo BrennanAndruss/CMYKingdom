@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+
 #include "core/Time.h"
 #include "renderer/RenderContext.h"
 #include "renderer/resources/Shader.h"
@@ -40,8 +41,7 @@ namespace engine
 		_waterSceneCopy.resize(width, height);
 	}
 
-	void ForwardRenderPass::execute(const Scene& scene, const AssetManager& assets, 
-		RenderContext& ctx)
+	void ForwardRenderPass::execute(const Scene& scene, const AssetManager& assets, RenderContext& ctx)
 	{
 		_framebuffer.bind();
 		glStencilMask(0xFF);
@@ -53,13 +53,11 @@ namespace engine
 		const CameraData& camData = camera->getCameraData();
 		Frustum frustum = Frustum::fromMatrix(camData.projection * camData.view);
 
-		// Cull and draw
 		for (const auto& object : scene.getRootObjects())
 		{
 			drawObjectCulled(object, scene, assets, frustum, camera, false, nullptr);
 		}
 
-		// Copy opaque scene into a texture pair we can safely sample from when drawing water.
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, _framebuffer.getFboId());
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _waterSceneCopy.getFboId());
 		glBlitFramebuffer(
@@ -70,13 +68,11 @@ namespace engine
 		);
 		glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer.getFboId());
 
-		// Draw water after the scene has been captured.
 		for (const auto& object : scene.getRootObjects())
 		{
 			drawObjectCulled(object, scene, assets, frustum, camera, true, &_waterSceneCopy);
 		}
 
-		// Clean up state for next pass
 		glDisable(GL_STENCIL_TEST);
 		glStencilMask(0x00);
 		_framebuffer.unbind();
@@ -91,41 +87,33 @@ namespace engine
 		const Camera* camera, bool waterOnly, const Framebuffer* sceneCopy)
 	{
 		const bool isWaterObject = (object->name == "TempWaterPlane");
+
 		if (waterOnly != isWaterObject)
 		{
 			for (auto* childTransform : object->transform.getChildren())
 			{
 				if (Object* child = childTransform->owner)
-				{
 					drawObjectCulled(child, scene, assets, frustum, camera, waterOnly, sceneCopy);
-				}
 			}
 			return;
 		}
 
-		// Test object's hierarchy bbox
 		if (!object->transform.getChildren().empty())
 		{
-			// Test combined bbox to cull the subtree
 			BBox hierarchyBBox = object->getHierarchyBBox(assets);
 			if (!hierarchyBBox.intersectsFrustum(frustum))
-			{
-				// std::cout << "Culled " << object->name << " and its subtree\n";
 				return;
-			}
 		}
 
-		// Test object's own bbox
 		if (auto* mr = object->getComponent<MeshRenderer>())
 		{
 			const BBox& worldBBox = object->getWorldBBox(assets);
 			if (!worldBBox.intersectsFrustum(frustum))
-			{
 				return;
-			}
 
 			drawObject(object, scene, assets, camera, sceneCopy);
 		}
+
 		if (auto* grass = object->getComponent<GrassRenderer>())
 		{
 			glDisable(GL_CULL_FACE);
@@ -133,13 +121,10 @@ namespace engine
 			glEnable(GL_CULL_FACE);
 		}
 
-		// Recurse into children
 		for (auto* childTransform : object->transform.getChildren())
 		{
 			if (Object* child = childTransform->owner)
-			{
 				drawObjectCulled(child, scene, assets, frustum, camera, waterOnly, sceneCopy);
-			}
 		}
 	}
 
@@ -156,7 +141,6 @@ namespace engine
 		auto* shader = assets.getShader(mat->shader);
 		if (!shader) return;
 
-		// Write stencil
 		if (meshRenderer->writeStencil)
 		{
 			glEnable(GL_STENCIL_TEST);
@@ -179,7 +163,7 @@ namespace engine
 			irradianceMap = assets.getCubemap(scene.getIrradianceMap());
 			if (irradianceMap)
 			{
-				irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 10);
+				irradianceMap->bindToUnit(shader->getUniform("irradianceMap"), 15);
 				shader->setInt("useIrradianceMap", 1);
 				shader->setFloat("irradianceStrength", 1.2f);
 			}
@@ -216,53 +200,52 @@ namespace engine
 
 			if (sceneCopy)
 			{
-				const GLuint sceneColor = sceneCopy->getColorAttachment(0);
+				GLuint sceneColor = sceneCopy->getColorAttachment(0);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, sceneColor);
 				glUniform1i(shader->getUniform("u_sceneColorTex"), 0);
 
 				if (auto* noiseTex = assets.getTexture("waterNoiseTex"))
-				{
 					noiseTex->bindToUnit(shader->getUniform("u_noiseTex"), 1);
-				}
 
 				if (auto* terrainHeightTex = assets.getTexture(mat->terrainHeightTex))
-				{
 					terrainHeightTex->bindToUnit(shader->getUniform("u_terrainHeightTex"), 2);
-				}
 			}
 		}
-
-		// Bind textures
-		Texture* terrainSplat0 = nullptr;
-		Texture* terrainGrass = nullptr;
-		Texture* terrainSand = nullptr;
-		Texture* terrainRock = nullptr;
-		Texture* terrainSnow = nullptr;
 
 		Texture* difTex = nullptr;
 		Texture* specTex = nullptr;
 
 		if (mat->renderMode == RenderMode::Terrain)
 		{
-			terrainSplat0 = assets.getTexture(mat->splat0);
-			terrainGrass = assets.getTexture(mat->terrainGrass);
-			terrainSand = assets.getTexture(mat->terrainSand);
-			terrainRock = assets.getTexture(mat->terrainRock);
-			terrainSnow = assets.getTexture(mat->terrainSnow);
+			const int splatBaseUnit = 0;
+			const int terrainBaseUnit = 3;
 
-			if (terrainSplat0)
-				terrainSplat0->bindToUnit(shader->getUniform("splat0"), 0);
-			if (terrainGrass)
-				terrainGrass->bindToUnit(shader->getUniform("terrainGrass"), 1);
-			if (terrainSand)
-				terrainSand->bindToUnit(shader->getUniform("terrainSand"), 2);
-			if (terrainRock)
-				terrainRock->bindToUnit(shader->getUniform("terrainRock"), 3);
-			if (terrainSnow)
-				terrainSnow->bindToUnit(shader->getUniform("terrainSnow"), 4);
+			for (int i = 0; i < mat->splatMapCount; i++)
+			{
+				if (auto* t = assets.getTexture(mat->splatMaps[i]))
+				{
+					t->bindToUnit(
+						shader->getUniform("splatMaps[" + std::to_string(i) + "]"),
+						splatBaseUnit + i
+					);
+				}
+			}
 
+			for (int i = 0; i < mat->terrainTextureCount; i++)
+			{
+				if (auto* t = assets.getTexture(mat->terrainTextures[i]))
+				{
+					t->bindToUnit(
+						shader->getUniform("terrainTextures[" + std::to_string(i) + "]"),
+						terrainBaseUnit + i
+					);
+				}
+			}
+
+			shader->setInt("splatMapCount", mat->splatMapCount);
+			shader->setInt("terrainTextureCount", mat->terrainTextureCount);
 			shader->setFloat("terrainTextureTiling", mat->terrainTextureTiling);
 		}
 		else
@@ -270,23 +253,26 @@ namespace engine
 			difTex = assets.getTexture(mat->difTex);
 			specTex = assets.getTexture(mat->specTex);
 
-			if (difTex)  difTex->bind(shader->getUniform("mat.difTex"));
+			if (difTex) difTex->bind(shader->getUniform("mat.difTex"));
 			if (specTex) specTex->bind(shader->getUniform("mat.specTex"));
 		}
 
-		// Bone matrices for skinned meshes
 		Animator* animator = nullptr;
 		if (mesh->isSkinned() && (animator = object->getComponent<Animator>()))
 		{
 			const auto& boneMatrices = animator->getBoneMatrices();
 			const int numBones = static_cast<int>(
 				std::min(boneMatrices.size(), MAX_SHADER_BONES));
+
 			shader->setInt("isSkinned", 1);
 			shader->setInt("numBones", numBones);
+
 			for (int i = 0; i < numBones; ++i)
 			{
-				shader->setMat4("bones[" + std::to_string(i) + "]",
-					boneMatrices[static_cast<std::size_t>(i)]);
+				shader->setMat4(
+					"bones[" + std::to_string(i) + "]",
+					boneMatrices[static_cast<std::size_t>(i)]
+				);
 			}
 		}
 
@@ -302,18 +288,29 @@ namespace engine
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 
-		if (terrainSplat0)	terrainSplat0->unbindFromUnit(0);
-		if (terrainGrass)	terrainGrass->unbindFromUnit(1);
-		if (terrainSand)	terrainSand->unbindFromUnit(2);
-		if (terrainRock)	terrainRock->unbindFromUnit(3);
-		if (terrainSnow)	terrainSnow->unbindFromUnit(4);
-		if (difTex)			difTex->unbind();
-		if (specTex)		specTex->unbind();
+		if (mat->renderMode == RenderMode::Terrain)
+		{
+			const int splatBaseUnit = 0;
+			const int terrainBaseUnit = 3;
+
+			for (int i = 0; i < mat->splatMapCount; i++)
+			{
+				if (auto* t = assets.getTexture(mat->splatMaps[i]))
+					t->unbindFromUnit(splatBaseUnit + i);
+			}
+
+			for (int i = 0; i < mat->terrainTextureCount; i++)
+			{
+				if (auto* t = assets.getTexture(mat->terrainTextures[i]))
+					t->unbindFromUnit(terrainBaseUnit + i);
+			}
+		}
+
+		if (difTex) difTex->unbind();
+		if (specTex) specTex->unbind();
 
 		if (irradianceMap)
-		{
-			irradianceMap->unbindFromUnit(10);
-		}
+			irradianceMap->unbindFromUnit(15);
 
 		shader->unbind();
 	}
