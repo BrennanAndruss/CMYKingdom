@@ -1064,7 +1064,7 @@ void MyGame::init(engine::AssetManager& assets,
 		grassRenderer->usePatchStreaming = true;
 		// Grass Patches
 		grassRenderer->patchSize = 25.0f;
-		grassRenderer->patchRadius = 2;
+		grassRenderer->patchRadius = 5;
 		grassRenderer->bladesPerPatch = 2500;
 		grassRenderer->reloadDistance = 25.0f; // not needed anymore 
 		// Grass Mesh Data

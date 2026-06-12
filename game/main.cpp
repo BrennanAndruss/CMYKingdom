@@ -11,10 +11,10 @@ extern "C" {
 
 int main() {
     engine::AppConfig config;
-    config.title = "My Game";
-    config.width = 640;
-    config.height = 480;
-    config.fullscreen = true;
+    config.title = "CMYKingdom";
+    config.width = 1500;
+    config.height = 800;
+    config.fullscreen = false;
     config.renderingPath = engine::RenderingPath::Deferred;
     config.defaultScene = "scene_objects";
 

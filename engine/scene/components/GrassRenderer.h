@@ -68,12 +68,12 @@ namespace engine
 		float maxBend = 0.35f;
 
 		glm::vec3 centerPosition = glm::vec3(0.0f);
-		float spawnRadius = 75.0f;
+		float spawnRadius = 800.0f;
 		float reloadDistance = 20.0f;
 
 		// Patch Variables
 		BBox worldBounds;
-		bool usePatchStreaming = true;
+		bool usePatchStreaming = false;
 
 		float patchSize = 25.0f;
 		int patchRadius = 3;
