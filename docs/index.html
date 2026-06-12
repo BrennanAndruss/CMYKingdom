@@ -73,6 +73,11 @@
       margin: 1em 0;
     }
 
+    iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+
     body {
       background: rgb(22, 24, 25);
     }
@@ -90,7 +95,7 @@
       display: flex;
       justify-content: center;
 
-      background: url("images/jumbotron.png");
+      background: url("images/jumbotron.jpg");
       background-size: cover;
       background-position: 0 50%;
     }
@@ -107,16 +112,19 @@
   <div class="container">
     <h2>Description</h2>
     <p>
-      Made over 10 weeks with C++ and OpenGL for CSC 476: Real-time 3D Computer Graphics Software.
+      You find yourself in a magical kingdom void of color. Your quest is to explore the region to
+      collect cyan, magenta, and yellow gems to restore color to the world!
+    </p>
+    <p>
+      CMYKingdom was made over 10 weeks with C++ and OpenGL for CSC 476: Real-time 3D Computer 
+      Graphics Software.
     </p>
 
-    <img src="../assets/images/gamepicture.png" alt="Game screenshot" />
+    <img src="images/forest.png" alt="Game screenshot" />
 
     <h2>Video</h2>
     <p>
-      <a href="https://youtu.be/f-BxPDLBmBU" target="_blank" rel="noopener noreferrer">
-        Minimal gameplay demo video with 1 max gem count for each pigment
-      </a>
+      <iframe src="https://www.youtube.com/embed/f-BxPDLBmBU?si=vCWONCKFgguzGPNW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </p>
 
     <hr />
@@ -133,6 +141,8 @@
         <li>WASD: Movement</li>
         <li>Shift/Space: Move Up/Down</li>
         <li>Arrows: Rotation</li>
+        <li>Selection: Click object colliders</li>
+        <li>Various toggles in editor windows</li>
     </p>
 
     <h3>Debugs</h3>
@@ -151,7 +161,70 @@
         <li>F8: Toggle Post-processing</li>
     </p>
 
-    <h2>Contributions</h2>
+    <hr>
+
+    <h2>Technologies</h2>
+    <h3>Scene Organization</h3>
+    <p>
+        We implemented a component-based object system for scene organization, with hierarchy
+        handled through Transform classes owned by each object. Hierarchy is implemented in the
+        Transform class to handle local and world space transformations. The hierarchy enables
+        grouping of objects to support shadow mapping and speed up <b>view frustum culling</b>.
+    </p>
+    <p>
+        The engine has various components for key object functionality, and additional components 
+        can be created and added to function as "script" components. Objects and components are 
+        created in the game-side code and added to the scene.
+    </p>
+    <p>
+        The scene class holds references to various scene components, including cameras and lights.
+        The main camera can be switched during runtime, used to switch between gameplay and editor
+        cameras. The list of lights and objects are fetched by the renderer for render passes.
+    </p>
+
+    <h3>Complex Environment</h3>
+    <p>
+        <!--could also include instanced grass and water here-->
+        The terrain was scuplted and textured using Unity's terrain tool. The heightmaps and splatmaps
+        are exported and loaded into our engine, where the heightmap is used to generate a mesh and
+        heightmap collider and the splatmaps are used for the terrain shader.
+
+        Additional game-side shaders for the environment included the water shader and instanced-rendered
+        grass shader
+    </p>
+
+    <h3>Physics and Collisions</h3>
+    <p>
+        To handle <b>collision detection</b> efficiently with a heightmap terrain and lots of assets,
+        we integrated the Bullet Physics library. Setup is handled in the engine's physics system, 
+        and components for rigidbodies and various colliders are implemented to sync the Bullet 
+        physics world with the engine-side object transforms for accurate rendering.
+    </p>
+
+    <h3>Render Pipeline</h3>
+    <p>
+        We implemented a modular render pipeline extensible with various render passes. Rendering
+        techniques used include <b>deferred rendering</b>, <b>HDR rendering</b>, skybox rendering, 
+        and <b>screen-space refractions</b> for water rendering.
+    </p>
+
+    <h3>Cascade Shadow Mapping</h3>
+    <p>
+        To support a large complex environment, <b>cascade shadow mapping</b> is implemented. 
+        Additionally, percentage closer filtering with poisson disk sampling and shadow samplers are 
+        used to create soft shadows.
+    </p>
+
+    <h3>Level Editor</h3>
+    <p>
+
+    </p>
+
+    <img src="images/grayscale.png" alt="Game screenshot" />
+
+    <hr />
+
+        <h2>Contributions</h2>
     <p>
         Brennan
         <ul>
@@ -199,59 +272,6 @@
             <li>Power-ups and UI</li>
         </ul>
     </p>
-
-    <h2>Technologies</h2>
-    <h3>Scene Organization</h3>
-    <p>
-        We implemented a component-based object system for scene organization, with hierarchy
-        handled through Transform classes owned by each object. Hierarchy is implemented in the
-        Transform class to handle local and world space transformations. The hierarchy enables
-        grouping of objects to support shadow mapping and speed up <b>view frustum culling</b>.
-    </p>
-    <p>
-        The engine has various components for key object functionality, and additional components 
-        can be created and added to function as "script" components. Objects and components are 
-        created in the game-side code and added to the scene.
-    </p>
-    <p>
-        The scene class holds references to various scene components, including cameras and lights.
-        The main camera can be switched during runtime, used to switch between gameplay and editor
-        cameras. The list of lights and objects are fetched by the renderer for render passes.
-    </p>
-
-    <h3>Complex Environment</h3>
-    <p>
-        <!--could also include instanced grass and water here-->
-    </p>
-
-    <h3>Physics and Collisions</h3>
-    <p>
-        To handle <b>collision detection</b> efficiently with a heightmap terrain and lots of assets,
-        we integrated the Bullet Physics library. Setup is handled in the engine's physics system, 
-        and components for rigidbodies and various colliders are implemented to sync the Bullet 
-        physics world with the engine-side object transforms for accurate rendering.
-    </p>
-
-    <h3>Render Pipeline</h3>
-    <p>
-        We implemented a modular render pipeline extensible with various render passes. Rendering
-        techniques used include <b>deferred rendering</b>, <b>HDR rendering</b>, skybox rendering, 
-        and <b>screen-space refractions</b> for water rendering.
-    </p>
-
-    <h3>Cascade Shadow Mapping</h3>
-    <p>
-        To support a large complex environment, <b>cascade shadow mapping</b> is implemented. 
-        Additionally, percentage closer filtering with poisson disk sampling and shadow samplers are 
-        used to create soft shadows.
-    </p>
-
-    <h3>Level Editor</h3>
-    <p>
-
-    </p>
-
-    <hr />
 
     <h3>Resources</h3>
     <p>
