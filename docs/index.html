@@ -24,6 +24,7 @@
     h1,
     h2,
     h3,
+    h4,
     p,
     li {
       color: rgb(232, 230, 227);
@@ -36,7 +37,8 @@
     }
 
     h1,
-    h2 {
+    h4 {
+      text-align: center;
       text-shadow: 2px 2px 2px black;
     }
 
@@ -54,8 +56,14 @@
       margin-top: 1em;
     }
 
-    p {
+    h4 {
       font-size: 1.25em;
+      margin-top: 1em;
+      text-shadow: 1px 1px 1px black;
+    }
+
+    p {
+      font-size: 1.1em;
       margin: 1em 0;
     }
 
@@ -95,7 +103,7 @@
       display: flex;
       justify-content: center;
 
-      background: url("images/jumbotron.jpg");
+      background: url("images/jumbotron.png");
       background-size: cover;
       background-position: 0 50%;
     }
@@ -106,14 +114,15 @@
   <div class="jumbotron">
     <div class="container">
       <h1>CMYKingdom</h1>
-      <p>Brennan Andruss, Camila Yeremin, Hahns Pena, Joaquin Arredondo, Lori Gavia</p>
+      <h4>Brennan Andruss, Camila Yeremin, Hahns Pena, Joaquin Arredondo, Lori Gavia</h4>
     </div>
   </div>
   <div class="container">
     <h2>Description</h2>
     <p>
-      You find yourself in a magical kingdom void of color. Your quest is to explore the region to
-      collect cyan, magenta, and yellow gems to restore color to the world!
+      You find yourself in a magical kingdom void of color. Your quest is to explore the world to
+      collect cyan, magenta, and yellow crystals scattered throughout the land to restore color 
+      to the kingdom!
     </p>
     <p>
       CMYKingdom was made over 10 weeks with C++ and OpenGL for CSC 476: Real-time 3D Computer 
@@ -188,10 +197,13 @@
         The terrain was scuplted and textured using Unity's terrain tool. The heightmaps and splatmaps
         are exported and loaded into our engine, where the heightmap is used to generate a mesh and
         heightmap collider and the splatmaps are used for the terrain shader.
-
-        Additional game-side shaders for the environment included the water shader and instanced-rendered
-        grass shader
     </p>
+    <p>
+        Additional game-side shaders for the environment included the water shader and instanced-rendered
+        grass shader.
+    </p>
+
+    <img src="gifs/wind.gif"/>
 
     <h3>Physics and Collisions</h3>
     <p>
@@ -200,6 +212,15 @@
         and components for rigidbodies and various colliders are implemented to sync the Bullet 
         physics world with the engine-side object transforms for accurate rendering.
     </p>
+
+    <h3>Skeletal Animation</h3>
+    <p>
+        Our player character has an array of animations, driven by skinned skeletal animation and
+        blending between animations. Animation and other asset loading is handled with Assimp, and our
+        character model and animations were hand-made!
+    </p>
+
+    <img src="gifs/animation.gif"/>
 
     <h3>Render Pipeline</h3>
     <p>
@@ -211,16 +232,21 @@
     <h3>Cascade Shadow Mapping</h3>
     <p>
         To support a large complex environment, <b>cascade shadow mapping</b> is implemented. 
-        Additionally, percentage closer filtering with poisson disk sampling and shadow samplers are 
+        Percentage closer filtering with poisson disk sampling and shadow samplers are 
         used to create soft shadows.
     </p>
 
+    <img src="images/grayscale.png" alt="Game screenshot" />
+
+
     <h3>Level Editor</h3>
     <p>
-
+      To build out our world, we implemented an in-game level editor to handle editing and creating
+      objects and their components. The editor enables saving and loading of scenes, allowing for a 
+      customizable experience traveling through the world.
     </p>
 
-    <img src="images/grayscale.png" alt="Game screenshot" />
+    <img src="images/editor.png" alt="Game screenshot" />
 
     <hr />
 
@@ -248,7 +274,7 @@
     <p>
         Hahns
         <ul>
-            <li>Editor</li>
+            <li>Level Editor</li>
             <li>Level Design</li>
             <li>Player Controller</li>
             <li>Physics Integration</li>
@@ -269,9 +295,11 @@
             <li>Environment Mapping</li>
             <li>Character Modeling and Animation</li>
             <li>Player Controller</li>
-            <li>Power-ups and UI</li>
+            <li>Power-ups and Game UI</li>
         </ul>
     </p>
+
+    <img src="images/loading.png" alt="Game screenshot" />
 
     <h3>Resources</h3>
     <p>
@@ -311,22 +339,17 @@
     </li>
     <br />
 
-    <p><b>Libraries</b></p>
-    <li>Bullet Physics</li>
-    <li>Imgui</li>
-    <li>Assimp</li>
-    <li>Miniaudio</li>
-    <li>GLFW</li>
-    <li>GLM</li>
     <br />
-
-    <hr />
-
     <p>
       <b>Source Code</b>:
       <a href="https://github.com/BrennanAndruss/GL-Engine" target="_blank"
         >CMYKingdom</a
       >
     </p>
+
+    <hr />
+
+    <img src="images/group.jpg" alt="Game screenshot" />
+    <p style="text-align: center; margin-top: 0">Made with ❤️</p>
   </div>
 </body>
